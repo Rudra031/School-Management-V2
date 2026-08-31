@@ -3,10 +3,11 @@
 [![Django](https://img.shields.io/badge/Django-5.2+-092e20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![Python](https://img.shields.io/badge/Python-3.12+-3776ab?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3+-7952b3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
+[![Three.js](https://img.shields.io/badge/Three.js-3D%20WebGL-black?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Test Suite](https://img.shields.io/badge/Test%20Suite-85%2F85%20Passing%20(100%25)-success?style=for-the-badge)](https://github.com/Rudra031/School-Management-V2)
 [![Trial Version](https://img.shields.io/badge/Evaluation-7--Day%20Free%20Trial-orange?style=for-the-badge)](mailto:rudrasarkar02@gmail.com)
 
-A modern, enterprise-grade, multi-role School Management & Academic Administration Platform engineered with **Python 3.12+**, **Django 5.2+**, **Bootstrap 5**, and **HMAC-SHA256 Cryptographic Licensing**.
+A modern, enterprise-grade, multi-role School Management & Academic Administration Platform engineered with **Python 3.12+**, **Django 5.2+**, **Bootstrap 5**, **Interactive 3D Three.js WebGL**, and **HMAC-SHA256 Cryptographic Licensing**.
 
 ---
 
@@ -32,14 +33,77 @@ A modern, enterprise-grade, multi-role School Management & Academic Administrati
 ---
 
 ## 📑 Table of Contents
-1. [Specialized Manuals & Guides](#-specialized-manuals--guides-docs)
-2. [Key Capabilities & Modules](#-key-capabilities--modules)
-3. [Role-Based Access Control & Demo Credentials](#-role-based-access-control--demo-credentials)
-4. [System Architecture](#-system-architecture)
-5. [Software License & 1-Time Activation Flow](#-software-license--1-time-activation-flow)
-6. [Project Directory Structure](#-project-directory-structure)
-7. [Quick Start & Installation Guide](#-quick-start--installation-guide)
-8. [Automated Test Suite](#-automated-test-suite)
+1. [Super Attractive 3D Public Landing Page & Web Studio](#-super-attractive-3d-public-landing-page--web-studio)
+2. [Specialized Manuals & Guides](#-specialized-manuals--guides-docs)
+3. [Key Capabilities & Modules](#-key-capabilities--modules)
+4. [Role-Based Access Control & Demo Credentials](#-role-based-access-control--demo-credentials)
+5. [System Architecture](#-system-architecture)
+6. [Software License & 1-Time Activation Flow](#-software-license--1-time-activation-flow)
+7. [Project Directory Structure](#-project-directory-structure)
+8. [Quick Start & Installation Guide](#-quick-start--installation-guide)
+9. [Automated Test Suite](#-automated-test-suite)
+
+---
+
+## 🌐 Super Attractive 3D Public Landing Page & Web Studio (`/`)
+
+The platform includes a stunning, award-worthy public-facing school website powered by **Three.js WebGL**, fluid glassmorphism, responsive micro-interactions, and a real-time **No-Code Visual Studio Customizer** (`/customizer/`).
+
+```text
++-------------------------------------------------------------------------------------------------+
+|                               HORIZON INTERNATIONAL ACADEMY                                    |
+| [✨ Interactive 3D WebGL Mesh]   [📢 Rolling Live News Ticker]   [⚡ Fast Online Admissions]     |
+| [🎓 Stream / Course Explorer]    [📊 99.4% Pass Rate Stats]     [🏛️ Virtual 360 Campus Tour]   |
++-------------------------------------------------------------------------------------------------+
+```
+
+### 🌟 High-Impact Landing Page Features:
+
+#### 1. 🌌 Interactive 3D Three.js WebGL Hero Canvas
+- **Kinetic 3D Depth**: Interactive floating geometric polyhedra, particle vortexes, and dynamic celestial nebulae that respond smoothly to mouse movement and cursor parallax.
+- **4 Real-Time WebGL Modes**:
+  - *Floating Geometric Polyhedra & Nebula* (Default Prestige)
+  - *Ambient Particle Vortex*
+  - *Minimal 3D Horizon Grid*
+  - *Static Luxury CSS Mesh Gradient* (Reduced motion / lightweight fallback)
+- **Performance Engine**: 60 FPS hardware-accelerated WebGL with automatic battery & mobile device throttling.
+
+#### 2. 🎨 No-Code Visual Studio Customizer (`/customizer/`)
+- **5 Built-in Institutional Theme Presets**:
+  1. 🏛️ **Academic Prestige**: Deep slate, obsidian, and royal gold accents.
+  2. 🌊 **Modern Blue**: Navy, electric indigo, and cyan highlights.
+  3. 🌿 **Emerald Academy**: Deep forest green, jade, and sage.
+  4. ☀️ **Minimal Light**: Crisp frosted white, slate, and violet.
+  5. 🔮 **Premium Dark**: Obsidian black, neon violet, and cyan glows.
+- **Real-Time Palette & Typography Tuning**: Change branding colors, Google Fonts (`Geist`, `Inter`, `Hanken Grotesk`), card corner radius, container widths, and inject custom CSS/JS on-the-fly without restarting the server.
+
+#### 3. 📢 Real-Time Rolling Circulars & Notice Ticker
+- High-visibility marquee ticker announcing breaking school alerts, exam dates, holiday notices, and admissions deadlines.
+
+#### 4. 📚 Interactive Curriculum & Stream Explorer
+- Visual stream cards covering **Pre-Primary (Montessori)**, **Primary (Grades 1–5)**, **Middle School (Grades 6–8)**, **Secondary (Grades 9–10)**, and **Senior Secondary (Science, Commerce, Humanities)** with subject breakdowns and downloadable syllabus PDFs.
+
+#### 5. 📈 Animated Milestone & Key Stats Counter
+- Live animated counters showcasing institutional achievements:
+  - 🏆 **99.4%** CBSE Board Distinction Rate
+  - 🎓 **100+** Top University Placements
+  - 🔬 **35+** Advanced Science & Robotics Labs
+  - 🎒 **4,000+** Active Students Enrolled
+
+#### 6. 🏛️ Campus Infrastructure & Laboratory Tour Gallery
+- Filterable, high-resolution media gallery highlighting Smart Classrooms, Computer Laboratories, Olympic Swimming Pool, Library Vault, and Indoor Sports Arena.
+
+#### 7. 👨‍🏫 Faculty Leadership & Department Showcase
+- Interactive faculty profile cards detailing academic qualifications, awards, research papers, and subject expertise.
+
+#### 8. 💬 Parent, Student & Alumni Testimonial Carousel
+- Verified parent reviews, student accolades, and alumni success stories with star ratings and authentic quotes.
+
+#### 9. 📝 Instant Online Admissions Inquiry & Lead Capture
+- Prospective parents can submit admission inquiries online with instant validation, generating automated lead tickets directly in the **Admissions Pipeline** (`/admissions/pipeline/`).
+
+#### 10. 📍 Campus Visit & Contact Hub
+- Interactive contact dispatch form, direct phone/email hotlines, office working hours, and embedded Google Maps geolocation.
 
 ---
 
@@ -131,6 +195,12 @@ All demonstration accounts are seeded with password: `Password@123`
 graph TD
     UserBrowser([End User Browser]) --> AuthRouter{Multi-Role Dashboard Router}
     
+    subgraph Public Web Layer
+        UserBrowser --> WebGL[🌐 3D WebGL Public Landing Page]
+        WebGL --> Customizer[🎨 No-Code Visual Studio Customizer]
+        WebGL --> PublicLeads[📝 Online Admissions Inquiry]
+    end
+
     subgraph Core & RBAC Layer
         AuthRouter --> SuperAdmin[👑 Super Administrator]
         AuthRouter --> Principal[🎓 Principal / Head of School]
@@ -213,7 +283,7 @@ school_management/
 ├── inventory/                  # Asset management & custody
 ├── expenses/                   # Operating expense vouchers
 ├── reports/                    # Reports hub & analytics
-├── website/                    # School marketing homepage
+├── website/                    # School marketing homepage & 3D WebGL customizer
 ├── templates/                  # Frontend UI templates
 └── README.md                   # 🏫 Root Master Project Overview
 ```
@@ -241,15 +311,17 @@ pip install -r requirements.txt
 # Run database migrations
 python manage.py migrate
 
-# Seed complete demo data (superadmin, teachers, students, parents, courses)
+# Seed complete demo data (superadmin, teachers, students, parents, courses, website)
 python manage.py seed_demo_data
+python manage.py seed_website
 ```
 
 ### 3. Launch Development Server
 ```powershell
 python manage.py runserver
 ```
-Open **`http://127.0.0.1:8000/accounts/login/`** in your browser and use any of the **Demo Fast-Fill** persona buttons to log in instantly!
+- Open **`http://127.0.0.1:8000/`** to experience the **3D Interactive Public Landing Page**.
+- Open **`http://127.0.0.1:8000/accounts/login/`** in your browser and use any of the **Demo Fast-Fill** persona buttons to log in to the administrative portal!
 
 ---
 
@@ -263,7 +335,7 @@ python manage.py test
 
 > **Test Suite Output**:
 > ```text
-> Ran 85 tests in 168.316s
+> Ran 85 tests in 187.153s
 > OK
 > ```
 

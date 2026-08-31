@@ -18,7 +18,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Horizon Design System 2026 -->
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4.3">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=6.0">
+  {% include "includes/sidebar_styles.html" %}
+
 
   <!-- Inline theme & sidebar init to prevent flash -->
   <script>
@@ -81,6 +83,112 @@
       <!-- Navigation Menu -->
       <ul class="sidebar-menu" id="sidebarMenu">
 
+        {% if user.is_student %}
+        <!-- STUDENT ACADEMIC HUB -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Student Portal</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'accounts:student_dashboard' %}" class="sidebar-link {% if request.path == '/accounts/dashboard/student/' or 'student_dashboard' in request.resolver_match.url_name %}active{% endif %}" data-magnetic="true" data-tooltip="Dashboard">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-gauge-high text-primary"></i></span>
+            <span class="sidebar-link-text">Academic Hub</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'students:my_timetable' %}" class="sidebar-link {% if 'my-timetable' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Class Timetable">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-calendar-week text-info"></i></span>
+            <span class="sidebar-link-text">My Class Timetable</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'students:my_attendance' %}" class="sidebar-link {% if 'my-attendance' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Attendance">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-calendar-check text-success"></i></span>
+            <span class="sidebar-link-text">Attendance Ledger</span>
+            <span class="sidebar-counter-badge badge-live">Live</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'assignments:list' %}" class="sidebar-link {% if 'assignments' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Homework">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-book-open text-warning"></i></span>
+            <span class="sidebar-link-text">Homework &amp; Tasks</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'examinations:admit_card' %}" class="sidebar-link {% if 'admit-card' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Admit Card">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-id-badge text-danger"></i></span>
+            <span class="sidebar-link-text">Exam Admit Card</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        {% if user.student_profile %}
+        <li class="sidebar-item">
+          <a href="{% url 'students:id_card' user.student_profile.pk %}" class="sidebar-link" target="_blank" data-magnetic="true" data-tooltip="Digital ID">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-id-card text-info"></i></span>
+            <span class="sidebar-link-text">Digital ID Card</span>
+            <span class="sidebar-counter-badge badge-cr80">CR80</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        {% endif %}
+        <li class="sidebar-item">
+          <a href="{% url 'communication:notice_board' %}" class="sidebar-link {% if 'communication' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Notices">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-bullhorn text-violet"></i></span>
+            <span class="sidebar-link-text">School Notices</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% if user.is_parent %}
+        <!-- PARENT & GUARDIAN HUB -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Parent Hub</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'accounts:parent_dashboard' %}" class="sidebar-link {% if request.path == '/accounts/dashboard/parent/' or 'parent_dashboard' in request.resolver_match.url_name %}active{% endif %}" data-magnetic="true" data-tooltip="Parent Portal">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-users-rectangle text-primary"></i></span>
+            <span class="sidebar-link-text">Parent Command Hub</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'parents:ward_timetable' %}" class="sidebar-link {% if 'ward-timetable' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Ward Timetable">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-calendar-days text-info"></i></span>
+            <span class="sidebar-link-text">Ward Timetable</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'parents:ward_leave' %}" class="sidebar-link {% if 'apply-leave' in request.path or 'ward_leave' in request.resolver_match.url_name %}active{% endif %}" data-magnetic="true" data-tooltip="Apply Leave">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-plane-departure text-warning"></i></span>
+            <span class="sidebar-link-text">Apply for Ward Leave</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'fees:invoice_list' %}" class="sidebar-link {% if 'fees' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Invoices">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-receipt text-success"></i></span>
+            <span class="sidebar-link-text">Fee Invoices &amp; Receipts</span>
+            <span class="sidebar-counter-badge badge-pos">Receipts</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'communication:notice_board' %}" class="sidebar-link {% if 'communication' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Circulars">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-bullhorn text-violet"></i></span>
+            <span class="sidebar-link-text">School Circulars</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% if not user.is_student and not user.is_parent %}
         <!-- 1. CORE OVERVIEW -->
         <li class="sidebar-section-header">
           <span class="sidebar-section-title">Core Overview</span>
@@ -102,6 +210,8 @@
           </a>
         </li>
         {% endif %}
+        {% endif %}
+
 
         {% if user.is_superadmin or user.is_principal or user.is_school_admin %}
         <!-- 2. STUDENT ADMISSIONS & SIS -->

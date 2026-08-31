@@ -36,18 +36,22 @@ class Command(BaseCommand):
         
         # 1. School Setting Singleton
         setting, _ = SchoolSetting.objects.get_or_create(id=1, defaults={
-            'school_name': 'Horizon International Academy',
+            'name': 'Horizon Public School',
+            'code': 'HPS-DELHI',
             'tagline': 'Excellence in Leadership, Academics & Global Citizenship',
-            'email': 'contact@horizonacademy.edu',
-            'phone': '+1 (555) 234-5678',
-            'address': '750 Innovation Way, Silicon Valley, CA 94025',
-            'currency_symbol': '$',
-            'currency_code': 'USD',
-            'date_format': 'DD/MM/YYYY',
-            'academic_session_start_month': 8,
-            'max_students_per_section': 30,
+            'email': 'admissions@horizonpublicschool.edu.in',
+            'phone': '+91 (011) 2748-9012',
+            'address': 'Sector 14, Urban Estate, Rohini',
+            'city': 'New Delhi',
+            'state': 'Delhi (NCT)',
+            'country': 'India',
+            'currency_symbol': '₹',
+            'currency_code': 'INR',
+            'date_format': 'd M Y',
+            'attendance_threshold_percentage': 75.00,
         })
         self.stdout.write(self.style.SUCCESS('[1/18] School Setting configured.'))
+
 
         # 2. Academic Years
         today = timezone.now().date()
