@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏫 Horizon School Management & Administration System (SMS)
 
 [![Django](https://img.shields.io/badge/Django-5.2+-092e20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
@@ -185,3 +186,6 @@ Visit `http://127.0.0.1:8000/accounts/login/` and click any fast-fill role butto
 python manage.py test core accounts admissions website documents
 ```
 > Result: **58/58 tests passed (100% OK)**
+=======
+# School-Management-V2
+>>>>>>> 4b896103cae7d9e9257d1515593ee18c015a1cba
