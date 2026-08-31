@@ -17,7 +17,6 @@ A modern, enterprise-grade, multi-role School Management & Academic Administrati
 | 📖 [**User Guide (`docs/USER_GUIDE.md`)**](docs/USER_GUIDE.md) | School Admins, Teachers, Accountants, Parents & Students | Visual workflows, fast-fill login, admissions dual pipeline, fee invoicing, attendance matrix, and report card generation. |
 | 🛠️ [**Developer Guide (`docs/DEVELOPER_GUIDE.md`)**](docs/DEVELOPER_GUIDE.md) | Software Developers, DevOps & Vendors | System architecture, license generation, 1-time anti-replay security, remote license revocation, factory reset engine, and production deployment. |
 | 🚀 [**Deployment Guide (`docs/DEPLOYMENT_GUIDE.md`)**](docs/DEPLOYMENT_GUIDE.md) | System Administrators & IT Teams | Linux VPS setup, PostgreSQL 16 configuration, Gunicorn systemd daemon, Nginx reverse proxy, and SSL/TLS. |
-| 🔑 [**Licensing Guide (`docs/LICENSING_GUIDE.md`)**](docs/LICENSING_GUIDE.md) | Vendors & Commercial Operators | Cryptographic key generation, 1-year/lifetime keys, activation flow, and 3 revocation methods. |
 | 🎓 [**Admissions Guide (`docs/ADMISSIONS_GUIDE.md`)**](docs/ADMISSIONS_GUIDE.md) | Admission Staff & Registrars | Quick Admission, 1-click continuation, 10-step full dossier, and document uploads. |
 | 📂 [**Documentation Index (`docs/README.md`)**](docs/README.md) | All Users & Developers | Complete central documentation index and table of contents. |
 
