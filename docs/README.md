@@ -11,7 +11,6 @@ Welcome to the official documentation directory for **Horizon School Management 
 | 📖 [**User Guide (`USER_GUIDE.md`)**](USER_GUIDE.md) | School Administrators, Principals, Faculty, Accountants, Parents & Students | Visual workflows, UI mockups, Demo Fast-Fill logins, Dual Admissions pipeline (Quick vs Full), Attendance Matrix, Fee Invoicing, Exams & Gradebooks, Timetables, and Library Circulation. |
 | 🛠️ [**Developer Guide (`DEVELOPER_GUIDE.md`)**](DEVELOPER_GUIDE.md) | Software Developers, Maintainers & SaaS Vendors | Technical architecture, 18-app modular breakdown, test suite, HMAC-SHA256 cryptographic licensing engine, anti-replay nonce ledger, clock rollback protection, and database factory reset. |
 | 🚀 [**Deployment Guide (`DEPLOYMENT_GUIDE.md`)**](DEPLOYMENT_GUIDE.md) | DevOps Engineers, System Admins & IT Staff | Enterprise Linux (Ubuntu 22/24) deployment, PostgreSQL 16 setup, Gunicorn systemd daemon, Nginx reverse proxy, Certbot SSL/TLS, and automated backup schedules. |
-| 🔑 [**Licensing Guide (`LICENSING_GUIDE.md`)**](LICENSING_GUIDE.md) | Vendors & Commercial Operators | Quick reference cheatsheet for generating commercial keys, 1-year keys, lifetime keys, 3-step school activation flow, and 3 methods for deactivating/revoking licenses. |
 | 🎓 [**Admissions Guide (`ADMISSIONS_GUIDE.md`)**](ADMISSIONS_GUIDE.md) | Admission Officers & Registrars | Detailed guide on the Quick Admission fast-track, instant conversion, continuation into the 10-step dossier, document uploads (TC, marksheets), and printable admission letters. |
 
 ---
