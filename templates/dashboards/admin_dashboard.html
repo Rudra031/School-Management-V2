@@ -1,0 +1,1444 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Executive Command Center | {{ school.name|default:"Horizon SMS" }}{% endblock %}
+{% block page_heading %}Executive Command Center{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ==========================================================================
+     EXECUTIVE COMMAND CENTER — 2026 NEXT-GEN LUXURY STYLING
+     ========================================================================== */
+
+  :root {
+    --dash-hero-bg: radial-gradient(circle at 85% 15%, rgba(79, 70, 229, 0.18) 0%, rgba(10, 25, 55, 0.95) 75%, #051428 100%);
+    --card-glass: rgba(10, 25, 55, 0.72);
+    --card-glass-border: rgba(255, 255, 255, 0.1);
+    --gold-accent: #f59e0b;
+    --gold-glow: rgba(245, 158, 11, 0.3);
+    --cyan-accent: #06b6d4;
+    --emerald-accent: #10b981;
+  }
+
+  [data-theme="light"] {
+    --dash-hero-bg: radial-gradient(circle at 85% 15%, rgba(99, 102, 241, 0.1) 0%, rgba(241, 245, 249, 0.98) 75%, #f8fafc 100%);
+    --card-glass: rgba(255, 255, 255, 0.88);
+    --card-glass-border: rgba(15, 23, 42, 0.08);
+  }
+
+  /* 1. Hero Command Bar */
+  .dashboard-hero-card {
+    background: var(--dash-hero-bg);
+    border: 1px solid var(--card-glass-border);
+    border-radius: 24px;
+    padding: 1.6rem 2rem;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  [data-theme="light"] .dashboard-hero-card {
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+  }
+
+  .hero-ambient-glow {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    filter: blur(70px);
+    pointer-events: none;
+    opacity: 0.3;
+  }
+
+  .glow-top-right {
+    top: -50px;
+    right: -50px;
+    background: radial-gradient(circle, #6366f1, transparent);
+  }
+
+  .glow-bottom-left {
+    bottom: -80px;
+    left: 20%;
+    background: radial-gradient(circle, #06b6d4, transparent);
+  }
+
+  .live-clock-badge {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 0.45rem 0.9rem;
+    font-family: 'Geist', monospace;
+    font-size: 0.88rem;
+    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  [data-theme="light"] .live-clock-badge {
+    background: rgba(15, 23, 42, 0.06);
+    border-color: rgba(15, 23, 42, 0.12);
+    color: #0f172a;
+  }
+
+  .bell-schedule-pill {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 16px;
+    padding: 0.65rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  [data-theme="light"] .bell-schedule-pill {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.4);
+  }
+
+  /* 2. Speed-Dial 6-Button Quick Action Launchpad */
+  .speed-dial-card {
+    background: var(--card-glass);
+    border: 1px solid var(--card-glass-border);
+    border-radius: 18px;
+    padding: 1rem 1.15rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none !important;
+    color: inherit;
+    height: 100%;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  }
+
+  .speed-dial-card:hover {
+    transform: translateY(-4px);
+    background: rgba(79, 70, 229, 0.25);
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35), 0 0 20px rgba(99, 102, 241, 0.25);
+  }
+
+  [data-theme="light"] .speed-dial-card {
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  }
+
+  [data-theme="light"] .speed-dial-card:hover {
+    background: rgba(79, 70, 229, 0.08);
+    border-color: rgba(79, 70, 229, 0.3);
+    box-shadow: 0 10px 24px rgba(79, 70, 229, 0.12);
+  }
+
+  .speed-dial-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  /* 3. Luxury 8-Metric Executive KPI Grid */
+  .stat-card-luxury {
+    background: var(--card-glass);
+    border: 1px solid var(--card-glass-border);
+    border-radius: 20px;
+    padding: 1.35rem 1.4rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(18px);
+    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card-luxury:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+    border-color: rgba(245, 158, 11, 0.45);
+  }
+
+  [data-theme="light"] .stat-card-luxury {
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+  }
+
+  [data-theme="light"] .stat-card-luxury:hover {
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+    border-color: rgba(79, 70, 229, 0.35);
+  }
+
+  .stat-card-glow-strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    opacity: 0.85;
+  }
+
+  .stat-icon-capsule {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .stat-value-display {
+    font-size: 1.85rem;
+    font-weight: 800;
+    font-family: 'Geist', -apple-system, sans-serif;
+    line-height: 1.1;
+    margin: 8px 0 4px;
+    letter-spacing: -0.03em;
+  }
+
+  [data-theme="dark"] .stat-value-display {
+    color: #ffffff;
+  }
+
+  [data-theme="light"] .stat-value-display {
+    color: #0f172a;
+  }
+
+  .stat-label-text {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  [data-theme="dark"] .stat-label-text {
+    color: #93c5fd;
+  }
+
+  [data-theme="light"] .stat-label-text {
+    color: #475569;
+  }
+
+  .stat-trend-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* 4. Tabbed Multi-Metric Analytics Hub */
+  .analytics-hub-card {
+    background: var(--card-glass);
+    border: 1px solid var(--card-glass-border);
+    border-radius: 22px;
+    padding: 1.6rem;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    margin-bottom: 1.5rem;
+  }
+
+  [data-theme="light"] .analytics-hub-card {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  .analytics-nav-pills {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  [data-theme="light"] .analytics-nav-pills {
+    background: rgba(15, 23, 42, 0.05);
+    border-color: rgba(15, 23, 42, 0.08);
+  }
+
+  .analytics-nav-pills .nav-link {
+    border: none;
+    border-radius: 9px;
+    padding: 0.45rem 1rem;
+    font-size: 0.84rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  [data-theme="dark"] .analytics-nav-pills .nav-link {
+    color: #94a3b8;
+  }
+
+  [data-theme="light"] .analytics-nav-pills .nav-link {
+    color: #64748b;
+  }
+
+  .analytics-nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  }
+
+  .timeframe-pill-btn {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: transparent;
+    padding: 0.28rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  [data-theme="dark"] .timeframe-pill-btn {
+    color: #94a3b8;
+  }
+
+  [data-theme="light"] .timeframe-pill-btn {
+    color: #64748b;
+    border-color: rgba(15, 23, 42, 0.12);
+  }
+
+  .timeframe-pill-btn.active {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: #0f172a !important;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+  }
+
+  /* Donut Center Label */
+  .donut-center-container {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .donut-center-text {
+    position: absolute;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  /* Pulse Dot */
+  .pulse-live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    display: inline-block;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: livePulse 1.8s infinite;
+  }
+
+  @keyframes livePulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+
+  /* Priority Action Card */
+  .ai-action-card {
+    border-radius: 14px;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: transform 0.2s ease;
+  }
+
+  .ai-action-card:hover {
+    transform: translateX(4px);
+  }
+
+  .ai-action-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+
+  .ai-action-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .ai-action-info {
+    background: rgba(6, 182, 212, 0.1);
+    border-color: rgba(6, 182, 212, 0.3);
+  }
+
+  .ai-action-primary {
+    background: rgba(79, 70, 229, 0.1);
+    border-color: rgba(79, 70, 229, 0.3);
+  }
+
+  /* Table Polish */
+  .table-custom-glass {
+    --bs-table-bg: transparent;
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.04);
+    font-size: 0.84rem;
+  }
+
+  [data-theme="light"] .table-custom-glass {
+    --bs-table-hover-bg: rgba(15, 23, 42, 0.03);
+  }
+
+  /* Audit Item */
+  .audit-timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 0.55rem 0.65rem;
+    border-radius: 10px;
+    transition: background 0.2s ease;
+  }
+
+  .audit-timeline-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .audit-avatar-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: rgba(79, 70, 229, 0.2);
+    color: #818cf8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================================================================
+     1. HERO COMMAND BAR (LIVE TIME, BELL SCHEDULE & ACTIONS)
+     ========================================================================= -->
+<div class="dashboard-hero-card">
+  <div class="hero-ambient-glow glow-top-right"></div>
+  <div class="hero-ambient-glow glow-bottom-left"></div>
+
+  <div class="row align-items-center g-3 position-relative" style="z-index: 2;">
+    <!-- Left: Welcome & Status -->
+    <div class="col-lg-6">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-50 px-2 py-1">
+          <i class="fa-solid fa-graduation-cap me-1"></i> {{ academic_year.name|default:"Academic Session 2026-27" }}
+        </span>
+        <span class="live-clock-badge">
+          <i class="fa-regular fa-clock text-info"></i>
+          <span id="liveClockDisplay">--:--:--</span>
+        </span>
+      </div>
+      <h3 class="fw-bold mb-1" style="font-family:'Geist',sans-serif; letter-spacing:-0.03em;">
+        Executive Command Center
+      </h3>
+      <p class="mb-0 text-muted small">
+        Holistic operational overview, academic metrics, and real-time campus telemetry for {{ school.name|default:"Horizon International Academy" }}.
+      </p>
+    </div>
+
+    <!-- Right: Live Period Bell Countdown & Quick Controls -->
+    <div class="col-lg-6">
+      <div class="d-flex flex-column flex-sm-row justify-content-lg-end align-items-sm-center gap-3">
+        <!-- Bell Schedule Pill -->
+        <div class="bell-schedule-pill">
+          <div style="width:38px; height:38px; border-radius:10px; background:rgba(245,158,11,0.2); color:#f59e0b; display:flex; align-items:center; justify-content:center; font-size:1.15rem;">
+            <i class="fa-solid fa-bell-concierge"></i>
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="pulse-live-dot"></span>
+              <strong class="small" id="liveBellPeriodName" style="font-family:'Geist',sans-serif;">Period 3 in Progress</strong>
+            </div>
+            <div class="text-muted" style="font-size:0.75rem;" id="liveBellCountdown">
+              <span class="text-warning fw-semibold">24m remaining</span> &bull; Next: Lunch Recess
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-outline-light d-flex align-items-center gap-2" onclick="window.print();" title="Print Executive Summary" style="border-radius:10px; padding:0.55rem 0.85rem;">
+            <i class="fa-solid fa-print"></i>
+            <span class="d-none d-md-inline">Report</span>
+          </button>
+          <a href="{% url 'reports:hub' %}" class="btn btn-sm btn-primary d-flex align-items-center gap-2" style="border-radius:10px; padding:0.55rem 0.95rem;">
+            <i class="fa-solid fa-chart-line"></i>
+            <span class="d-none d-md-inline">Analytics Hub</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================================
+     2. SPEED-DIAL 6-BUTTON RAPID ACTION LAUNCHPAD
+     ========================================================================= -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4 col-xl-2">
+    <a href="{% url 'students:student_register' %}" class="speed-dial-card">
+      <div class="speed-dial-icon" style="background:rgba(99,102,241,0.18); color:#818cf8;">
+        <i class="fa-solid fa-user-plus"></i>
+      </div>
+      <div>
+        <div class="fw-bold" style="font-size:0.86rem;">Enroll Student</div>
+        <div class="text-muted" style="font-size:0.7rem;">New Admission</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-6 col-md-4 col-xl-2">
+    <a href="{% url 'attendance:mark' %}" class="speed-dial-card">
+      <div class="speed-dial-icon" style="background:rgba(16,185,129,0.18); color:#34d399;">
+        <i class="fa-solid fa-clipboard-check"></i>
+      </div>
+      <div>
+        <div class="fw-bold" style="font-size:0.86rem;">Daily Attendance</div>
+        <div class="text-muted" style="font-size:0.7rem;">Record Roster</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-6 col-md-4 col-xl-2">
+    <a href="{% url 'fees:invoice_list' %}" class="speed-dial-card">
+      <div class="speed-dial-icon" style="background:rgba(245,158,11,0.18); color:#fbbf24;">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+      </div>
+      <div>
+        <div class="fw-bold" style="font-size:0.86rem;">Collect Fees</div>
+        <div class="text-muted" style="font-size:0.7rem;">Issue &amp; Receipts</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-6 col-md-4 col-xl-2">
+    <a href="{% url 'examinations:marks_entry' %}" class="speed-dial-card">
+      <div class="speed-dial-icon" style="background:rgba(239,68,68,0.18); color:#f87171;">
+        <i class="fa-solid fa-pen-ruler"></i>
+      </div>
+      <div>
+        <div class="fw-bold" style="font-size:0.86rem;">Gradebook</div>
+        <div class="text-muted" style="font-size:0.7rem;">Enter Marks</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-6 col-md-4 col-xl-2">
+    <a href="{% url 'communication:notice_create' %}" class="speed-dial-card">
+      <div class="speed-dial-icon" style="background:rgba(6,182,212,0.18); color:#38bdf8;">
+        <i class="fa-solid fa-bullhorn"></i>
+      </div>
+      <div>
+        <div class="fw-bold" style="font-size:0.86rem;">Broadcast</div>
+        <div class="text-muted" style="font-size:0.7rem;">Notice / SMS</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col-6 col-md-4 col-xl-2">
+    <a href="{% url 'accounts:user_list' %}" class="speed-dial-card">
+      <div class="speed-dial-icon" style="background:rgba(168,85,247,0.18); color:#c084fc;">
+        <i class="fa-solid fa-users-gear"></i>
+      </div>
+      <div>
+        <div class="fw-bold" style="font-size:0.86rem;">User Directory</div>
+        <div class="text-muted" style="font-size:0.7rem;">Roles &amp; Access</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- =========================================================================
+     3. LUXURY 8-METRIC EXECUTIVE KPI GRID
+     ========================================================================= -->
+<div class="row g-3 mb-4">
+  
+  <!-- KPI 1: Enrolled Scholars -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card-luxury">
+      <div class="stat-card-glow-strip" style="background:linear-gradient(90deg, #4f46e5, #06b6d4);"></div>
+      <div class="d-flex justify-content-between align-items-start">
+        <span class="stat-label-text">Total Enrolled</span>
+        <span class="stat-trend-badge bg-success bg-opacity-25 text-success">
+          <i class="fa-solid fa-arrow-trend-up"></i> +{{ new_admissions }} new
+        </span>
+      </div>
+      <div class="stat-value-display">{{ total_students }}</div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-10" style="font-size:0.76rem;">
+        <span class="text-muted"><i class="fa-solid fa-mars text-info me-1"></i>{{ male_students }} Boys</span>
+        <span class="text-muted"><i class="fa-solid fa-venus text-warning me-1"></i>{{ female_students }} Girls</span>
+        <a href="{% url 'students:student_list' %}" class="text-primary text-decoration-none fw-semibold">View &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI 2: Faculty & Staff Presence -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card-luxury">
+      <div class="stat-card-glow-strip" style="background:linear-gradient(90deg, #10b981, #059669);"></div>
+      <div class="d-flex justify-content-between align-items-start">
+        <span class="stat-label-text">Faculty &amp; Staff</span>
+        <span class="stat-trend-badge bg-primary bg-opacity-25 text-primary">
+          <i class="fa-solid fa-chalkboard-user"></i> {{ active_teachers }} active
+        </span>
+      </div>
+      <div class="stat-value-display">{{ total_teachers }}</div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-10" style="font-size:0.76rem;">
+        <span class="text-success"><i class="fa-solid fa-circle-check me-1"></i>{{ staff_attendance_pct }}% on duty</span>
+        <span class="text-warning"><i class="fa-solid fa-user-clock me-1"></i>{{ teachers_on_leave }} on leave</span>
+        <a href="{% url 'staff:staff_list' %}" class="text-success text-decoration-none fw-semibold">Roster &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI 3: Daily Attendance Rate -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card-luxury">
+      <div class="stat-card-glow-strip" style="background:linear-gradient(90deg, #f59e0b, #d97706);"></div>
+      <div class="d-flex justify-content-between align-items-start">
+        <span class="stat-label-text">Today's Attendance</span>
+        <span class="stat-trend-badge bg-warning bg-opacity-25 text-warning">
+          <span class="pulse-live-dot me-1"></span> Live
+        </span>
+      </div>
+      <div class="stat-value-display text-warning">{{ attendance_rate_today }}%</div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-10" style="font-size:0.76rem;">
+        <span class="text-success"><i class="fa-solid fa-user-check me-1"></i>{{ student_present_today }} Pres.</span>
+        <span class="text-danger"><i class="fa-solid fa-user-xmark me-1"></i>{{ student_absent_today }} Abs.</span>
+        <a href="{% url 'attendance:mark' %}" class="text-warning text-decoration-none fw-semibold">Sheet &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI 4: Monthly Fee Recovery -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card-luxury">
+      <div class="stat-card-glow-strip" style="background:linear-gradient(90deg, #06b6d4, #2563eb);"></div>
+      <div class="d-flex justify-content-between align-items-start">
+        <span class="stat-label-text">Monthly Fee Inflow</span>
+        <span class="stat-trend-badge bg-info bg-opacity-25 text-info">
+          {{ fee_recovery_rate }}% collected
+        </span>
+      </div>
+      <div class="stat-value-display text-info">₹{{ monthly_fee_collection|floatformat:0 }}</div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-10" style="font-size:0.76rem;">
+        <span class="text-danger"><i class="fa-solid fa-triangle-exclamation me-1"></i>₹{{ outstanding_fees|floatformat:0 }} due</span>
+        <a href="{% url 'fees:invoice_list' %}" class="text-info text-decoration-none fw-semibold">Billing &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI 5: Class Sections & Capacity -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card-luxury">
+      <div class="stat-card-glow-strip" style="background:linear-gradient(90deg, #8b5cf6, #ec4899);"></div>
+      <div class="d-flex justify-content-between align-items-start">
+        <span class="stat-label-text">Active Classes</span>
+        <span class="stat-trend-badge bg-purple bg-opacity-25 text-purple" style="color:#c084fc;">
+          {{ total_sections }} Sections
+        </span>
+      </div>
+      <div class="stat-value-display">{{ total_classes }} <span style="font-size:0.95rem; font-weight:500; color:var(--text-muted);">Grades</span></div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-10" style="font-size:0.76rem;">
+        <span class="text-muted"><i class="fa-solid fa-building me-1"></i>{{ capacity_pct }}% Campus Capacity</span>
+        <a href="{% url 'academics:class_manage' %}" class="text-decoration-none" style="color:#c084fc; font-weight:600;">Classes &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI 6: Admissions Pipeline -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card-luxury">
+      <div class="stat-card-glow-strip" style="background:linear-gradient(90deg, #3b82f6, #6366f1);"></div>
+      <div class="d-flex justify-content-between align-items-start">
+        <span class="stat-label-text">Admissions Funnel</span>
+        <span class="stat-trend-badge bg-primary bg-opacity-25 text-primary">
+          <i class="fa-solid fa-filter"></i> Active Desk
+        </span>
+      </div>
+      <div class="stat-value-display">{{ pending_admissions }} <span style="font-size:0.95rem; font-weight:500; color:var(--text-muted);">Queue</span></div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-10" style="font-size:0.76rem;">
+        <span class="text-muted"><i class="fa-solid fa-user-clock me-1"></i>Under Review</span>
+        <a href="{% url 'admissions:pipeline' %}" class="text-primary text-decoration-none fw-semibold">Pipeline &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI 7: Examinations & Gradebook -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card-luxury">
+      <div class="stat-card-glow-strip" style="background:linear-gradient(90deg, #ef4444, #f59e0b);"></div>
+      <div class="d-flex justify-content-between align-items-start">
+        <span class="stat-label-text">Exams &amp; Terms</span>
+        <span class="stat-trend-badge bg-danger bg-opacity-25 text-danger">
+          {{ upcoming_exams }} Upcoming
+        </span>
+      </div>
+      <div class="stat-value-display">{{ completed_exams }} <span style="font-size:0.95rem; font-weight:500; color:var(--text-muted);">Held</span></div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-10" style="font-size:0.76rem;">
+        <span class="text-muted"><i class="fa-solid fa-award me-1"></i>{{ pending_results }} Pending Results</span>
+        <a href="{% url 'examinations:schedule_list' %}" class="text-danger text-decoration-none fw-semibold">Exams &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI 8: Resource Library & Assets -->
+  <div class="col-sm-6 col-xl-3">
+    <div class="stat-card-luxury">
+      <div class="stat-card-glow-strip" style="background:linear-gradient(90deg, #14b8a6, #06b6d4);"></div>
+      <div class="d-flex justify-content-between align-items-start">
+        <span class="stat-label-text">Library &amp; Assets</span>
+        <span class="stat-trend-badge bg-teal bg-opacity-25 text-teal" style="color:#2dd4bf;">
+          {{ issued_books }} Issued
+        </span>
+      </div>
+      <div class="stat-value-display">{{ total_books }} <span style="font-size:0.95rem; font-weight:500; color:var(--text-muted);">Titles</span></div>
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-10" style="font-size:0.76rem;">
+        <span class="text-warning"><i class="fa-solid fa-triangle-exclamation me-1"></i>{{ low_stock_count }} Low Stock</span>
+        <a href="{% url 'library:catalog' %}" class="text-teal text-decoration-none fw-semibold" style="color:#2dd4bf;">Catalog &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- =========================================================================
+     4. AI & OPERATIONAL INTELLIGENCE ALERT CENTER
+     ========================================================================= -->
+{% if ai_insights %}
+<div class="mb-4">
+  <div class="d-flex align-items-center justify-content-between mb-2">
+    <div class="d-flex align-items-center gap-2">
+      <div style="width:28px; height:28px; border-radius:8px; background:rgba(99,102,241,0.2); color:#818cf8; display:flex; align-items:center; justify-content:center; font-size:0.85rem;">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+      </div>
+      <h6 class="fw-bold mb-0 text-uppercase" style="font-size:0.82rem; letter-spacing:0.06em; color:var(--text-muted);">
+        Proactive Operational Intelligence &amp; Alerts
+      </h6>
+    </div>
+    <span class="badge bg-secondary bg-opacity-25 text-muted small">{{ ai_insights|length }} action items</span>
+  </div>
+
+  <div class="row g-2">
+    {% for insight in ai_insights %}
+      <div class="col-md-6 col-xl-3">
+        <div class="ai-action-card ai-action-{{ insight.type }}">
+          <div class="d-flex align-items-center gap-2 overflow-hidden">
+            <i class="fa-solid {{ insight.icon }} text-{{ insight.type }} fs-5 flex-shrink-0"></i>
+            <div class="overflow-hidden">
+              <div class="fw-bold small text-truncate">{{ insight.title }}</div>
+              <div class="text-muted text-truncate" style="font-size:0.74rem;">{{ insight.message }}</div>
+            </div>
+          </div>
+          {% if insight.type == 'danger' %}
+            <a href="{% url 'fees:invoice_list' %}" class="btn btn-sm btn-danger px-2 py-0" style="font-size:0.72rem; border-radius:6px; white-space:nowrap;">Action</a>
+          {% elif insight.type == 'warning' %}
+            <a href="{% url 'inventory:item_list' %}" class="btn btn-sm btn-warning px-2 py-0" style="font-size:0.72rem; border-radius:6px; white-space:nowrap;">Reorder</a>
+          {% elif insight.type == 'info' %}
+            <a href="{% url 'leave:list' %}" class="btn btn-sm btn-info px-2 py-0 text-white" style="font-size:0.72rem; border-radius:6px; white-space:nowrap;">Review</a>
+          {% else %}
+            <a href="{% url 'admissions:pipeline' %}" class="btn btn-sm btn-primary px-2 py-0" style="font-size:0.72rem; border-radius:6px; white-space:nowrap;">Open</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- =========================================================================
+     5. INTERACTIVE MULTI-TAB ANALYTICS HUB (CHART.JS)
+     ========================================================================= -->
+<div class="analytics-hub-card">
+  
+  <!-- Tab Header & Dynamic Controls -->
+  <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4 pb-3 border-bottom border-white border-opacity-10">
+    <div class="d-flex align-items-center gap-3">
+      <ul class="nav analytics-nav-pills" id="analyticsHubTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="tab-finance-btn" data-bs-toggle="pill" data-bs-target="#tab-finance" type="button" role="tab">
+            <i class="fa-solid fa-chart-area me-1"></i> Revenue &amp; Expenses
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-attendance-btn" data-bs-toggle="pill" data-bs-target="#tab-attendance" type="button" role="tab">
+            <i class="fa-solid fa-users-viewfinder me-1"></i> Attendance Trajectory
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-performance-btn" data-bs-toggle="pill" data-bs-target="#tab-performance" type="button" role="tab">
+            <i class="fa-solid fa-chart-simple me-1"></i> Academic Benchmarks
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="tab-growth-btn" data-bs-toggle="pill" data-bs-target="#tab-growth" type="button" role="tab">
+            <i class="fa-solid fa-arrow-trend-up me-1"></i> Admissions Funnel &amp; Growth
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Timeframe Filters -->
+    <div class="d-flex align-items-center gap-2">
+      <span class="small text-muted d-none d-md-inline" style="font-size:0.75rem;">TIMEFRAME:</span>
+      <div class="btn-group" id="timeframeButtonGroup" role="group">
+        <button type="button" class="timeframe-pill-btn active" data-timeframe="7d">7 Days</button>
+        <button type="button" class="timeframe-pill-btn" data-timeframe="30d">30 Days</button>
+        <button type="button" class="timeframe-pill-btn" data-timeframe="ytd">Year-to-Date</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content Panes -->
+  <div class="tab-content" id="analyticsHubTabContent">
+    
+    <!-- TAB 1: REVENUE & EXPENSES STREAM -->
+    <div class="tab-pane fade show active" id="tab-finance" role="tabpanel">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-9">
+          <div style="height: 320px; width: 100%;">
+            <canvas id="financeHubChart"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <div class="d-flex flex-column gap-3 p-3 rounded-4" style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.06);">
+            <div>
+              <div class="text-muted small text-uppercase" style="font-size:0.72rem; font-weight:700;">Inflow Target vs Realized</div>
+              <div class="d-flex justify-content-between align-items-baseline mt-1">
+                <span class="fw-bold fs-5 text-success">₹{{ total_income|floatformat:0 }}</span>
+                <span class="small text-muted">/ ₹{{ annual_fee_target|floatformat:0 }}</span>
+              </div>
+              <div class="progress mt-2" style="height: 6px; background:rgba(255,255,255,0.08); border-radius:10px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {{ fee_target_pct }}%; border-radius:10px;"></div>
+              </div>
+            </div>
+
+            <div class="border-top border-white border-opacity-10 pt-2">
+              <div class="text-muted small text-uppercase" style="font-size:0.72rem; font-weight:700;">Net Operational Margin</div>
+              <div class="fw-bold fs-5 text-info mt-1">+₹{{ monthly_fee_collection|floatformat:0 }}</div>
+              <span class="text-muted" style="font-size:0.74rem;">After staff payroll and facility costs</span>
+            </div>
+
+            <div class="border-top border-white border-opacity-10 pt-2">
+              <a href="{% url 'fees:invoice_list' %}" class="btn btn-sm btn-outline-warning w-100 fw-semibold" style="border-radius:8px;">
+                <i class="fa-solid fa-file-invoice me-1"></i> Invoicing Ledger
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: ATTENDANCE TRAJECTORY & DONUT BREAKDOWN -->
+    <div class="tab-pane fade" id="tab-attendance" role="tabpanel">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-8">
+          <div style="height: 320px; width: 100%;">
+            <canvas id="attendanceHubChart"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="donut-center-container">
+            <canvas id="attendanceDonutChart"></canvas>
+            <div class="donut-center-text">
+              <div class="fw-bold fs-4 text-white" id="donutRateDisplay">{{ attendance_rate_today }}%</div>
+              <div class="text-muted" style="font-size:0.72rem;">AVERAGE PRESENCE</div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-around mt-2 text-center" style="font-size:0.76rem;">
+            <div><span class="badge bg-success p-1 me-1"></span>{{ donut_present }} Present</div>
+            <div><span class="badge bg-danger p-1 me-1"></span>{{ donut_absent }} Absent</div>
+            <div><span class="badge bg-warning p-1 me-1"></span>{{ donut_late }} Late</div>
+            <div><span class="badge bg-info p-1 me-1"></span>{{ donut_leave }} Leave</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ACADEMIC PERFORMANCE & GRADEBOOK BENCHMARKS -->
+    <div class="tab-pane fade" id="tab-performance" role="tabpanel">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-9">
+          <div style="height: 320px; width: 100%;">
+            <canvas id="performanceHubChart"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <div class="d-flex flex-column gap-3 p-3 rounded-4" style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.06);">
+            <div>
+              <div class="text-muted small text-uppercase" style="font-size:0.72rem; font-weight:700;">Top Performing Class</div>
+              {% if class_scores %}
+                <div class="fw-bold fs-5 text-warning mt-1">{{ class_labels.0 }} &bull; {{ class_scores.0 }}%</div>
+                <span class="text-success" style="font-size:0.74rem;"><i class="fa-solid fa-medal me-1"></i>{{ class_dist_pass.0 }}% Pass Rate</span>
+              {% else %}
+                <div class="fw-bold fs-5 text-muted mt-1">No Data</div>
+                <span class="text-muted" style="font-size:0.74rem;">No class results recorded yet</span>
+              {% endif %}
+            </div>
+            <div class="border-top border-white border-opacity-10 pt-2">
+              <div class="text-muted small text-uppercase" style="font-size:0.72rem; font-weight:700;">Upcoming Term Exams</div>
+              <div class="fw-bold fs-5 text-primary mt-1">{{ upcoming_exams }} Active Schedules</div>
+              <span class="text-muted" style="font-size:0.74rem;">Term Assessment Cycle</span>
+            </div>
+            <div class="border-top border-white border-opacity-10 pt-2">
+              <a href="{% url 'examinations:tabulation_sheet' %}" class="btn btn-sm btn-outline-primary w-100 fw-semibold" style="border-radius:8px;">
+                <i class="fa-solid fa-table-cells me-1"></i> Tabulation Matrix
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ADMISSIONS FUNNEL & 5-YEAR ENROLLMENT -->
+    <div class="tab-pane fade" id="tab-growth" role="tabpanel">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-7">
+          <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size:0.74rem;">5-Year Historical Enrollment Trajectory</div>
+          <div style="height: 290px; width: 100%;">
+            <canvas id="enrollmentHubChart"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size:0.74rem;">Admissions Conversion Funnel</div>
+          <div style="height: 290px; width: 100%;">
+            <canvas id="funnelHubChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- =========================================================================
+     6. LIVE OPERATIONS & CRITICAL ACTIVITY GRIDS
+     ========================================================================= -->
+<div class="row g-4 mb-4">
+  
+  <!-- Left Column: New Online Admissions & Class Fee Recovery -->
+  <div class="col-lg-7">
+    
+    <!-- Online Admissions Applications Queue -->
+    <div class="analytics-hub-card mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-file-signature text-warning"></i>
+          <h6 class="fw-bold mb-0 text-white" style="font-size:0.95rem;">Recent Online Admissions Queue</h6>
+        </div>
+        <a href="{% url 'admissions:pipeline' %}" class="small text-warning text-decoration-none fw-semibold">Open Pipeline &rarr;</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-custom-glass table-hover mb-0">
+          <thead>
+            <tr class="text-muted small">
+              <th>REF NO</th>
+              <th>APPLICANT NAME</th>
+              <th>CLASS</th>
+              <th>APPLIED</th>
+              <th class="text-end">ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in recent_online_applications %}
+              <tr>
+                <td><span class="badge bg-warning bg-opacity-25 text-warning fw-mono">{{ app.application_number }}</span></td>
+                <td class="text-white fw-semibold">{{ app.applicant_full_name }}</td>
+                <td class="text-info">{{ app.applying_for_class.name }}</td>
+                <td class="text-muted">{{ app.applied_date|date:"d M" }}</td>
+                <td class="text-end">
+                  <a href="{% url 'admissions:detail' pk=app.pk %}" class="btn btn-sm btn-outline-light py-0 px-2" style="font-size:0.72rem; border-radius:6px;">
+                    <i class="fa-solid fa-eye me-1"></i> Review
+                  </a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-3 text-muted">No pending online applications in queue.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Class-Wise Fee Collection Recovery Progress -->
+    <div class="analytics-hub-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-info"></i>
+          <h6 class="fw-bold mb-0 text-white" style="font-size:0.95rem;">Class-Wise Fee Recovery Rates</h6>
+        </div>
+        <a href="{% url 'fees:invoice_list' %}" class="small text-info text-decoration-none fw-semibold">Detailed Ledger &rarr;</a>
+      </div>
+
+      <div class="row g-3">
+        {% for cl in class_recovery_list %}
+          <div class="col-md-6">
+            <div class="p-2 px-3 rounded-3" style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.05);">
+              <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.82rem;">
+                <span class="fw-semibold text-white">{{ cl.name }}</span>
+                <span class="fw-bold text-{{ cl.status_color }}">{{ cl.collected_pct }}%</span>
+              </div>
+              <div class="progress" style="height: 5px; background:rgba(255,255,255,0.06); border-radius:10px;">
+                <div class="progress-bar bg-{{ cl.status_color }}" role="progressbar" style="width: {{ cl.collected_pct }}%;"></div>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="text-muted small py-2">No class recovery data available.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Column: Critical Fee Arrears & Live Audit Stream -->
+  <div class="col-lg-5">
+    
+    <!-- Top Overdue Fee Arrears -->
+    <div class="analytics-hub-card mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+          <h6 class="fw-bold mb-0 text-white" style="font-size:0.95rem;">Overdue Fee Arrears (Top 5)</h6>
+        </div>
+        <span class="badge bg-danger bg-opacity-25 text-danger small">Urgent</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-custom-glass table-hover mb-0">
+          <thead>
+            <tr class="text-muted small">
+              <th>STUDENT</th>
+              <th>INVOICE</th>
+              <th>BALANCE</th>
+              <th class="text-end">REMIND</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for inv in top_fee_defaulters %}
+              <tr>
+                <td class="text-white fw-semibold">{{ inv.student_enrollment.student.full_name|truncatechars:18 }}</td>
+                <td class="text-muted small">{{ inv.invoice_number }}</td>
+                <td class="text-danger fw-bold">₹{{ inv.balance_amount|floatformat:0 }}</td>
+                <td class="text-end">
+                  <a href="https://wa.me/{{ inv.student_enrollment.student.parent.phone_number }}?text=Dear%20Parent,%20kindly%20clear%20pending%20school%20fees%20of%20₹{{ inv.balance_amount }}." target="_blank" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size:0.72rem; border-radius:6px;" title="Send WhatsApp Reminder">
+                    <i class="fa-brands fa-whatsapp"></i>
+                  </a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4" class="text-center py-3 text-muted">No critical fee defaulters recorded.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Live Security & Audit Trail -->
+    <div class="analytics-hub-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-info"></i>
+          <h6 class="fw-bold mb-0 text-white" style="font-size:0.95rem;">Live Security &amp; Activity Stream</h6>
+        </div>
+        <span class="badge bg-success bg-opacity-25 text-success small"><span class="pulse-live-dot me-1"></span> Live</span>
+      </div>
+
+      <div class="d-flex flex-column gap-2" style="max-height: 250px; overflow-y:auto;">
+        {% for audit in recent_audits %}
+          <div class="audit-timeline-item">
+            <div class="audit-avatar-icon">
+              <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div class="flex-grow-1 overflow-hidden">
+              <div class="d-flex justify-content-between">
+                <span class="text-white small fw-bold text-truncate">{{ audit.user.first_name|default:audit.user.username|default:"System" }}</span>
+                <span class="text-muted" style="font-size:0.68rem;">{{ audit.timestamp|timesince }} ago</span>
+              </div>
+              <p class="text-muted small mb-0 text-truncate" style="font-size:0.75rem;">
+                <span class="badge bg-secondary bg-opacity-50 text-white me-1">{{ audit.get_action_display }}</span> {{ audit.object_repr|truncatechars:40 }}
+              </p>
+            </div>
+          </div>
+        {% empty %}
+          <div class="text-center text-muted py-3 small">No recent activity logs.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js 4.4 Engine -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    
+    // =========================================================================
+    // 1. REAL-TIME TICKING CLOCK
+    // =========================================================================
+    function updateClock() {
+      const now = new Date();
+      const clockEl = document.getElementById('liveClockDisplay');
+      if (clockEl) {
+        clockEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      }
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // =========================================================================
+    // 2. DYNAMIC BELL SCHEDULE & PERIOD COUNTDOWN
+    // =========================================================================
+    function updateBellSchedule() {
+      const now = new Date();
+      const hrs = now.getHours();
+      const mins = now.getMinutes();
+      const totalMins = hrs * 60 + mins;
+      
+      const bellElem = document.getElementById('liveBellPeriodName');
+      const countElem = document.getElementById('liveBellCountdown');
+      if (!bellElem || !countElem) return;
+
+      if (totalMins < 8 * 60 + 30) {
+        bellElem.innerHTML = "Morning Assembly &bull; 08:00 AM – 08:30 AM";
+        countElem.innerHTML = "<span class='text-warning fw-semibold'>Starts at 08:30 AM</span> &bull; Period 1 Next";
+      } else if (totalMins < 9 * 60 + 15) {
+        bellElem.innerHTML = "Period 1 &bull; 08:30 AM – 09:15 AM";
+        countElem.innerHTML = "<span class='text-warning fw-semibold'>Active</span> &bull; Next: Period 2";
+      } else if (totalMins < 10 * 60 + 0) {
+        bellElem.innerHTML = "Period 2 &bull; 09:15 AM – 10:00 AM";
+        countElem.innerHTML = "<span class='text-warning fw-semibold'>Active</span> &bull; Next: Period 3";
+      } else if (totalMins < 10 * 60 + 45) {
+        bellElem.innerHTML = "Period 3 &bull; 10:00 AM – 10:45 AM";
+        countElem.innerHTML = "<span class='text-warning fw-semibold'>Active</span> &bull; Next: Period 4";
+      } else if (totalMins < 11 * 60 + 30) {
+        bellElem.innerHTML = "Period 4 &bull; 10:45 AM – 11:30 AM";
+        countElem.innerHTML = "<span class='text-warning fw-semibold'>Active</span> &bull; Next: Lunch Recess";
+      } else if (totalMins < 12 * 60 + 15) {
+        bellElem.innerHTML = "Lunch Recess &bull; 11:30 AM – 12:15 PM";
+        countElem.innerHTML = "<span class='text-success fw-semibold'>Recess</span> &bull; Next: Period 5";
+      } else if (totalMins < 13 * 60 + 45) {
+        bellElem.innerHTML = "Period 5 &amp; 6 &bull; 12:15 PM – 01:45 PM";
+        countElem.innerHTML = "<span class='text-warning fw-semibold'>Active</span> &bull; Next: Co-Curriculars";
+      } else {
+        bellElem.innerHTML = "Campus Dispersal &bull; 02:30 PM";
+        countElem.innerHTML = "<span class='text-info fw-semibold'>Shift Concluded</span> &bull; Admin Active";
+      }
+    }
+    updateBellSchedule();
+    setInterval(updateBellSchedule, 60000);
+
+    // =========================================================================
+    // 3. CHART.JS CONFIGURATION & TIME-SERIES DATA ENGINE
+    // =========================================================================
+    const rawDatasets = {{ chart_datasets_json|safe }};
+    const isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 23, 42, 0.06)';
+    const tickColor = isDark ? '#94a3b8' : '#64748b';
+
+    const defaultGrid = { color: gridColor, drawBorder: false };
+    const defaultTicks = { color: tickColor, font: { family: "'Geist', 'Inter', sans-serif", size: 11 } };
+
+    // --- Chart 1: Financial Inflow vs Expenses Stream ---
+    const ctxFinance = document.getElementById('financeHubChart');
+    let financeChart = null;
+    if (ctxFinance) {
+      const initialFinance = rawDatasets.finance['7d'];
+      financeChart = new Chart(ctxFinance, {
+        type: 'line',
+        data: {
+          labels: initialFinance.labels,
+          datasets: [
+            {
+              label: 'Fee Inflow (₹)',
+              data: initialFinance.income,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              fill: true,
+              tension: 0.38,
+              borderWidth: 2.8,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              pointBackgroundColor: '#10b981'
+            },
+            {
+              label: 'Operating Expenses (₹)',
+              data: initialFinance.expenses,
+              borderColor: '#ef4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.08)',
+              fill: true,
+              tension: 0.38,
+              borderWidth: 2,
+              pointRadius: 3,
+              pointHoverRadius: 5,
+              pointBackgroundColor: '#ef4444'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: { color: tickColor, font: { family: "'Geist', sans-serif", size: 12 }, usePointStyle: true, boxWidth: 8 }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.92)',
+              titleColor: '#ffffff',
+              bodyColor: '#e2e8f0',
+              borderColor: 'rgba(255, 255, 255, 0.15)',
+              borderWidth: 1,
+              padding: 10,
+              displayColors: true
+            }
+          },
+          scales: {
+            x: { grid: defaultGrid, ticks: defaultTicks },
+            y: { grid: defaultGrid, ticks: defaultTicks }
+          }
+        }
+      });
+    }
+
+    // --- Chart 2: Attendance Trajectory Line Chart ---
+    const ctxAtt = document.getElementById('attendanceHubChart');
+    let attendanceChart = null;
+    if (ctxAtt) {
+      const initialAtt = rawDatasets.attendance['7d'];
+      attendanceChart = new Chart(ctxAtt, {
+        type: 'line',
+        data: {
+          labels: initialAtt.labels,
+          datasets: [{
+            label: 'Attendance Rate (%)',
+            data: initialAtt.values,
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.16)',
+            fill: true,
+            tension: 0.38,
+            borderWidth: 3,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#f59e0b'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.92)',
+              titleColor: '#ffffff',
+              callbacks: {
+                label: function(context) { return ` Presence: ${context.parsed.y}%`; }
+              }
+            }
+          },
+          scales: {
+            x: { grid: defaultGrid, ticks: defaultTicks },
+            y: { grid: defaultGrid, ticks: defaultTicks, min: 0, max: 100 }
+          }
+        }
+      });
+    }
+
+    // --- Chart 2b: Attendance Donut Chart ---
+    const ctxDonut = document.getElementById('attendanceDonutChart');
+    if (ctxDonut) {
+      const donutData = {{ chart_donut_data|safe }};
+      new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+          labels: ['Present', 'Absent', 'Late', 'Leave'],
+          datasets: [{
+            data: donutData,
+            backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#06b6d4'],
+            borderWidth: 0,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '76%',
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    // --- Chart 3: Academic Performance Bar Chart ---
+    const ctxPerf = document.getElementById('performanceHubChart');
+    if (ctxPerf) {
+      const perfLabels = {{ chart_performance_labels|safe }};
+      const perfValues = {{ chart_performance_values|safe }};
+      const perfPass = {{ chart_performance_pass|safe }};
+
+      new Chart(ctxPerf, {
+        type: 'bar',
+        data: {
+          labels: perfLabels,
+          datasets: [
+            {
+              label: 'Average Score (%)',
+              data: perfValues,
+              backgroundColor: 'rgba(99, 102, 241, 0.85)',
+              borderRadius: 8,
+              borderSkipped: false
+            },
+            {
+              label: 'Pass Rate (%)',
+              data: perfPass,
+              backgroundColor: 'rgba(6, 182, 212, 0.55)',
+              borderRadius: 8,
+              borderSkipped: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: { color: tickColor, font: { size: 12 }, usePointStyle: true, boxWidth: 8 }
+            }
+          },
+          scales: {
+            x: { grid: defaultGrid, ticks: defaultTicks },
+            y: { grid: defaultGrid, ticks: defaultTicks, min: 0, max: 100 }
+          }
+        }
+      });
+    }
+
+    // --- Chart 4: Historical 5-Year Enrollment Growth ---
+    const ctxEnr = document.getElementById('enrollmentHubChart');
+    if (ctxEnr) {
+      const enrLabels = {{ chart_enrollment_labels|safe }};
+      const enrValues = {{ chart_enrollment_values|safe }};
+
+      new Chart(ctxEnr, {
+        type: 'line',
+        data: {
+          labels: enrLabels,
+          datasets: [{
+            label: 'Total Enrolled Scholars',
+            data: enrValues,
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56, 189, 248, 0.15)',
+            fill: true,
+            tension: 0.35,
+            borderWidth: 2.8,
+            pointRadius: 5,
+            pointBackgroundColor: '#38bdf8'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: defaultGrid, ticks: defaultTicks },
+            y: { grid: defaultGrid, ticks: defaultTicks }
+          }
+        }
+      });
+    }
+
+    // --- Chart 4b: Admissions Conversion Funnel Bar ---
+    const ctxFunnel = document.getElementById('funnelHubChart');
+    if (ctxFunnel) {
+      const funnelLabels = {{ chart_funnel_labels|safe }};
+      const funnelValues = {{ chart_funnel_values|safe }};
+
+      new Chart(ctxFunnel, {
+        type: 'bar',
+        data: {
+          labels: funnelLabels,
+          datasets: [{
+            label: 'Conversion Stage Count',
+            data: funnelValues,
+            backgroundColor: ['#6366f1', '#3b82f6', '#06b6d4', '#10b981'],
+            borderRadius: 8,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: defaultGrid, ticks: defaultTicks },
+            y: { grid: { display: false }, ticks: defaultTicks }
+          }
+        }
+      });
+    }
+
+    // =========================================================================
+    // 4. INTERACTIVE TIMEFRAME SWITCHER (7D / 30D / YTD)
+    // =========================================================================
+    const timeframeBtns = document.querySelectorAll('.timeframe-pill-btn');
+    timeframeBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        timeframeBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        const tf = this.getAttribute('data-timeframe');
+        
+        // Update Finance Chart
+        if (financeChart && rawDatasets.finance[tf]) {
+          financeChart.data.labels = rawDatasets.finance[tf].labels;
+          financeChart.data.datasets[0].data = rawDatasets.finance[tf].income;
+          financeChart.data.datasets[1].data = rawDatasets.finance[tf].expenses;
+          financeChart.update();
+        }
+
+        // Update Attendance Chart
+        if (attendanceChart && rawDatasets.attendance[tf]) {
+          attendanceChart.data.labels = rawDatasets.attendance[tf].labels;
+          attendanceChart.data.datasets[0].data = rawDatasets.attendance[tf].values;
+          attendanceChart.update();
+        }
+      });
+    });
+
+  });
+</script>
+{% endblock %}

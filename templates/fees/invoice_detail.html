@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice #{{ invoice.invoice_number }}{% endblock %}
+{% block page_heading %}Student Fee Invoice & Payment Receipt{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 no-print">
+  <div>
+    <h5 class="fw-bold mb-1">Invoice #{{ invoice.invoice_number }}</h5>
+    <p class="text-muted small mb-0">{{ invoice.student_enrollment.student.full_name }} | {{ invoice.student_enrollment.section.full_name }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <button onclick="window.print()" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-print me-1"></i> Print Invoice / Receipt</button>
+    <a href="{% url 'fees:invoice_list' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Back to Invoices</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Left Side: Printable Invoice Document -->
+  <div class="col-lg-8">
+    <div class="card-saas p-5 bg-white shadow-sm border invoice-printable">
+      <!-- School Header -->
+      <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4">
+        <div>
+          <h4 class="fw-bold text-dark mb-1">{{ school_setting.school_name|default:"HORIZON PUBLIC SCHOOL" }}</h4>
+          <p class="text-muted small mb-0">{{ school_setting.address|default:"Sector 14, Urban Estate, Rohini, New Delhi - 110085 (Affiliated to CBSE)" }}</p>
+          <p class="text-muted small mb-0">Phone: {{ school_setting.phone|default:"+91 (011) 2748-9012 / +91 98765 43210" }}</p>
+        </div>
+        <div class="text-end">
+          <h5 class="fw-bold text-primary mb-1">FEE INVOICE (INR)</h5>
+          <div class="small fw-semibold text-dark">#{{ invoice.invoice_number }}</div>
+          <div class="small text-muted">Date: {{ invoice.issue_date|date:"d M Y" }}</div>
+        </div>
+      </div>
+
+      <!-- Billed To & Session Info -->
+      <div class="row g-3 mb-4 small bg-light p-3 rounded border">
+        <div class="col-md-6">
+          <div class="text-muted">Billed Student:</div>
+          <strong class="text-dark fs-6">{{ invoice.student_enrollment.student.full_name }}</strong>
+          <div>Admission #: {{ invoice.student_enrollment.student.admission_number }}</div>
+          <div>Roll #: #{{ invoice.student_enrollment.roll_number }}</div>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <div>Class: <strong>{{ invoice.student_enrollment.section.full_name }}</strong></div>
+          <div>Academic Session: <strong>{{ invoice.academic_year.name }}</strong></div>
+          <div>Payment Due Date: <strong class="text-danger">{{ invoice.due_date|date:"d M Y" }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Invoice Breakdown -->
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered mb-0">
+          <thead class="table-light small fw-bold">
+            <tr>
+              <th>Description / Fee Item</th>
+              <th class="text-end" style="width: 150px;">Amount (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="fw-semibold text-dark">{{ invoice.title }}</td>
+              <td class="text-end fw-bold">₹{{ invoice.total_amount }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Summary Balance -->
+      <div class="row justify-content-end mb-4">
+        <div class="col-md-6">
+          <div class="p-3 bg-light border rounded small">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted">Total Billed:</span>
+              <span class="fw-bold">₹{{ invoice.total_amount }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-1 text-success">
+              <span>Total Paid:</span>
+              <span class="fw-bold">-₹{{ invoice.paid_amount }}</span>
+            </div>
+            <hr class="my-2">
+            <div class="d-flex justify-content-between fs-6">
+              <strong>Balance Due:</strong>
+              <strong class="text-danger">₹{{ invoice.balance_amount }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Receipts History -->
+      <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-receipt text-primary me-2"></i> Payment Receipts Applied</h6>
+      <div class="table-responsive mb-4">
+        <table class="table table-sm table-bordered mb-0 small">
+          <thead class="table-light">
+            <tr>
+              <th>Receipt #</th>
+              <th>Date</th>
+              <th>Method</th>
+              <th>Reference (UPI/UTR/Cheque)</th>
+              <th class="text-end">Amount (₹)</th>
+              <th class="text-center no-print">Receipt</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pay in payments %}
+              <tr>
+                <td class="fw-semibold text-primary font-monospace">{{ pay.receipt_number }}</td>
+                <td>{{ pay.payment_date|date:"d M Y" }}</td>
+                <td>
+                  <span class="badge bg-light text-dark border">{{ pay.get_payment_method_display }}</span>
+                </td>
+                <td class="text-muted font-monospace">
+                  {% if pay.upi_utr_number %}
+                    UPI UTR: {{ pay.upi_utr_number }}
+                  {% elif pay.cheque_number %}
+                    Chq #{{ pay.cheque_number }} ({{ pay.cheque_bank_name }})
+                  {% else %}
+                    {{ pay.transaction_id|default:"-" }}
+                  {% endif %}
+                </td>
+                <td class="text-end fw-bold text-success font-monospace">₹{{ pay.amount_paid|floatformat:2 }}</td>
+                <td class="text-center no-print">
+                  <a href="{% url 'fees:receipt_print' pay.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2" title="Print Official 3-Part Receipt">
+                    <i class="fa-solid fa-print me-1"></i> Print 3-Part
+                  </a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="text-center text-muted py-2">No payments received for this invoice yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Parent Online Checkout OR Staff Collection Terminal -->
+  <div class="col-lg-4 no-print">
+    {% if user.is_accountant or user.is_superadmin or user.is_school_admin %}
+      <div class="card-saas p-4 mb-3">
+        <div class="card-saas-header p-0 pb-3 mb-3 border-bottom d-flex justify-content-between align-items-center">
+          <span class="fw-bold text-dark"><i class="fa-solid fa-cash-register text-success me-2"></i> Collect Payment</span>
+          <a href="{% url 'fees:pos_counter' %}?student_id={{ invoice.student_enrollment.student.id }}" class="btn btn-sm btn-outline-success">
+            <i class="fa-solid fa-bolt me-1"></i> Full POS
+          </a>
+        </div>
+
+        {% if invoice.balance_amount > 0 %}
+          <form method="post" action="{% url 'fees:invoice_pay' invoice.pk %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Payment Date</label>
+              {{ payment_form.payment_date }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Amount to Pay (₹)</label>
+              {{ payment_form.amount_paid }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Payment Method</label>
+              {{ payment_form.payment_method }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Reference (UPI UTR / Cheque / TXN)</label>
+              {{ payment_form.transaction_id }}
+            </div>
+            <div class="mb-4">
+              <label class="form-label small fw-semibold">Cashier Remarks</label>
+              {{ payment_form.notes }}
+            </div>
+            <button type="submit" class="btn btn-success fw-bold w-100 py-2">
+              <i class="fa-solid fa-check me-1"></i> Receive Payment &amp; Print Receipt
+            </button>
+          </form>
+        {% else %}
+          <div class="alert alert-success text-center mb-0">
+            <i class="fa-solid fa-circle-check fs-3 mb-2 d-block"></i>
+            <strong>Fully Settled!</strong>
+            <p class="small mb-0">This invoice has zero remaining balance.</p>
+          </div>
+        {% endif %}
+      </div>
+    {% elif invoice.balance_amount > 0 %}
+      <!-- Parent / Student Portal Online Pay Widget -->
+      <div class="card-saas p-4 text-center border-top border-4 border-success">
+        <div class="rounded-circle bg-success bg-opacity-10 text-success d-inline-flex align-items-center justify-content-center mb-3" style="width:60px; height:60px;">
+          <i class="fa-solid fa-shield-halved fs-3"></i>
+        </div>
+        <h5 class="fw-bold mb-1">Instant Online Fee Payment</h5>
+        <p class="text-muted small mb-3">Pay securely using UPI QR, GooglePay, PhonePe, Paytm, Net Banking, or Debit/Credit Cards.</p>
+        
+        <div class="p-3 bg-light rounded-3 mb-3 border">
+          <span class="text-muted small d-block">Total Payable Now:</span>
+          <h3 class="fw-bold text-success font-monospace mb-0">₹{{ invoice.balance_amount|floatformat:2 }}</h3>
+        </div>
+
+        <form method="POST" action="{% url 'fees:online_pay' invoice.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="gateway_mode" value="UPI_INSTANT">
+          <button type="submit" class="btn btn-success btn-lg w-100 fw-bold py-2 shadow-sm">
+            <i class="fa-solid fa-lock me-2"></i> Pay ₹{{ invoice.balance_amount|floatformat:0 }} via UPI / Card
+          </button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

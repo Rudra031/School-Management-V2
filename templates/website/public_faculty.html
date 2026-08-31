@@ -1,0 +1,86 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}Caring Teachers &amp; Early Mentors | {{ school.name|default:"Horizon Primary World School" }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="py-5" style="background:radial-gradient(circle at 50% 0%, rgba(255, 184, 0, 0.25) 0%, rgba(2, 132, 199, 0.4) 60%, #031126 100%);">
+  <div class="container text-center py-4">
+    <div class="badge rounded-pill px-3 py-2 fw-bold kid-badge-yellow mx-auto mb-3" style="background:rgba(255,184,0,0.2); color:#ffc107; border:1px solid rgba(255,184,0,0.5);">
+      <i class="fa-solid fa-heart text-warning me-1"></i> Loving &amp; Certified Educators
+    </div>
+    <h1 class="display-5 fw-bold text-white mt-2">Meet Our Caring Mentors &amp; Teachers</h1>
+    <p class="text-white-50 max-w-800 mx-auto" style="font-size:1.1rem; line-height:1.8;">
+      Montessori-certified early childhood educators, Jolly Phonics experts, pediatric counselors, and passionate primary teachers dedicated to nurturing every child with warmth, patience, and smiles.
+    </p>
+  </div>
+</div>
+
+<div class="container py-5">
+  
+  <!-- Department Filter Pills -->
+  <div class="d-flex justify-content-center flex-wrap gap-2 mb-5">
+    <a href="{% url 'website:faculty' %}" class="btn btn-sm {% if selected_dept == 'ALL' %}btn-warning fw-bold text-dark{% else %}btn-outline-light{% endif %}" style="border-radius:20px;">
+      All Wings &amp; Specialists
+    </a>
+    {% for code, name in departments %}
+      <a href="{% url 'website:faculty' %}?dept={{ code }}" class="btn btn-sm {% if selected_dept == code %}btn-warning fw-bold text-dark{% else %}btn-outline-light{% endif %}" style="border-radius:20px;">
+        {{ name }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- Faculty Roster Cards -->
+  <div class="row g-4 mb-5">
+    {% for f in faculty_list %}
+      <div class="col-md-6 col-lg-3">
+        <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between text-center">
+          <div>
+            <div class="position-relative d-inline-block mb-3">
+              <div style="width:96px; height:96px; border-radius:50%; background:linear-gradient(135deg, #ffb800, #f43f5e); padding:3px; display:inline-block;">
+                {% if f.photo %}
+                  <img src="{{ f.photo.url }}" alt="{{ f.name }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                {% else %}
+                  <div style="width:100%; height:100%; border-radius:50%; background:#05142b; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.8rem; font-weight:700;">
+                    {{ f.name|slice:":1" }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            <h5 class="fw-bold text-white mb-1">{{ f.name }}</h5>
+            <span class="text-info small d-block mb-2 fw-semibold">{{ f.designation }}</span>
+            <span class="badge bg-secondary bg-opacity-25 text-warning mb-3" style="font-size:0.72rem;">{{ f.get_department_display }}</span>
+            <p class="text-white-50 small mb-3" style="line-height:1.6; font-size:0.82rem;">
+              {{ f.bio|truncatewords:20 }}
+            </p>
+          </div>
+          <div class="pt-3 border-top border-secondary border-opacity-25">
+            <span class="text-warning small d-block mb-1" style="font-size:0.75rem;"><i class="fa-solid fa-graduation-cap me-1"></i>{{ f.qualification }}</span>
+            <span class="text-white-50 small" style="font-size:0.72rem;">{{ f.experience_years }}+ Years Nurturing Experience</span>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center py-5 text-white-50">
+        <i class="fa-solid fa-chalkboard-user fs-1 text-secondary mb-3 d-block"></i>
+        No faculty members currently listed for this department filter.
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Faculty Mentorship Overview Card -->
+  <div class="glass-panel p-4 p-lg-5 text-center">
+    <h4 class="fw-bold text-white mb-2">Passionate About Early Childhood Education?</h4>
+    <p class="text-white-50 max-w-700 mx-auto small mb-4" style="line-height:1.7;">
+      {{ school.name|default:"Horizon Primary World School" }} is always looking for loving educators, phonics trainers, and activity counselors who cherish working with young children.
+    </p>
+    <a href="{% url 'website:contact' %}" class="btn btn-warning rounded-pill px-4 py-2 fw-bold text-dark shadow">
+      <i class="fa-solid fa-envelope me-1"></i> Contact Early Years Directorate
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+
+

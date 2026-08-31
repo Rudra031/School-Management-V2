@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Book Circulation & Loans{% endblock %}
+{% block page_heading %}Book Circulation & Loan Tracking{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Book Circulation Ledger</h5>
+    <p class="text-muted small mb-0">{{ active_loans_count }} Active Loans | <span class="text-danger fw-semibold">{{ overdue_loans_count }} Overdue Loans</span></p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'library:catalog' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Catalog</a>
+    <a href="{% url 'library:book_issue' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Issue Book</a>
+  </div>
+</div>
+
+<!-- Status Filter -->
+<div class="card-saas p-3 mb-4">
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{% url 'library:circulation_list' %}" class="btn btn-sm {% if not selected_status %}btn-saas-primary{% else %}btn-saas-secondary{% endif %}">All Loans</a>
+    <a href="{% url 'library:circulation_list' %}?status=BORROWED" class="btn btn-sm {% if selected_status == 'BORROWED' %}btn-saas-primary{% else %}btn-saas-secondary{% endif %}">Active Loans</a>
+    <a href="{% url 'library:circulation_list' %}?status=OVERDUE" class="btn btn-sm {% if selected_status == 'OVERDUE' %}btn-danger{% else %}btn-outline-danger{% endif %}">Overdue Fines</a>
+    <a href="{% url 'library:circulation_list' %}?status=RETURNED" class="btn btn-sm {% if selected_status == 'RETURNED' %}btn-saas-primary{% else %}btn-saas-secondary{% endif %}">Returned History</a>
+  </div>
+</div>
+
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Book Title</th>
+            <th>Borrower</th>
+            <th>Borrowed Date</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Overdue Fine (₹)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in loans %}
+            <tr>
+              <td class="fw-semibold text-dark">{{ loan.book.title }}</td>
+              <td>{{ loan.user.email }}</td>
+              <td class="small">{{ loan.borrow_date|date:"d M Y" }}</td>
+              <td class="small {% if loan.is_overdue %}text-danger fw-bold{% endif %}">{{ loan.due_date|date:"d M Y" }}</td>
+              <td>
+                {% if loan.status == 'BORROWED' %}
+                  {% if loan.is_overdue %}
+                    <span class="badge bg-danger">Overdue</span>
+                  {% else %}
+                    <span class="badge bg-primary-subtle text-primary">Active Loan</span>
+                  {% endif %}
+                {% else %}
+                  <span class="badge bg-success-subtle text-success">Returned</span>
+                {% endif %}
+              </td>
+              <td class="fw-bold {% if loan.fine_amount > 0 %}text-danger{% else %}text-muted{% endif %}">
+                ₹{{ loan.fine_amount }}
+              </td>
+              <td>
+                {% if loan.status == 'BORROWED' %}
+                  <form method="post" action="{% url 'library:book_return' loan.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-success py-0" data-confirm="Process return for this book?">
+                      <i class="fa-solid fa-arrow-turn-down-left me-1"></i> Return Book
+                    </button>
+                  </form>
+                {% else %}
+                  <span class="small text-muted">Closed</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4 small">No circulation loans found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

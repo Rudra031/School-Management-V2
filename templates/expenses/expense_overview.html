@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses Overview{% endblock %}
+{% block page_heading %}Operating Expenses & Outflow{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Operating Expenses Hub</h5>
+    <p class="text-muted small mb-0">{{ academic_year.name|default:"Active Session" }} | Institutional Operational Costs</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'expenses:list' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-receipt me-1"></i> Expense Vouchers</a>
+    <a href="{% url 'expenses:create' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Record Expenditure</a>
+  </div>
+</div>
+
+<!-- Key Stat Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6 col-lg-4">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-danger"><i class="fa-solid fa-money-bill-transfer"></i></div>
+        <div>
+          <div class="text-muted small">Total Operating Expenses</div>
+          <h3 class="fw-bold mb-0 text-danger">₹{{ total_expenses|floatformat:2 }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-primary"><i class="fa-solid fa-tags"></i></div>
+        <div>
+          <div class="text-muted small">Expense Categories</div>
+          <h3 class="fw-bold mb-0 text-dark">{{ category_breakdown|length }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-success"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <div>
+          <div class="text-muted small">Vouchers Processed</div>
+          <h3 class="fw-bold mb-0 text-success">{{ recent_expenses|length }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Category Breakdown -->
+  <div class="col-lg-5">
+    <div class="card-saas h-100">
+      <div class="card-saas-header">
+        <span class="fw-bold text-dark"><i class="fa-solid fa-chart-pie text-primary me-2"></i> Category Breakdown</span>
+      </div>
+      <div class="card-saas-body">
+        {% for cat_data in category_breakdown %}
+          <div class="mb-3">
+            <div class="d-flex justify-content-between small mb-1">
+              <span class="fw-semibold">{{ cat_data.category.name }}</span>
+              <span class="text-muted">₹{{ cat_data.total }} ({{ cat_data.percentage }}%)</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+              <div class="progress-bar bg-primary" role="progressbar" style="width: {{ cat_data.percentage }}%"></div>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-muted text-center py-4 small">No expenses recorded for this session.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Expense Vouchers -->
+  <div class="col-lg-7">
+    <div class="card-saas h-100">
+      <div class="card-saas-header">
+        <span class="fw-bold text-dark"><i class="fa-solid fa-receipt text-primary me-2"></i> Recent Payment Vouchers</span>
+        <a href="{% url 'expenses:list' %}" class="small">View Full Directory</a>
+      </div>
+      <div class="card-saas-body p-0">
+        <div class="table-responsive">
+          <table class="table-saas mb-0">
+            <thead>
+              <tr>
+                <th>Voucher #</th>
+                <th>Expense Item</th>
+                <th>Vendor</th>
+                <th>Date</th>
+                <th>Amount (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for exp in recent_expenses %}
+                <tr>
+                  <td class="fw-bold text-primary small">{{ exp.voucher_number }}</td>
+                  <td class="fw-semibold text-dark">{{ exp.title }}</td>
+                  <td class="small text-muted">{{ exp.vendor_name|default:"-" }}</td>
+                  <td class="small">{{ exp.expense_date|date:"d M Y" }}</td>
+                  <td class="fw-bold text-danger">₹{{ exp.amount }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-4 small">No expenses recorded yet.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

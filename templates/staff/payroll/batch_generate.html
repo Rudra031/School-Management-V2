@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Run Monthly Payroll Batch | Horizon SMS{% endblock %}
+{% block page_heading %}Monthly Payroll Batch Generation{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <a href="{% url 'staff:payroll_dashboard' %}" class="btn btn-sm btn-saas-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Payroll Hub
+      </a>
+      <span class="badge bg-primary-subtle text-primary">Automated Payroll Wizard</span>
+    </div>
+
+    <div class="card-saas p-4">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--violet));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">
+          <i class="fa-solid fa-calculator"></i>
+        </div>
+        <div>
+          <h5 class="fw-bold mb-0" style="color:var(--text-main);">Generate Staff Payroll Run</h5>
+          <span class="text-muted small">Batch process salary stubs with Basic + Allowances - Deductions calculation</span>
+        </div>
+      </div>
+
+      <div class="alert alert-info border-0 rounded-3 small mb-4" style="background:rgba(6, 182, 212, 0.08); color:var(--info);">
+        <i class="fa-solid fa-circle-info me-2"></i>
+        This tool generates itemized salary slips for all <strong>Active Staff Members</strong> using their configured compensation structures (Basic Salary, HRA, Travel, Medical allowances, Tax, and Provident Fund deductions).
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">{{ form.academic_year.label }}</label>
+            {{ form.academic_year }}
+            {% if form.academic_year.errors %}<div class="text-danger small">{{ form.academic_year.errors }}</div>{% endif %}
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label small fw-bold text-muted">{{ form.month.label }}</label>
+            {{ form.month }}
+            {% if form.month.errors %}<div class="text-danger small">{{ form.month.errors }}</div>{% endif %}
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label small fw-bold text-muted">{{ form.year.label }}</label>
+            {{ form.year }}
+            {% if form.year.errors %}<div class="text-danger small">{{ form.year.errors }}</div>{% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">{{ form.payment_date.label }}</label>
+            {{ form.payment_date }}
+            {% if form.payment_date.errors %}<div class="text-danger small">{{ form.payment_date.errors }}</div>{% endif %}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">{{ form.payment_method.label }}</label>
+            {{ form.payment_method }}
+            {% if form.payment_method.errors %}<div class="text-danger small">{{ form.payment_method.errors }}</div>{% endif %}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label small fw-bold text-muted">{{ form.notes.label }}</label>
+            {{ form.notes }}
+            {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors }}</div>{% endif %}
+          </div>
+
+          <div class="col-12 pt-3 border-top border-secondary border-opacity-10 d-flex justify-content-between">
+            <a href="{% url 'staff:payroll_dashboard' %}" class="btn btn-saas-secondary">Cancel</a>
+            <button type="submit" class="btn btn-saas-primary">
+              <i class="fa-solid fa-play me-1"></i> Generate &amp; Compute Payroll Slips
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

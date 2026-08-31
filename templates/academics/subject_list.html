@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Curriculum Subjects Catalog | Horizon School{% endblock %}
+{% block page_heading %}Curriculum Subjects Catalog{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold text-dark mb-1">Curriculum Subjects Catalog</h4>
+    <p class="text-muted small mb-0">Course catalog, theory/practical breakdown, department grouping, and credit weights.</p>
+  </div>
+  <div>
+    <a href="{% url 'academics:subject_create' %}" class="btn btn-primary btn-sm fw-semibold rounded-3">
+      <i class="fa-solid fa-plus me-1"></i> Add New Subject
+    </a>
+  </div>
+</div>
+
+<div class="card shadow-sm border-0 rounded-4 overflow-hidden bg-white">
+  <div class="card-header bg-light py-3 px-4 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <i class="fa-solid fa-book-open text-primary fs-5"></i>
+      <h6 class="fw-bold text-dark mb-0">Active School Subjects</h6>
+      <span class="badge bg-secondary-subtle text-secondary small">{{ subjects|length }} Subjects</span>
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4">Code</th>
+            <th>Subject Name</th>
+            <th>Department</th>
+            <th>Type</th>
+            <th>Credit Weight</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sub in subjects %}
+            <tr>
+              <td class="ps-4 fw-bold text-primary">
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1">
+                  {{ sub.code }}
+                </span>
+              </td>
+              <td>
+                <div class="fw-bold text-dark">{{ sub.name }}</div>
+                {% if sub.description %}<span class="text-muted small" style="font-size:0.72rem;">{{ sub.description|truncatechars:60 }}</span>{% endif %}
+              </td>
+              <td><span class="badge bg-light text-secondary border">{{ sub.department.name|default:"General Academics" }}</span></td>
+              <td>
+                {% if sub.subject_type == 'THEORY' %}
+                  <span class="badge bg-info-subtle text-info fw-semibold">Theory</span>
+                {% elif sub.subject_type == 'PRACTICAL' %}
+                  <span class="badge bg-warning-subtle text-warning fw-semibold">Practical</span>
+                {% elif sub.subject_type == 'BOTH' %}
+                  <span class="badge bg-success-subtle text-success fw-semibold">Theory &amp; Practical</span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary fw-semibold">Elective / Optional</span>
+                {% endif %}
+              </td>
+              <td class="small fw-semibold text-secondary">{{ sub.credit_hours }} Credits</td>
+              <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                  <a href="{% url 'academics:subject_edit' sub.id %}" class="btn btn-outline-secondary btn-sm" title="Edit Subject Details">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </a>
+                  <a href="{% url 'academics:subject_delete' sub.id %}" class="btn btn-outline-danger btn-sm" title="Remove Subject">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-5">
+                <i class="fa-solid fa-book-bookmark fs-1 text-muted d-block mb-2"></i>
+                No curriculum subjects registered yet.
+                <div class="mt-2">
+                  <a href="{% url 'academics:subject_create' %}" class="btn btn-sm btn-primary">Add Subject</a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

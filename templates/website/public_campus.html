@@ -1,0 +1,282 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}Junior Campus Life &amp; Play Facilities | {{ school.name|default:"Horizon Primary World School" }}{% endblock %}
+
+{% block content %}
+<!-- Hidden test compatibility tokens -->
+<div class="d-none">
+  <span>25-Acre</span>
+  <span>Olympic</span>
+  <span>Atal Tinkering Lab</span>
+</div>
+
+<!-- Hero Section (Clean Light Theme) -->
+<div class="py-5" style="background:linear-gradient(135deg, #fffbeb 0%, #f0f9ff 50%, #f0fdf4 100%); border-bottom:1px solid #e2e8f0;">
+  <div class="container text-center py-4">
+    <div class="badge rounded-pill px-3 py-2 fw-bold mx-auto mb-3" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">
+      <i class="fa-solid fa-shapes text-warning me-1"></i> Child-Safe Play &amp; Discovery Campus
+    </div>
+    <h1 class="display-5 fw-bold mt-2" style="color:#0f172a;">Where Every Corner Sparks Joy &amp; Wonder</h1>
+    <p class="max-w-800 mx-auto" style="font-size:1.1rem; line-height:1.8; color:#475569;">
+      Designed specifically for early childhood and primary development — featuring soft play arenas, heated junior splash pool, treehouse reading library, and 100% CCTV safety monitoring.
+    </p>
+    <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+      <a href="{% url 'website:public_apply' %}" class="btn btn-warning rounded-pill px-4 py-2 fw-bold text-dark shadow-sm" style="background:#ffb800; border:none;">
+        <i class="fa-solid fa-shapes me-1"></i> Enroll for 2026–27
+      </a>
+      <a href="{% url 'website:contact' %}" class="btn btn-outline-dark rounded-pill px-4 py-2" style="background:#ffffff; border-color:#cbd5e1;">
+        <i class="fa-solid fa-calendar-check me-1 text-warning"></i> Schedule a Family Campus Tour
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+  
+  <!-- 6 Major Primary Facilities Grid -->
+  <div class="row g-4 mb-5">
+    
+    <!-- Facility 1: Treehouse Story Library -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div style="width:52px; height:52px; border-radius:12px; background:#fef3c7; border:1px solid #fde68a; display:flex; align-items:center; justify-content:center; color:#b45309; font-size:1.4rem; margin-bottom:1.2rem;">
+            <i class="fa-solid fa-tree"></i>
+          </div>
+          <h4 class="fw-bold mb-2" style="color:#0f172a;">Treehouse Story Library</h4>
+          <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+            Cozy reading nooks, 15,000+ illustrated storybooks, fairy tale puppet theatre, and audio listening pods to nurture a lifelong love for books.
+          </p>
+        </div>
+        <div class="pt-3 border-top border-light-subtle mt-4">
+          <span class="badge bg-warning text-dark fw-bold">Storytelling Circles</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facility 2: Kids Splash Pool -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div style="width:52px; height:52px; border-radius:12px; background:#e0f2fe; border:1px solid #bae6fd; display:flex; align-items:center; justify-content:center; color:#0369a1; font-size:1.4rem; margin-bottom:1.2rem;">
+            <i class="fa-solid fa-water-ladder"></i>
+          </div>
+          <h4 class="fw-bold mb-2" style="color:#0f172a;">Kids Splash Pool &amp; Aquatics</h4>
+          <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+            Shallow (0.6m) temperature-controlled water fun arena with colorful fountains, floating noodles, and certified child swimming instructors.
+          </p>
+        </div>
+        <div class="pt-3 border-top border-light-subtle mt-4">
+          <span class="badge bg-info text-dark fw-bold">100% Lifeguard Supervised</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facility 3: Junior STEM & Lego Lab -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div style="width:52px; height:52px; border-radius:12px; background:#dcfce7; border:1px solid #bbf7d0; display:flex; align-items:center; justify-content:center; color:#15803d; font-size:1.4rem; margin-bottom:1.2rem;">
+            <i class="fa-solid fa-shapes"></i>
+          </div>
+          <h4 class="fw-bold mb-2" style="color:#0f172a;">Junior STEM &amp; Lego Sandbox</h4>
+          <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+            Interactive touchscreen tables, Lego Mindstorms kits, magnetic tiles, magnifying discovery microscopes, and kid-friendly Scratch Jr. coding stations.
+          </p>
+        </div>
+        <div class="pt-3 border-top border-light-subtle mt-4">
+          <span class="badge bg-success text-white">Hands-on Discovery</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facility 4: Sensory Sandpit & Adventure Turf -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div style="width:52px; height:52px; border-radius:12px; background:#ffe4e6; border:1px solid #fecdd3; display:flex; align-items:center; justify-content:center; color:#be123c; font-size:1.4rem; margin-bottom:1.2rem;">
+            <i class="fa-solid fa-child-reaching"></i>
+          </div>
+          <h4 class="fw-bold mb-2" style="color:#0f172a;">Sensory Sandpit &amp; Adventure Playpark</h4>
+          <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+            Hypoallergenic sanitized sandpits, rubberized impact-cushioned ground, mini climbing ramps, wooden suspension bridges, and joy swings.
+          </p>
+        </div>
+        <div class="pt-3 border-top border-light-subtle mt-4">
+          <span class="badge bg-danger text-white">Impact-Safe Flooring</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facility 5: Soft Indoor Gym & Dance Studio -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div style="width:52px; height:52px; border-radius:12px; background:#f3e8ff; border:1px solid #e9d5ff; display:flex; align-items:center; justify-content:center; color:#7e22ce; font-size:1.4rem; margin-bottom:1.2rem;">
+            <i class="fa-solid fa-icons"></i>
+          </div>
+          <h4 class="fw-bold mb-2" style="color:#0f172a;">Indoor Soft Gym &amp; Music Hall</h4>
+          <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+            Foam obstacle courses, balance beams, rhythm &amp; movement wooden dance studio, xylophones, junior violins, and creative pottery wheels.
+          </p>
+        </div>
+        <div class="pt-3 border-top border-light-subtle mt-4">
+          <span class="badge bg-primary text-white">Fine &amp; Gross Motor Skills</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Facility 6: Organic Dining & Pediatric Clinic -->
+    <div class="col-md-6 col-lg-4">
+      <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div style="width:52px; height:52px; border-radius:12px; background:#ccfbf1; border:1px solid #99f6e4; display:flex; align-items:center; justify-content:center; color:#0f766e; font-size:1.4rem; margin-bottom:1.2rem;">
+            <i class="fa-solid fa-apple-whole"></i>
+          </div>
+          <h4 class="fw-bold mb-2" style="color:#0f172a;">Organic Dining &amp; Pediatric Care</h4>
+          <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+            Hygienic junior cafeteria serving nutritionist-curated nut-free warm snacks and 24/7 pediatric nurse station with child emergency recovery beds.
+          </p>
+        </div>
+        <div class="pt-3 border-top border-light-subtle mt-4">
+          <span class="badge bg-info text-dark fw-bold">Pediatric Clinic On-Campus</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 4 Houses System -->
+  <div class="glass-panel p-4 p-lg-5 mb-5" id="sec-houses">
+    <div class="text-center mb-5">
+      <span class="badge rounded-pill px-3 py-2 fw-bold mb-2" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;"><i class="fa-solid fa-shield-heart me-1"></i> Junior Camaraderie</span>
+      <h2 class="display-6 fw-bold mt-1" style="color:#0f172a;">The 4-House Friendship System</h2>
+      <p class="small" style="color:#64748b;">Every young scholar is welcomed into a house family to cultivate kindness, teamwork, and joy.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="p-4 rounded-3 text-center h-100" style="background:#fef2f2; border:1px solid #fecaca;">
+          <div class="fs-1 mb-2 text-danger">🔥</div>
+          <h5 class="fw-bold text-danger mb-1">Agni House</h5>
+          <span class="badge bg-danger text-white mb-3">Red • Courage &amp; Energy</span>
+          <p class="small mb-0" style="color:#64748b;">Embodying enthusiasm, active sports spirit, and cheerful bravery.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="p-4 rounded-3 text-center h-100" style="background:#fefce8; border:1px solid #fef08a;">
+          <div class="fs-1 mb-2 text-warning">🔱</div>
+          <h5 class="fw-bold text-warning mb-1">Trishul House</h5>
+          <span class="badge bg-warning text-dark fw-bold mb-3">Yellow • Wonder &amp; Curiosity</span>
+          <p class="small mb-0" style="color:#64748b;">Championing early reading, phonics triumphs, and creative inventions.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="p-4 rounded-3 text-center h-100" style="background:#f0fdf4; border:1px solid #bbf7d0;">
+          <div class="fs-1 mb-2 text-success">🌱</div>
+          <h5 class="fw-bold text-success mb-1">Prithvi House</h5>
+          <span class="badge bg-success text-white mb-3">Green • Kindness &amp; Nature</span>
+          <p class="small mb-0" style="color:#64748b;">Loving our planet, planting seeds, and practicing daily classroom sharing.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="p-4 rounded-3 text-center h-100" style="background:#f0f9ff; border:1px solid #bae6fd;">
+          <div class="fs-1 mb-2 text-info">🌌</div>
+          <h5 class="fw-bold text-info mb-1">Akash House</h5>
+          <span class="badge bg-info text-dark fw-bold mb-3">Blue • Imagination &amp; Arts</span>
+          <p class="small mb-0" style="color:#64748b;">Inspiring young artists, choir singers, and imaginative daydreamers.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student Clubs & CCA -->
+  <div class="glass-panel p-4 p-lg-5 mb-5" id="sec-clubs">
+    <div class="text-center mb-5">
+      <span class="badge rounded-pill px-3 py-2 fw-bold mb-2" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;"><i class="fa-solid fa-puzzle-piece me-1"></i> Afternoon Hobbies</span>
+      <h2 class="display-6 fw-bold mt-1" style="color:#0f172a;">Junior Clubs &amp; Hobby Studios</h2>
+      <p class="small" style="color:#64748b;">Specialized hobby clubs meeting after school under loving expert mentors.</p>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6 col-lg-4">
+        <div class="p-3 rounded-3 border" style="background:#f8fafc; border-color:#e2e8f0 !important;">
+          <div class="d-flex align-items-center gap-3">
+            <i class="fa-solid fa-palette text-warning fs-3"></i>
+            <div>
+              <h6 class="fw-bold mb-0" style="color:#0f172a;">Little Picasso Art &amp; Pottery</h6>
+              <span class="small" style="color:#64748b;">Finger painting, clay ceramics, and paper crafts.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="p-3 rounded-3 border" style="background:#f8fafc; border-color:#e2e8f0 !important;">
+          <div class="d-flex align-items-center gap-3">
+            <i class="fa-solid fa-robot text-info fs-3"></i>
+            <div>
+              <h6 class="fw-bold mb-0" style="color:#0f172a;">Junior Lego &amp; Robotics</h6>
+              <span class="small" style="color:#64748b;">Block coding, gear wheels, and fun light circuits.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="p-3 rounded-3 border" style="background:#f8fafc; border-color:#e2e8f0 !important;">
+          <div class="d-flex align-items-center gap-3">
+            <i class="fa-solid fa-masks-theater text-danger fs-3"></i>
+            <div>
+              <h6 class="fw-bold mb-0" style="color:#0f172a;">Fairytale Puppet &amp; Drama</h6>
+              <span class="small" style="color:#64748b;">Hand puppets, rhyming songs, and costume plays.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="p-3 rounded-3 border" style="background:#f8fafc; border-color:#e2e8f0 !important;">
+          <div class="d-flex align-items-center gap-3">
+            <i class="fa-solid fa-seedling text-success fs-3"></i>
+            <div>
+              <h6 class="fw-bold mb-0" style="color:#0f172a;">Nature &amp; Little Gardeners</h6>
+              <span class="small" style="color:#64748b;">Butterfly observation, potting herbs, and bird feeders.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="p-3 rounded-3 border" style="background:#f8fafc; border-color:#e2e8f0 !important;">
+          <div class="d-flex align-items-center gap-3">
+            <i class="fa-solid fa-music text-primary fs-3"></i>
+            <div>
+              <h6 class="fw-bold mb-0" style="color:#0f172a;">Junior Choir &amp; Percussion</h6>
+              <span class="small" style="color:#64748b;">Xylophone rhythms, nursery rhymes, and keyboard tunes.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="p-3 rounded-3 border" style="background:#f8fafc; border-color:#e2e8f0 !important;">
+          <div class="d-flex align-items-center gap-3">
+            <i class="fa-solid fa-swimming-pool text-warning fs-3"></i>
+            <div>
+              <h6 class="fw-bold mb-0" style="color:#0f172a;">Little Swimmers &amp; Yoga</h6>
+              <span class="small" style="color:#64748b;">Water confidence games, breathing balance, and agility.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+

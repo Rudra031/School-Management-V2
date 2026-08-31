@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Attendance Analytics{% endblock %}
+{% block page_heading %}Monthly Section Attendance Report{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Attendance Analytics & Threshold Monitor</h5>
+    <p class="text-muted small mb-0">Minimum Exam Eligibility Threshold: <strong>{{ threshold }}%</strong></p>
+  </div>
+  <div>
+    <a href="{% url 'attendance:mark' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-clipboard-check me-1"></i> Mark Daily Register</a>
+  </div>
+</div>
+
+<!-- Section Selector -->
+<div class="card-saas p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-6">
+      <select name="section" class="form-select form-select-sm" onchange="this.form.submit()">
+        {% for sec in sections %}
+          <option value="{{ sec.id }}" {% if selected_section.id == sec.id %}selected{% endif %}>{{ sec.full_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-6 text-end">
+      <span class="badge bg-danger-subtle text-danger p-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> Low Attendance (< {{ threshold }}%)</span>
+    </div>
+  </form>
+</div>
+
+<!-- Attendance Matrix Table -->
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Roll #</th>
+            <th>Student Name</th>
+            <th>Total Sessions</th>
+            <th>Present Days</th>
+            <th>Absent Days</th>
+            <th>Attendance %</th>
+            <th>Exam Eligibility</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in report_rows %}
+            <tr {% if row.is_low_attendance %}class="table-danger bg-opacity-25"{% endif %}>
+              <td class="fw-bold text-primary">#{{ row.roll_number }}</td>
+              <td class="fw-semibold text-dark">{{ row.student.full_name }}</td>
+              <td class="small">{{ row.total_days }}</td>
+              <td class="small text-success fw-semibold">{{ row.present_days }}</td>
+              <td class="small text-danger fw-semibold">{{ row.absent_days }}</td>
+              <td class="fw-bold">
+                <div class="d-flex align-items-center gap-2">
+                  <span>{{ row.percentage }}%</span>
+                  <div class="progress flex-grow-1" style="height: 6px; width: 80px;">
+                    <div class="progress-bar {% if row.is_low_attendance %}bg-danger{% else %}bg-success{% endif %}" role="progressbar" style="width: {{ row.percentage }}%;"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                {% if row.is_low_attendance %}
+                  <span class="badge bg-danger"><i class="fa-solid fa-xmark me-1"></i> Critical (< {{ threshold }}%)</span>
+                {% else %}
+                  <span class="badge bg-success-subtle text-success"><i class="fa-solid fa-check me-1"></i> Eligible</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4 small">No attendance records found for this section.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

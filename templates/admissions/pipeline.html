@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}Admission Control Center | Apex SMS{% endblock %}
+
+{% block content %}
+
+<!-- Header & Top Navigation -->
+<div class="page-hero reveal-up mb-4" style="background: linear-gradient(135deg, rgba(30,64,175,0.06) 0%, rgba(15,23,42,0.03) 100%); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.5rem 1.75rem;">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="badge" style="background:var(--primary-light);color:var(--primary);font-size:0.75rem;font-weight:600;padding:4px 10px;border-radius:20px;">
+          <i class="fa-solid fa-graduation-cap me-1"></i> Admissions Session 2026–27
+        </span>
+        <span class="badge" style="background:var(--success-light);color:var(--success);font-size:0.75rem;font-weight:600;padding:4px 10px;border-radius:20px;">
+          <span style="width:6px;height:6px;background:var(--success);border-radius:50%;display:inline-block;margin-right:4px;"></span> Enrollment Open
+        </span>
+      </div>
+      <h3 class="fw-bold mb-1" style="font-family:'Geist',sans-serif;color:var(--text-main);letter-spacing:-0.02em;">
+        Student Admission Control Center
+      </h3>
+      <p class="mb-0 text-muted" style="font-size:0.875rem;">
+        Intake management, applicant verification pipeline, and rapid enrollment workflows.
+      </p>
+    </div>
+
+    <!-- Dual Admission Mode Action Buttons -->
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <a href="{% url 'admissions:quick_admission' %}" class="btn btn-saas-secondary btn-sm" style="font-weight:600;padding:7px 14px;">
+        <i class="fa-solid fa-bolt text-warning me-1"></i> Mode 1: Quick Admission
+      </a>
+      <a href="{% url 'admissions:full_admission' %}" class="btn btn-saas-primary btn-sm" style="font-weight:600;padding:7px 16px;">
+        <i class="fa-solid fa-file-signature me-1"></i> Mode 2: Full Multi-Step Admission
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- KPI Cards (6 Core Metrics) -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4 col-xl-2 reveal-up delay-1">
+    <div class="stat-card p-3 h-100">
+      <div class="text-muted small fw-semibold">Total Inquiries</div>
+      <div class="stat-number my-1" style="font-size:1.5rem;">{{ total_count }}</div>
+      <div class="small text-primary fw-medium"><i class="fa-solid fa-arrow-trend-up"></i> +{{ today_inquiries }} Today</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2 reveal-up delay-2">
+    <div class="stat-card p-3 h-100">
+      <div class="text-muted small fw-semibold">Quick Mode</div>
+      <div class="stat-number my-1 text-primary" style="font-size:1.5rem;">{{ quick_mode_count }}</div>
+      <div class="small text-muted">Fast Track</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2 reveal-up delay-3">
+    <div class="stat-card p-3 h-100">
+      <div class="text-muted small fw-semibold">Full Mode</div>
+      <div class="stat-number my-1 text-violet" style="font-size:1.5rem;">{{ full_mode_count }}</div>
+      <div class="small text-muted">Detailed Dossiers</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2 reveal-up delay-4">
+    <div class="stat-card p-3 h-100">
+      <div class="text-muted small fw-semibold">Under Review</div>
+      <div class="stat-number my-1 text-warning" style="font-size:1.5rem;">{{ review_count }}</div>
+      <div class="small text-warning">Verification</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2 reveal-up delay-5">
+    <div class="stat-card p-3 h-100">
+      <div class="text-muted small fw-semibold">Approved</div>
+      <div class="stat-number my-1 text-success" style="font-size:1.5rem;">{{ accepted_count }}</div>
+      <div class="small text-success">Eligible for Enroll</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2 reveal-up delay-6">
+    <div class="stat-card p-3 h-100">
+      <div class="text-muted small fw-semibold">Enrolled Students</div>
+      <div class="stat-number my-1 text-info" style="font-size:1.5rem;">{{ enrolled_count }}</div>
+      <div class="small text-info">Roll Allocated</div>
+    </div>
+  </div>
+</div>
+
+<!-- Admission Funnel Progress Track -->
+<div class="card-saas mb-4 reveal-up">
+  <div class="card-saas-header d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;">
+        <i class="fa-solid fa-filter text-primary" style="font-size:0.8rem;"></i>
+      </div>
+      <span class="fw-bold text-main" style="font-size:0.9rem;">2026–27 Admission Conversion Funnel</span>
+    </div>
+    <span class="badge" style="background:var(--primary-light);color:var(--primary);font-size:0.75rem;">{{ conversion_rate }}% Conversion Rate</span>
+  </div>
+  <div class="card-saas-body py-3 px-4">
+    <div class="row g-2 text-center align-items-center">
+      <div class="col">
+        <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:0.75rem 0.5rem;">
+          <div class="text-muted" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;">1. Inquiries</div>
+          <div class="fw-bold text-main" style="font-family:'Geist Mono',monospace;font-size:1.15rem;">{{ total_count }}</div>
+        </div>
+      </div>
+      <div class="col-auto text-muted"><i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i></div>
+      <div class="col">
+        <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:0.75rem 0.5rem;">
+          <div class="text-muted" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;">2. Submitted</div>
+          <div class="fw-bold text-primary" style="font-family:'Geist Mono',monospace;font-size:1.15rem;">{{ submitted_count }}</div>
+        </div>
+      </div>
+      <div class="col-auto text-muted"><i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i></div>
+      <div class="col">
+        <div style="background:var(--warning-light);border:1px solid rgba(245,158,11,0.25);border-radius:10px;padding:0.75rem 0.5rem;">
+          <div class="text-warning" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;">3. Under Review</div>
+          <div class="fw-bold text-warning" style="font-family:'Geist Mono',monospace;font-size:1.15rem;">{{ review_count }}</div>
+        </div>
+      </div>
+      <div class="col-auto text-muted"><i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i></div>
+      <div class="col">
+        <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:0.75rem 0.5rem;">
+          <div class="text-muted" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;">4. Shortlisted</div>
+          <div class="fw-bold text-secondary" style="font-family:'Geist Mono',monospace;font-size:1.15rem;">{{ shortlist_count }}</div>
+        </div>
+      </div>
+      <div class="col-auto text-muted"><i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i></div>
+      <div class="col">
+        <div style="background:var(--success-light);border:1px solid rgba(22,163,74,0.25);border-radius:10px;padding:0.75rem 0.5rem;">
+          <div class="text-success" style="font-size:0.72rem;font-weight:600;text-transform:uppercase;">5. Approved</div>
+          <div class="fw-bold text-success" style="font-family:'Geist Mono',monospace;font-size:1.15rem;">{{ accepted_count }}</div>
+        </div>
+      </div>
+      <div class="col-auto text-muted"><i class="fa-solid fa-chevron-right" style="font-size:0.75rem;"></i></div>
+      <div class="col">
+        <div style="background:linear-gradient(135deg, rgba(30,64,175,0.15) 0%, rgba(22,163,74,0.15) 100%);border:1px solid var(--primary);border-radius:10px;padding:0.75rem 0.5rem;">
+          <div class="text-primary" style="font-size:0.72rem;font-weight:700;text-transform:uppercase;">6. Enrolled</div>
+          <div class="fw-bold text-primary" style="font-family:'Geist Mono',monospace;font-size:1.15rem;">{{ enrolled_count }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Applications Directory & Filters -->
+<div class="card-saas reveal-up">
+  <div class="card-saas-header p-3">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-md-4">
+        <div class="position-relative">
+          <i class="fa-solid fa-magnifying-glass position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="font-size:0.85rem;"></i>
+          <input type="text" name="search" class="form-control form-control-sm ps-5" placeholder="Search applicant, ID, phone..." value="{{ search_query }}">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="">All Pipeline Stages</option>
+          {% for val, label in stages %}
+            <option value="{{ val }}" {% if selected_status == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="class_level" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="">All Grades / Classes</option>
+          {% for cl in class_levels %}
+            <option value="{{ cl.id }}" {% if selected_class == cl.id|stringformat:"s" %}selected{% endif %}>{{ cl.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2 text-end">
+        <button type="submit" class="btn btn-saas-secondary btn-sm w-100">
+          <i class="fa-solid fa-filter me-1"></i> Filter
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0" style="font-size:0.83rem;">
+        <thead>
+          <tr>
+            <th class="ps-4">App ID</th>
+            <th>Applicant Student</th>
+            <th>Applying Class</th>
+            <th>Parent / Contact</th>
+            <th>Applied Date</th>
+            <th>Status</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in applications %}
+            <tr>
+              <td class="ps-4" style="font-family:'Geist Mono',monospace;font-weight:600;color:var(--primary);">
+                {{ app.application_number }}
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div style="width:30px;height:30px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;">
+                    {{ app.first_name|slice:":1" }}{{ app.last_name|slice:":1" }}
+                  </div>
+                  <div>
+                    <span class="fw-semibold text-main">{{ app.applicant_full_name }}</span>
+                    <span class="d-block text-muted" style="font-size:0.72rem;">{{ app.get_gender_display }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge" style="background:var(--primary-light);color:var(--primary);font-size:0.72rem;padding:3px 8px;border-radius:6px;">
+                  {{ app.applying_for_class.name }}
+                </span>
+              </td>
+              <td>
+                <div>{{ app.parent_name }}</div>
+                <div class="text-muted" style="font-size:0.72rem;">{{ app.parent_phone }}</div>
+              </td>
+              <td class="text-muted" style="font-size:0.78rem;">
+                {{ app.applied_date|date:"d M Y" }}
+              </td>
+              <td>
+                {% if app.status == 'ACCEPTED' %}
+                  <span style="background:var(--success-light);color:var(--success);padding:3px 8px;border-radius:20px;font-size:0.72rem;font-weight:600;">
+                    <i class="fa-solid fa-check me-1"></i> Approved
+                  </span>
+                {% elif app.status == 'ENROLLED' %}
+                  <span style="background:var(--primary-light);color:var(--primary);padding:3px 8px;border-radius:20px;font-size:0.72rem;font-weight:600;">
+                    <i class="fa-solid fa-user-graduate me-1"></i> Enrolled
+                  </span>
+                {% elif app.status == 'UNDER_REVIEW' or app.status == 'SUBMITTED' %}
+                  <span style="background:var(--warning-light);color:var(--warning);padding:3px 8px;border-radius:20px;font-size:0.72rem;font-weight:600;">
+                    <i class="fa-solid fa-clock me-1"></i> {{ app.get_status_display }}
+                  </span>
+                {% else %}
+                  <span class="badge badge-secondary" style="font-size:0.72rem;">{{ app.get_status_display }}</span>
+                {% endif %}
+              </td>
+              <td class="text-end pe-4">
+                <div class="d-inline-flex gap-1">
+                  <a href="{% url 'admissions:detail' app.pk %}" class="btn btn-saas-secondary btn-sm" title="View Details &amp; Verify" style="padding:2px 8px;font-size:0.75rem;">
+                    <i class="fa-solid fa-file-lines text-primary me-1"></i> Review
+                  </a>
+                  <a href="{% url 'admissions:full_admission' %}?app_id={{ app.pk }}" class="btn btn-outline-primary btn-sm" title="Complete / Edit Full Admission Dossier" style="padding:2px 8px;font-size:0.75rem;">
+                    <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Full Dossier
+                  </a>
+                </div>
+              </td>
+
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">
+                <i class="fa-solid fa-folder-open mb-2 d-block" style="font-size:2rem;opacity:0.4;"></i>
+                No admission applications found.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

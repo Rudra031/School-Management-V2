@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Class Invoices{% endblock %}
+{% block page_heading %}Batch Student Invoicing Wizard{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i> Batch Invoicing Wizard</span>
+      </div>
+      <div class="card-saas-body">
+        <div class="alert alert-info small mb-4">
+          <i class="fa-solid fa-circle-info me-2"></i>
+          This wizard will generate individual fee invoices for all currently enrolled students in the selected class level / section.
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Academic Session</label>
+            {{ form.academic_year }}
+            {% if form.academic_year.errors %}<div class="text-danger small">{{ form.academic_year.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Target Class Level</label>
+              {{ form.class_level }}
+              {% if form.class_level.errors %}<div class="text-danger small">{{ form.class_level.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Section (Optional - Leave blank for all sections)</label>
+              {{ form.section }}
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Fee Category</label>
+              {{ form.fee_category }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Invoice Title</label>
+              {{ form.title }}
+              {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Amount Per Student (₹)</label>
+              {{ form.amount }}
+              {% if form.amount.errors %}<div class="text-danger small">{{ form.amount.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Payment Due Date</label>
+              {{ form.due_date }}
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'fees:invoice_list' %}" class="btn btn-saas-secondary">Cancel</a>
+            <button type="submit" class="btn btn-saas-primary" data-confirm="Generate invoices for all enrolled students in this class?">
+              <i class="fa-solid fa-bolt me-1"></i> Generate Invoices
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,862 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit User: {{ form.instance.full_name }}{% else %}Create User Account Manually{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ============================================================
+     PREMIUM FORM & GLASSMORPHISM STYLES
+     ============================================================ */
+  .float-field { 
+    position: relative; 
+    margin-bottom: 1.25rem; 
+  }
+  
+  .float-field input, 
+  .float-field select, 
+  .float-field textarea {
+    background: var(--input-bg) !important;
+    border: 1.5px solid var(--input-border) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--text-main) !important;
+    padding: 1.15rem 0.95rem 0.45rem 0.95rem !important;
+    font-size: 0.92rem !important;
+    width: 100%;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    outline: none !important;
+  }
+  
+  .float-field input:focus, 
+  .float-field select:focus, 
+  .float-field textarea:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14) !important;
+    background: var(--card-bg) !important;
+  }
+  
+  .float-label {
+    position: absolute; 
+    top: 0.85rem; 
+    left: 0.95rem;
+    font-size: 0.84rem; 
+    color: var(--text-muted);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+    pointer-events: none; 
+    font-weight: 500;
+  }
+  
+  .float-field input:focus ~ .float-label,
+  .float-field input:not(:placeholder-shown) ~ .float-label,
+  .float-field select:focus ~ .float-label,
+  .float-field select:not([value=""]) ~ .float-label,
+  .float-field textarea:focus ~ .float-label,
+  .float-field textarea:not(:placeholder-shown) ~ .float-label {
+    top: 0.22rem; 
+    font-size: 0.68rem; 
+    color: var(--primary); 
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  /* Form Card Sections */
+  .form-section-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .form-section-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: rgba(79, 70, 229, 0.25);
+  }
+
+  .form-section-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--card-border);
+    background: rgba(79, 70, 229, 0.02);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .form-section-body {
+    padding: 1.25rem;
+  }
+
+  /* Parent Linking Section */
+  .parent-linking-container {
+    background: linear-gradient(180deg, rgba(79, 70, 229, 0.03) 0%, rgba(124, 58, 237, 0.02) 100%);
+    border: 1.5px solid rgba(79, 70, 229, 0.25);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .parent-header-gradient {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(124, 58, 237, 0.08));
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid rgba(79, 70, 229, 0.15);
+  }
+
+  /* Student Picker Card Grid */
+  .student-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.85rem;
+    max-height: 380px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    background: var(--bg-main);
+    border: 1px solid var(--card-border);
+  }
+
+  .student-cards-grid::-webkit-scrollbar { width: 5px; }
+  .student-cards-grid::-webkit-scrollbar-thumb { background: rgba(79, 70, 229, 0.25); border-radius: 4px; }
+
+  .student-select-card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    user-select: none;
+  }
+
+  .student-select-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.12);
+  }
+
+  .student-select-card.selected {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(124, 58, 237, 0.04));
+    border-color: var(--primary);
+    box-shadow: 0 4px 18px rgba(79, 70, 229, 0.18);
+  }
+
+  .student-select-card .student-avatar-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+  }
+
+  .student-select-card .selection-check {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--input-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    color: transparent;
+    transition: all 0.2s ease;
+  }
+
+  .student-select-card.selected .selection-check {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    box-shadow: 0 0 8px rgba(79, 70, 229, 0.5);
+  }
+
+  /* Right Sticky Preview */
+  .preview-sticky {
+    position: sticky;
+    top: calc(var(--topbar-height) + 1.25rem);
+  }
+
+  .user-badge-preview {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    border-radius: var(--radius-xl);
+    padding: 1.85rem 1.5rem;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 12px 35px rgba(30, 27, 75, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .user-badge-preview::after {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .preview-avatar {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05));
+    backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: #fff;
+    font-weight: 800;
+    margin: 0 auto 0.85rem;
+    border: 3px solid rgba(255,255,255,0.45);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    font-family: 'Geist', sans-serif;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .user-badge-preview:hover .preview-avatar {
+    transform: scale(1.08) rotate(4deg);
+  }
+
+  .preview-ward-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(6px);
+    font-size: 0.72rem;
+    color: #fff;
+    margin: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .preview-ward-chip-avatar {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #06b6d4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Banner -->
+<div class="page-hero reveal-up mb-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="d-flex align-items-center gap-3">
+      <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--violet));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.35rem;box-shadow:0 4px 20px var(--primary-glow);">
+        <i class="fa-solid fa-user-shield"></i>
+      </div>
+      <div>
+        <h4 class="fw-bold mb-0" style="font-family:'Geist',sans-serif;letter-spacing:-0.02em;">
+          {% if form.instance.pk %}Edit User: {{ form.instance.full_name }}{% else %}Manual User Account Creation{% endif %}
+        </h4>
+        <p class="mb-0 small" style="color:var(--text-muted);">
+          {% if form.instance.pk %}Update persona privileges, credentials, and parent-student linkages{% else %}Assign custom User ID, email, role persona, credentials, and link parent wards{% endif %}
+        </p>
+      </div>
+    </div>
+    <div>
+      <a href="{% url 'accounts:user_list' %}" class="btn btn-saas-secondary btn-sm">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to User Directory
+      </a>
+    </div>
+  </div>
+</div>
+
+<form method="post" novalidate id="manualUserForm">
+  {% csrf_token %}
+
+  <!-- Hidden default Django SelectMultiple for robust form submission -->
+  <div class="d-none">
+    {{ form.linked_children }}
+  </div>
+
+  <div class="row g-4">
+
+    <!-- Left: Primary Configuration Forms -->
+    <div class="col-lg-8">
+
+      <!-- 1. Account Credentials & Login Identity -->
+      <div class="form-section-card reveal-up delay-1">
+        <div class="form-section-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-id-card text-primary"></i>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.95rem;">Login Credentials &amp; Identity</span>
+          </div>
+          <span class="badge bg-primary-subtle text-primary fw-semibold" style="font-size:0.72rem;">Step 1: Identity</span>
+        </div>
+        <div class="form-section-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.username }}
+                <label class="float-label">Assign User ID / Username *</label>
+                {% if form.username.errors %}
+                  <div class="text-danger small mt-1"><i class="fa-solid fa-circle-exclamation me-1"></i>{{ form.username.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text small" style="font-size:0.74rem;">Unique login ID (e.g. <code>ADM001</code>, <code>TCH_MATH</code>, <code>PAR_2026_01</code>)</div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.email }}
+                <label class="float-label">Login Email Address *</label>
+                {% if form.email.errors %}
+                  <div class="text-danger small mt-1"><i class="fa-solid fa-circle-exclamation me-1"></i>{{ form.email.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text small" style="font-size:0.74rem;">Primary contact &amp; notification address</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password Assignment (Creation Mode Only) -->
+          {% if not form.instance.pk %}
+            <div class="p-3 my-2" style="background:var(--bg-main);border-radius:var(--radius-md);border:1px solid var(--card-border);">
+              <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                <div class="fw-bold small" style="color:var(--text-main);">
+                  <i class="fa-solid fa-key text-primary me-1"></i>Initial Password Assignment
+                </div>
+                <button type="button" class="btn btn-saas-secondary btn-sm" onclick="generateRandomPassword()" style="font-size:0.75rem;">
+                  <i class="fa-solid fa-wand-magic-sparkles text-primary me-1"></i> Generate Secure Password
+                </button>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="float-field mb-0">
+                    {{ form.password }}
+                    <label class="float-label">Initial Password *</label>
+                    {% if form.password.errors %}
+                      <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="float-field mb-0">
+                    {{ form.confirm_password }}
+                    <label class="float-label">Confirm Password *</label>
+                    {% if form.confirm_password.errors %}
+                      <div class="text-danger small mt-1">{{ form.confirm_password.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div id="generatedPassAlert" class="mt-2 p-2 rounded bg-primary-subtle text-primary small d-none d-flex align-items-center justify-content-between">
+                <div>
+                  <i class="fa-solid fa-circle-check me-1"></i> Generated password applied: <strong id="generatedPassText" class="font-monospace user-select-all"></strong>
+                </div>
+                <button type="button" class="btn btn-sm btn-link p-0 text-primary text-decoration-none" onclick="copyPasswordToClipboard()">
+                  <i class="fa-regular fa-copy me-1"></i>Copy
+                </button>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- 2. Personal & Persona Profile -->
+      <div class="form-section-card reveal-up delay-2">
+        <div class="form-section-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-user text-violet"></i>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.95rem;">Personal Profile &amp; Role Persona</span>
+          </div>
+          <span class="badge bg-violet-subtle text-violet fw-semibold" style="font-size:0.72rem;">Step 2: Profile</span>
+        </div>
+        <div class="form-section-body">
+          <!-- Names -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.first_name }}
+                <label class="float-label">First Name *</label>
+                {% if form.first_name.errors %}
+                  <div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.last_name }}
+                <label class="float-label">Last Name *</label>
+                {% if form.last_name.errors %}
+                  <div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Role & Phone -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="small fw-bold mb-1 d-flex align-items-center justify-content-between" style="color:var(--text-main);">
+                  <span>Assigned Persona Role *</span>
+                  <span class="badge bg-info-subtle text-info small" id="roleSelectionHint">Select Parent to link students</span>
+                </label>
+                {{ form.user_type }}
+                {% if form.user_type.errors %}
+                  <div class="text-danger small mt-1">{{ form.user_type.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="float-field mt-md-4">
+                {{ form.phone_number }}
+                <label class="float-label">Contact Phone Number</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gender & Address -->
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="small fw-semibold mb-1" style="color:var(--text-main);">Gender</label>
+                {{ form.gender }}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="float-field mt-md-4">
+                {{ form.address }}
+                <label class="float-label">Residential Address</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Dynamic Parent-Child Linking (Exclusive for Role == PARENT) -->
+      <div id="parentLinkingSection" class="parent-linking-container reveal-up mb-4" style="display: none;">
+        <div class="parent-header-gradient d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--violet));display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.95rem;">
+              <i class="fa-solid fa-children"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-family:'Geist',sans-serif;">Link Children &amp; Student Wards</h6>
+              <span class="small text-muted" style="font-size:0.75rem;">Associate registered students with this parent profile</span>
+            </div>
+          </div>
+          <div>
+            <span class="badge bg-primary text-white" id="selectedChildrenCounter">0 Children Linked</span>
+          </div>
+        </div>
+
+        <div class="p-3">
+          <!-- Relationship and Permissions Config -->
+          <div class="row g-3 mb-3 p-3 rounded" style="background:var(--card-bg);border:1px solid var(--card-border);">
+            <div class="col-md-4">
+              <label class="small fw-bold mb-1" style="color:var(--text-main);">Parent Relationship</label>
+              {{ form.relationship_type }}
+            </div>
+            <div class="col-md-4">
+              <label class="small fw-bold mb-1" style="color:var(--text-main);">SMS &amp; Invoicing</label>
+              <div class="form-check form-switch mt-1">
+                {{ form.is_primary_contact }}
+                <label class="form-check-label small" for="id_is_primary_contact">Primary Contact</label>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="small fw-bold mb-1" style="color:var(--text-main);">Campus Access</label>
+              <div class="form-check form-switch mt-1">
+                {{ form.can_pickup_child }}
+                <label class="form-check-label small" for="id_can_pickup_child">Authorized Pickup</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Student Live Search Filter -->
+          <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+            <div class="position-relative flex-grow-1" style="max-width:350px;">
+              <i class="fa-solid fa-magnifying-glass position-absolute" style="top:10px;left:12px;color:var(--text-muted);font-size:0.85rem;"></i>
+              <input type="text" id="studentSearchInput" class="form-control form-control-sm ps-5" placeholder="Search student by name or admission no..." style="border-radius:20px;">
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearAllSelectedStudents()" style="font-size:0.75rem;">
+                <i class="fa-solid fa-rotate-left me-1"></i>Reset Selection
+              </button>
+            </div>
+          </div>
+
+          <!-- Interactive Student Cards Grid -->
+          <div class="student-cards-grid" id="studentCardsContainer">
+            {% for student in available_students %}
+              <div class="student-select-card {% if student.id in linked_student_ids %}selected{% endif %}" 
+                   data-student-id="{{ student.id }}" 
+                   data-student-name="{{ student.full_name }}" 
+                   data-admission-no="{{ student.admission_number }}"
+                   onclick="toggleStudentSelection(this)">
+                <div class="student-avatar-box">
+                  {{ student.first_name|first|default:"S" }}{{ student.last_name|first|default:"" }}
+                </div>
+                <div class="overflow-hidden flex-grow-1">
+                  <div class="fw-bold small text-truncate" style="color:var(--text-main);">{{ student.full_name }}</div>
+                  <div class="small text-muted text-truncate" style="font-size:0.72rem;">
+                    <span class="font-monospace">{{ student.admission_number }}</span>
+                    {% if student.academic_class %} • {{ student.academic_class.name }}{% endif %}
+                  </div>
+                </div>
+                <div class="selection-check">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+              </div>
+            {% empty %}
+              <div class="p-4 text-center text-muted col-12">
+                <i class="fa-solid fa-user-graduate mb-2" style="font-size:1.8rem;opacity:0.5;"></i>
+                <p class="small mb-0">No active students found in the directory.</p>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="form-text small mt-2" style="font-size:0.74rem;">
+            <i class="fa-solid fa-circle-info text-primary me-1"></i>Click any student card to link or unlink them with this parent profile.
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Account Status & Security Policies -->
+      <div class="form-section-card reveal-up delay-3">
+        <div class="form-section-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-sliders text-success"></i>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.95rem;">Account Status &amp; Access Controls</span>
+          </div>
+          <span class="badge bg-success-subtle text-success fw-semibold" style="font-size:0.72rem;">Step 3: Security</span>
+        </div>
+        <div class="form-section-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-check form-switch p-0 d-flex align-items-center justify-content-between bg-light rounded p-3 border">
+                <div>
+                  <label class="form-check-label small fw-bold ps-2 mb-0" for="id_is_active">
+                    Active Account Status
+                  </label>
+                  <div class="small text-muted ps-2" style="font-size:0.72rem;">Allows immediate portal authentication</div>
+                </div>
+                {{ form.is_active }}
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-check form-switch p-0 d-flex align-items-center justify-content-between bg-light rounded p-3 border">
+                <div>
+                  <label class="form-check-label small fw-bold ps-2 mb-0" for="id_must_change_password">
+                    Mandatory Password Reset
+                  </label>
+                  <div class="small text-muted ps-2" style="font-size:0.72rem;">Prompts password change upon next login</div>
+                </div>
+                {{ form.must_change_password }}
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 d-flex justify-content-between align-items-center border-top">
+            <a href="{% url 'accounts:user_list' %}" class="btn btn-saas-secondary">
+              <i class="fa-solid fa-xmark me-1"></i>Cancel
+            </a>
+            <button type="submit" class="btn btn-saas-primary">
+              <i class="fa-solid fa-circle-check me-1"></i>
+              {% if form.instance.pk %}Save Profile Changes{% else %}Confirm &amp; Create Account{% endif %}
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Live User Credentials Preview Card -->
+    <div class="col-lg-4">
+      <div class="preview-sticky reveal-up delay-2">
+
+        <!-- 3D Holographic Persona Card -->
+        <div class="user-badge-preview">
+          <div class="preview-avatar" id="previewAvatar">
+            {{ form.instance.first_name|first|default:"U" }}
+          </div>
+          <h5 class="fw-bold mb-1" id="previewFullName" style="font-family:'Geist',sans-serif;">
+            {{ form.instance.full_name|default:"New User" }}
+          </h5>
+          <div class="badge bg-white text-dark mb-2" id="previewUserId" style="font-family:'Geist Mono',monospace;font-size:0.82rem;padding:4px 12px;border-radius:20px;letter-spacing:0.04em;">
+            {{ form.instance.username|default:"USER_ID" }}
+          </div>
+          <div class="d-block mb-2">
+            <span class="badge bg-white text-primary fw-bold" id="previewRoleBadge" style="font-size:0.75rem;padding:4px 12px;border-radius:12px;">
+              {{ form.instance.get_user_type_display|default:"Student" }}
+            </span>
+          </div>
+
+          <!-- Parent Wards Preview Capsule (Shows when role == PARENT) -->
+          <div id="previewParentWardsContainer" class="mt-3 pt-3 border-top border-white border-opacity-25" style="display: none;">
+            <div class="small fw-semibold text-white-50 mb-2" style="font-size:0.75rem;">
+              <i class="fa-solid fa-child-reaching me-1"></i>Linked Children Wards:
+            </div>
+            <div id="previewWardsList" class="d-flex flex-wrap justify-content-center">
+              <span class="small text-white-50 fst-italic" id="previewNoWardsText" style="font-size:0.74rem;">No children selected yet</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Credentials Quick Summary Card -->
+        <div class="form-section-card">
+          <div class="form-section-body p-3">
+            <h6 class="fw-bold small mb-3" style="color:var(--text-main);">
+              <i class="fa-solid fa-shield-halved me-2 text-primary"></i>Credentials Summary
+            </h6>
+            
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="small text-muted">User ID / Username:</span>
+              <strong class="small font-monospace text-primary" id="previewCardId">{{ form.instance.username|default:"—" }}</strong>
+            </div>
+
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="small text-muted">Login Email:</span>
+              <span class="small text-truncate" id="previewCardEmail" style="max-width:180px;">{{ form.instance.email|default:"—" }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="small text-muted">Role Persona:</span>
+              <span class="small fw-bold text-primary" id="previewCardRole">{{ form.instance.get_user_type_display|default:"—" }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between py-2">
+              <span class="small text-muted">Authentication Mode:</span>
+              <span class="small text-success fw-semibold"><i class="fa-solid fa-circle-check me-1"></i>User ID or Email</span>
+            </div>
+          </div>
+        </div>
+
+        {% if form.errors %}
+          <div class="form-section-card border-danger mt-3">
+            <div class="form-section-body py-2">
+              <p class="small fw-bold text-danger mb-1"><i class="fa-solid fa-circle-exclamation me-1"></i>Please address the following:</p>
+              {% for field, errors in form.errors.items %}
+                {% for err in errors %}
+                  <div class="small text-danger">• <strong>{{ field }}:</strong> {{ err }}</div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  /* ============================================================
+     PASSWORD GENERATION & CLIPBOARD COPY
+     ============================================================ */
+  function generateRandomPassword() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
+    let pass = "";
+    for (let i = 0; i < 12; i++) {
+      pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const p1 = document.getElementById('id_password');
+    const p2 = document.getElementById('id_confirm_password');
+    if (p1 && p2) {
+      p1.value = pass;
+      p2.value = pass;
+      p1.type = 'text';
+      p2.type = 'text';
+
+      const alertBox = document.getElementById('generatedPassAlert');
+      const textSpan = document.getElementById('generatedPassText');
+      if (alertBox && textSpan) {
+        textSpan.textContent = pass;
+        alertBox.classList.remove('d-none');
+      }
+    }
+  }
+
+  function copyPasswordToClipboard() {
+    const text = document.getElementById('generatedPassText')?.textContent;
+    if (text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Password copied to clipboard: ' + text);
+      });
+    }
+  }
+
+  /* ============================================================
+     PARENT LINKING & STUDENT SELECTION ENGINE
+     ============================================================ */
+  function toggleParentLinkingVisibility() {
+    const roleEl = document.getElementById('id_user_type');
+    const roleValue = roleEl ? roleEl.value : '';
+    const parentSection = document.getElementById('parentLinkingSection');
+    const wardsPreview = document.getElementById('previewParentWardsContainer');
+    const roleHint = document.getElementById('roleSelectionHint');
+
+    if (roleValue === 'PARENT') {
+      if (parentSection) parentSection.style.display = 'block';
+      if (wardsPreview) wardsPreview.style.display = 'block';
+      if (roleHint) roleHint.textContent = 'Parent Mode Active';
+    } else {
+      if (parentSection) parentSection.style.display = 'none';
+      if (wardsPreview) wardsPreview.style.display = 'none';
+      if (roleHint) roleHint.textContent = 'Select Parent to link students';
+    }
+  }
+
+  function toggleStudentSelection(card) {
+    card.classList.toggle('selected');
+    syncHiddenSelectField();
+  }
+
+  function syncHiddenSelectField() {
+    const selectField = document.getElementById('id_linked_children');
+    const selectedCards = document.querySelectorAll('.student-select-card.selected');
+    const counterBadge = document.getElementById('selectedChildrenCounter');
+    const wardsList = document.getElementById('previewWardsList');
+
+    if (!selectField) return;
+
+    // Reset select options
+    Array.from(selectField.options).forEach(opt => opt.selected = false);
+
+    let selectedCount = 0;
+    if (wardsList) wardsList.innerHTML = '';
+
+    selectedCards.forEach(card => {
+      const studentId = card.getAttribute('data-student-id');
+      const studentName = card.getAttribute('data-student-name');
+      const option = Array.from(selectField.options).find(opt => opt.value === studentId);
+      if (option) {
+        option.selected = true;
+        selectedCount++;
+
+        // Add to right preview
+        if (wardsList) {
+          const chip = document.createElement('span');
+          chip.className = 'preview-ward-chip';
+          chip.innerHTML = `<span class="preview-ward-chip-avatar">${studentName.charAt(0)}</span> ${studentName}`;
+          wardsList.appendChild(chip);
+        }
+      }
+    });
+
+    if (counterBadge) {
+      counterBadge.textContent = `${selectedCount} Children Linked`;
+    }
+
+    if (wardsList && selectedCount === 0) {
+      wardsList.innerHTML = '<span class="small text-white-50 fst-italic" id="previewNoWardsText" style="font-size:0.74rem;">No children selected yet</span>';
+    }
+  }
+
+  function clearAllSelectedStudents() {
+    document.querySelectorAll('.student-select-card.selected').forEach(c => c.classList.remove('selected'));
+    syncHiddenSelectField();
+  }
+
+  /* ============================================================
+     LIVE STUDENT SEARCH FILTER
+     ============================================================ */
+  function filterStudentCards() {
+    const query = document.getElementById('studentSearchInput')?.value.toLowerCase().trim() || '';
+    document.querySelectorAll('.student-select-card').forEach(card => {
+      const name = card.getAttribute('data-student-name')?.toLowerCase() || '';
+      const adm = card.getAttribute('data-admission-no')?.toLowerCase() || '';
+      if (name.includes(query) || adm.includes(query)) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  /* ============================================================
+     LIVE PROFILE PREVIEW SYNCHRONIZER
+     ============================================================ */
+  function syncUserPreview() {
+    const uid = document.getElementById('id_username')?.value.trim() || 'USER_ID';
+    const email = document.getElementById('id_email')?.value.trim() || 'user@school.edu';
+    const fn = document.getElementById('id_first_name')?.value.trim() || '';
+    const ln = document.getElementById('id_last_name')?.value.trim() || '';
+    const fullName = (fn + ' ' + ln).trim() || 'New User';
+    const initials = (fn[0] || 'U') + (ln[0] || '');
+
+    const avatarEl = document.getElementById('previewAvatar');
+    if (avatarEl) avatarEl.textContent = initials.toUpperCase() || 'U';
+
+    const fnEl = document.getElementById('previewFullName');
+    if (fnEl) fnEl.textContent = fullName;
+
+    const pUidEl = document.getElementById('previewUserId');
+    if (pUidEl) pUidEl.textContent = uid;
+
+    const pCardId = document.getElementById('previewCardId');
+    if (pCardId) pCardId.textContent = uid;
+
+    const pCardEmail = document.getElementById('previewCardEmail');
+    if (pCardEmail) pCardEmail.textContent = email;
+
+    const roleEl = document.getElementById('id_user_type');
+    if (roleEl) {
+      const roleText = roleEl.options[roleEl.selectedIndex]?.text || 'Student';
+      const roleBadge = document.getElementById('previewRoleBadge');
+      const cardRole = document.getElementById('previewCardRole');
+      if (roleBadge) roleBadge.textContent = roleText;
+      if (cardRole) cardRole.textContent = roleText;
+    }
+
+    toggleParentLinkingVisibility();
+  }
+
+  /* ============================================================
+     INIT ON LOAD
+     ============================================================ */
+  document.addEventListener('DOMContentLoaded', function () {
+    ['id_username', 'id_email', 'id_first_name', 'id_last_name', 'id_user_type'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', syncUserPreview);
+        el.addEventListener('change', syncUserPreview);
+      }
+    });
+
+    document.getElementById('studentSearchInput')?.addEventListener('input', filterStudentCards);
+
+    document.querySelectorAll('.float-field input, .float-field select, .float-field textarea').forEach(el => {
+      if (!el.getAttribute('placeholder')) el.setAttribute('placeholder', ' ');
+    });
+
+    // Initial sync
+    syncHiddenSelectField();
+    syncUserPreview();
+  });
+</script>
+{% endblock %}

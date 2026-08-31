@@ -1,0 +1,93 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}Testimonials &amp; Alumni Voices | {{ school.name|default:"Horizon Premier Public School" }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="py-5" style="background:radial-gradient(circle at 50% 0%, rgba(12, 12, 115, 0.3) 0%, rgba(0, 31, 92, 0.95) 70%, #001230 100%);">
+  <div class="container text-center py-4">
+    <div class="badge-tag mx-auto mb-3">
+      <i class="fa-solid fa-comments text-warning me-1"></i> Community Testimonials
+    </div>
+    <h1 class="display-5 fw-bold text-white mt-2">Voices of Trust, Legacy &amp; Achievement</h1>
+    <p class="text-white-50 max-w-800 mx-auto" style="font-size:1.1rem; line-height:1.8;">
+      Read authentic reflections from parents, enrolled scholars, and distinguished alumni who have matriculated into India's premier institutes and global universities.
+    </p>
+    <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+      <a href="{% url 'website:public_apply' %}" class="btn-site-gold">
+        <i class="fa-solid fa-file-pen me-1"></i> Join Our Family
+      </a>
+      <a href="{% url 'website:contact' %}" class="btn-site-glass">
+        <i class="fa-solid fa-pen-to-square me-1"></i> Share Your Testimonial
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+
+  <!-- Alumni & Parent Testimonial Grid -->
+  <div class="row g-4 mb-5">
+    {% for t in testimonials %}
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="badge bg-secondary bg-opacity-25 text-warning fw-bold" style="font-size:0.75rem;">{{ t.get_role_type_display }}</span>
+              <div class="text-warning small">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+              </div>
+            </div>
+            <p class="text-white-50 small mb-4" style="line-height:1.75; font-size:0.88rem;">
+              "{{ t.quote }}"
+            </p>
+          </div>
+          <div class="d-flex align-items-center gap-3 pt-3 border-top border-secondary border-opacity-25">
+            <div style="width:44px; height:44px; border-radius:50%; background:linear-gradient(135deg, #0c0c73, #ffc600); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:bold; font-size:1.1rem;">
+              {{ t.author_name|slice:":1" }}
+            </div>
+            <div>
+              <h6 class="text-white fw-bold mb-0" style="font-size:0.92rem;">{{ t.author_name }}</h6>
+              <span class="text-white-50" style="font-size:0.75rem;">{{ t.sub_title }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center py-5 text-white-50">
+        <i class="fa-solid fa-quote-left fs-1 text-secondary mb-3 d-block"></i>
+        No testimonials published yet.
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Alumni Matriculation Stats Banner -->
+  <div class="glass-panel p-4 p-lg-5 text-center" id="alumni-banner">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-3 col-6 border-end-md border-secondary border-opacity-25">
+        <h2 class="display-6 fw-bold text-warning mb-1">100%</h2>
+        <span class="text-white-50 small">CBSE Board Pass Rate</span>
+      </div>
+      <div class="col-lg-3 col-6 border-end-md border-secondary border-opacity-25">
+        <h2 class="display-6 fw-bold text-info mb-1">450+</h2>
+        <span class="text-white-50 small">IIT, AIIMS &amp; NIT Alumni</span>
+      </div>
+      <div class="col-lg-3 col-6 border-end-md border-secondary border-opacity-25">
+        <h2 class="display-6 fw-bold text-success mb-1">85+</h2>
+        <span class="text-white-50 small">Civil Services &amp; Defense Officers</span>
+      </div>
+      <div class="col-lg-3 col-6">
+        <h2 class="display-6 fw-bold text-primary mb-1">28 Yrs</h2>
+        <span class="text-white-50 small">Institutional Excellence</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+

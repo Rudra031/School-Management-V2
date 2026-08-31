@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Academics Management{% endblock %}
+{% block page_heading %}Academics & Curriculum Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Academic Overview</h5>
+    <p class="text-muted small mb-0">Manage academic sessions, departments, grade levels, sections, and subjects.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'academics:year_create' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-plus me-1"></i> New Session</a>
+    <a href="{% url 'academics:class_create' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-plus me-1"></i> Add Grade</a>
+    <a href="{% url 'academics:section_create' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-plus me-1"></i> Add Section</a>
+    <a href="{% url 'academics:subject_create' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-book-plus me-1"></i> Add Subject</a>
+  </div>
+</div>
+
+<!-- Academic Modules Grid -->
+<div class="row g-4 mb-4">
+  <!-- Sessions Card -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas h-100 p-3">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-primary"><i class="fa-solid fa-calendar"></i></div>
+        <div>
+          <h6 class="fw-bold mb-0">Academic Years</h6>
+          <small class="text-muted">{{ academic_years.count }} Sessions</small>
+        </div>
+      </div>
+      <p class="text-muted small">Manage school calendar cycles, active sessions, and term rollover.</p>
+      <a href="{% url 'academics:year_list' %}" class="btn btn-outline-primary btn-sm mt-auto w-100">Manage Sessions</a>
+    </div>
+  </div>
+
+  <!-- Classes Card -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas h-100 p-3">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-success"><i class="fa-solid fa-school"></i></div>
+        <div>
+          <h6 class="fw-bold mb-0">Classes & Sections</h6>
+          <small class="text-muted">{{ classes.count }} Grades</small>
+        </div>
+      </div>
+      <p class="text-muted small">Configure grade levels, section rooms, and class teachers.</p>
+      <a href="{% url 'academics:class_manage' %}" class="btn btn-outline-success btn-sm mt-auto w-100">Manage Classes</a>
+    </div>
+  </div>
+
+  <!-- Subjects Card -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas h-100 p-3">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-info"><i class="fa-solid fa-book"></i></div>
+        <div>
+          <h6 class="fw-bold mb-0">Subjects</h6>
+          <small class="text-muted">{{ subjects.count }} Subjects</small>
+        </div>
+      </div>
+      <p class="text-muted small">Curriculum subjects, theory/practical configurations, credits.</p>
+      <a href="{% url 'academics:subject_list' %}" class="btn btn-outline-info btn-sm mt-auto w-100">Manage Subjects</a>
+    </div>
+  </div>
+
+  <!-- Teacher Allocations Card -->
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas h-100 p-3">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-warning"><i class="fa-solid fa-chalkboard-user"></i></div>
+        <div>
+          <h6 class="fw-bold mb-0">Faculty Allocation</h6>
+          <small class="text-muted">{{ allocations.count }} Assigned</small>
+        </div>
+      </div>
+      <p class="text-muted small">Assign subject teachers to specific sections for the active year.</p>
+      <a href="{% url 'academics:allocation_list' %}" class="btn btn-outline-warning btn-sm mt-auto w-100">Assign Teachers</a>
+    </div>
+  </div>
+</div>
+
+<!-- Class & Section Summary Table -->
+<div class="card-saas">
+  <div class="card-saas-header">
+    <span><i class="fa-solid fa-layer-group text-primary me-2"></i> Class & Section Directory</span>
+    <a href="{% url 'academics:class_manage' %}" class="small">Full View</a>
+  </div>
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Class Level</th>
+            <th>Department</th>
+            <th>Sections</th>
+            <th>Total Capacity</th>
+            <th>Enrolled Students</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for class in classes %}
+            <tr>
+              <td class="fw-bold text-dark">{{ class.name }}</td>
+              <td><span class="badge bg-light text-secondary border">{{ class.department.name|default:"General" }}</span></td>
+              <td>
+                {% for sec in class.sections.all %}
+                  <span class="badge bg-primary-subtle text-primary me-1">Sec {{ sec.name }}</span>
+                {% empty %}
+                  <span class="text-muted small">No sections created</span>
+                {% endfor %}
+              </td>
+              <td>{{ class.sections.count|default:0|add:40 }} Max</td>
+              <td><span class="badge bg-success-subtle text-success">Active</span></td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4 small">No classes configured yet. Click "Add Grade" to start.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

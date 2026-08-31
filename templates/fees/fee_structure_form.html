@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Configure Fee Structure | Horizon School ERP{% endblock %}
+{% block page_heading %}Configure Fee Structure{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+  <div class="col-md-7 col-lg-6">
+    <div class="card shadow-sm border-0 rounded-4 overflow-hidden bg-white">
+      <div class="card-header bg-light py-3 px-4 d-flex align-items-center gap-2">
+        <i class="fa-solid fa-receipt text-primary fs-5"></i>
+        <h6 class="fw-bold text-dark mb-0">Fee Head Rule Configuration</h6>
+      </div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Academic Session</label>
+            {{ form.academic_year }}
+            {% if form.academic_year.errors %}<div class="text-danger small">{{ form.academic_year.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Target Class Level</label>
+              {{ form.class_level }}
+              {% if form.class_level.errors %}<div class="text-danger small">{{ form.class_level.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Fee Head Category</label>
+              {{ form.fee_category }}
+              {% if form.fee_category.errors %}<div class="text-danger small">{{ form.fee_category.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Amount (₹ INR)</label>
+              {{ form.amount }}
+              {% if form.amount.errors %}<div class="text-danger small">{{ form.amount.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Billing Frequency</label>
+              {{ form.frequency }}
+              {% if form.frequency.errors %}<div class="text-danger small">{{ form.frequency.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label small fw-bold">Default Due Date (Optional)</label>
+            {{ form.due_date }}
+            <small class="text-muted" style="font-size:0.75rem;">Leave empty for standard periodic term due dates.</small>
+          </div>
+
+          <div class="d-flex justify-content-between pt-2">
+            <a href="{% url 'fees:structure_list' %}" class="btn btn-light px-4 fw-semibold rounded-3">Cancel</a>
+            <button type="submit" class="btn btn-primary px-4 fw-bold rounded-3">
+              <i class="fa-solid fa-floppy-disk me-1"></i> Save Fee Structure
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

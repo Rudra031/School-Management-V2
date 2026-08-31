@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Library Catalog{% endblock %}
+{% block page_heading %}Library Books Catalog{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Library Catalog & Resources</h5>
+    <p class="text-muted small mb-0">Total {{ paginator.count }} titles in library inventory.</p>
+  </div>
+  <div class="d-flex gap-2">
+    {% if user.is_librarian or user.is_superadmin or user.is_school_admin %}
+      <a href="{% url 'library:circulation_list' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-arrows-rotate me-1"></i> Active Loans & Circulation</a>
+      <a href="{% url 'library:book_issue' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-hand-holding me-1"></i> Issue Book</a>
+      <a href="{% url 'library:book_create' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Add Book</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Search & Category Filter -->
+<div class="card-saas p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-6">
+      <input type="text" name="search" class="form-control form-control-sm" placeholder="Search by title, author, or ISBN..." value="{{ search_query }}">
+    </div>
+    <div class="col-md-4">
+      <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">All Book Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-saas-primary btn-sm w-100">Search</button>
+      <a href="{% url 'library:catalog' %}" class="btn btn-saas-secondary btn-sm">Reset</a>
+    </div>
+  </form>
+</div>
+
+<!-- Book Cards Grid -->
+<div class="row g-4">
+  {% for book in books %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card-saas h-100 p-3 d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="badge bg-light text-secondary border">{{ book.category.name|default:"General" }}</span>
+          {% if book.is_available %}
+            <span class="badge bg-success-subtle text-success">{{ book.available_copies }} Available</span>
+          {% else %}
+            <span class="badge bg-danger-subtle text-danger">Checked Out</span>
+          {% endif %}
+        </div>
+
+        <h6 class="fw-bold mb-1 text-dark">{{ book.title }}</h6>
+        <p class="text-muted small mb-2">by {{ book.author }}</p>
+
+        <hr class="my-2">
+
+        <div class="small text-muted mb-3">
+          {% if book.isbn %}<div>ISBN: {{ book.isbn }}</div>{% endif %}
+          {% if book.shelf_location %}<div>Location: <strong>{{ book.shelf_location }}</strong></div>{% endif %}
+          <div>Total Copies: {{ book.total_copies }}</div>
+        </div>
+
+        {% if user.is_librarian or user.is_superadmin or user.is_school_admin %}
+          {% if book.is_available %}
+            <a href="{% url 'library:book_issue' %}?book={{ book.id }}" class="btn btn-outline-primary btn-sm w-100 mt-auto">Issue Copy</a>
+          {% else %}
+            <button class="btn btn-outline-secondary btn-sm w-100 mt-auto" disabled>All Copies Borrowed</button>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+      <i class="fa-solid fa-book-open fs-2 mb-2 text-secondary opacity-50"></i>
+      <p>No books found matching search criteria.</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,350 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Daily Student Attendance Register | Horizon School{% endblock %}
+{% block page_heading %}Daily Attendance Management{% endblock %}
+
+{% block extra_css %}
+<style>
+  .att-legend-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .status-badge-interactive {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    border-radius: 10px;
+    min-width: 44px;
+    height: 38px;
+    font-size: 0.95rem;
+    border: 2px solid transparent;
+  }
+  .status-badge-interactive:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .badge-p { background-color: #10b981; color: #fff; border-color: #059669; }
+  .badge-a { background-color: #ef4444; color: #fff; border-color: #dc2626; }
+  .badge-l { background-color: #f59e0b; color: #fff; border-color: #d97706; }
+  .badge-hd { background-color: #8b5cf6; color: #fff; border-color: #7c3aed; }
+  .badge-lv { background-color: #0ea5e9; color: #fff; border-color: #0284c7; }
+
+  .stat-card-kpi {
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .stat-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="d-flex align-items-center gap-2">
+      <h4 class="fw-bold text-dark mb-0">Daily Student Attendance Register</h4>
+      <span class="badge bg-primary bg-opacity-10 text-primary fw-semibold">{{ academic_year.name|default:"Session 2026-2027" }}</span>
+    </div>
+    <p class="text-muted small mb-0">Interactive fast-marking register with single-click cycle badges and real-time computation.</p>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a href="{% url 'attendance:monthly_matrix' %}{% if selected_section %}?section={{ selected_section.id }}{% endif %}" class="btn btn-outline-primary btn-sm fw-semibold">
+      <i class="fa-solid fa-calendar-days me-1"></i> Open Monthly Matrix View
+    </a>
+    <a href="{% url 'attendance:report' %}{% if selected_section %}?section={{ selected_section.id }}{% endif %}" class="btn btn-outline-secondary btn-sm fw-semibold">
+      <i class="fa-solid fa-chart-pie me-1"></i> Attendance Analytics
+    </a>
+  </div>
+</div>
+
+<!-- Section & Date Filter Card -->
+<div class="card shadow-sm border-0 rounded-4 p-3 mb-4 bg-white">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-5">
+      <label class="form-label small fw-bold text-secondary mb-1"><i class="fa-solid fa-chalkboard-user me-1 text-primary"></i> Select Class &amp; Section</label>
+      <select name="section" class="form-select form-select-sm rounded-3" onchange="this.form.submit()">
+        {% for sec in sections %}
+          <option value="{{ sec.id }}" {% if selected_section.id == sec.id %}selected{% endif %}>{{ sec.full_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label small fw-bold text-secondary mb-1"><i class="fa-regular fa-calendar me-1 text-primary"></i> Attendance Date</label>
+      <input type="date" name="date" class="form-control form-control-sm rounded-3" value="{{ selected_date|date:'Y-m-d' }}" onchange="this.form.submit()">
+    </div>
+    <div class="col-md-3">
+      <button type="submit" class="btn btn-primary btn-sm w-100 rounded-3 fw-semibold">
+        <i class="fa-solid fa-rotate me-1"></i> Reload Register
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Live Summary Metrics & Legend -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card-kpi">
+      <div class="stat-icon-wrap" style="background:#ecfdf5; color:#10b981;"><i class="fa-solid fa-user-check"></i></div>
+      <div>
+        <span class="text-muted small fw-semibold d-block">Present (P)</span>
+        <h4 class="fw-bold text-success mb-0" id="kpi-present">{{ counts.PRESENT }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card-kpi">
+      <div class="stat-icon-wrap" style="background:#fef2f2; color:#ef4444;"><i class="fa-solid fa-user-xmark"></i></div>
+      <div>
+        <span class="text-muted small fw-semibold d-block">Absent (A)</span>
+        <h4 class="fw-bold text-danger mb-0" id="kpi-absent">{{ counts.ABSENT }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card-kpi">
+      <div class="stat-icon-wrap" style="background:#fffbeb; color:#f59e0b;"><i class="fa-solid fa-clock"></i></div>
+      <div>
+        <span class="text-muted small fw-semibold d-block">Late (L)</span>
+        <h4 class="fw-bold text-warning mb-0" id="kpi-late">{{ counts.LATE }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card-kpi">
+      <div class="stat-icon-wrap" style="background:#f5f3ff; color:#8b5cf6;"><i class="fa-solid fa-hourglass-half"></i></div>
+      <div>
+        <span class="text-muted small fw-semibold d-block">Half Day (HD)</span>
+        <h4 class="fw-bold text-purple mb-0" style="color:#8b5cf6;" id="kpi-halfday">{{ counts.HALF_DAY }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card-kpi">
+      <div class="stat-icon-wrap" style="background:#f0f9ff; color:#0ea5e9;"><i class="fa-solid fa-calendar-minus"></i></div>
+      <div>
+        <span class="text-muted small fw-semibold d-block">Leave (LV)</span>
+        <h4 class="fw-bold text-info mb-0" id="kpi-leave">{{ counts.EXCUSED_LEAVE }}</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="stat-card-kpi">
+      <div class="stat-icon-wrap" style="background:#f8fafc; color:#334155;"><i class="fa-solid fa-percent"></i></div>
+      <div>
+        <span class="text-muted small fw-semibold d-block">Attendance Rate</span>
+        <h4 class="fw-bold text-dark mb-0" id="kpi-pct">{{ att_pct }}%</h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Status Palette Legend & Bulk Action Bar -->
+<div class="card shadow-sm border-0 rounded-4 p-3 mb-4 bg-white">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <span class="small fw-bold text-secondary me-1">Click Badge to Cycle:</span>
+      <span class="att-legend-pill" style="background:#ecfdf5; color:#065f46; border:1px solid #10b981;"><span class="badge" style="background:#10b981;">P</span> Present</span>
+      <span class="att-legend-pill" style="background:#fef2f2; color:#991b1b; border:1px solid #ef4444;"><span class="badge" style="background:#ef4444;">A</span> Absent</span>
+      <span class="att-legend-pill" style="background:#fffbeb; color:#92400e; border:1px solid #f59e0b;"><span class="badge" style="background:#f59e0b;">L</span> Late</span>
+      <span class="att-legend-pill" style="background:#f5f3ff; color:#5b21b6; border:1px solid #8b5cf6;"><span class="badge" style="background:#8b5cf6;">HD</span> Half Day</span>
+      <span class="att-legend-pill" style="background:#f0f9ff; color:#075985; border:1px solid #0ea5e9;"><span class="badge" style="background:#0ea5e9;">LV</span> Leave</span>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-outline-success btn-sm rounded-3 fw-bold px-3" onclick="setAllRows('PRESENT')">
+        <i class="fa-solid fa-check-double me-1"></i> Mark All (P)
+      </button>
+      <button type="button" class="btn btn-outline-danger btn-sm rounded-3 fw-bold px-3" onclick="setAllRows('ABSENT')">
+        <i class="fa-solid fa-xmark me-1"></i> Mark All (A)
+      </button>
+    </div>
+  </div>
+</div>
+
+{% if selected_section %}
+<!-- Attendance Table Container -->
+<div class="card shadow-sm border-0 rounded-4 overflow-hidden bg-white mb-5">
+  <div class="card-header bg-light py-3 px-4 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <i class="fa-solid fa-users text-primary fs-5"></i>
+      <h6 class="fw-bold text-dark mb-0">{{ selected_section.full_name }} &bull; {{ selected_date|date:"l, d F Y" }}</h6>
+      <span class="badge bg-secondary-subtle text-secondary small">{{ total_marked }} Enrolled</span>
+    </div>
+    <span class="text-muted small"><i class="fa-solid fa-hand-pointer text-warning me-1"></i> Click on any status pill to toggle status</span>
+  </div>
+
+  <form method="post" id="attendanceForm">
+    {% csrf_token %}
+    <input type="hidden" name="section_id" value="{{ selected_section.id }}">
+    <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 80px;" class="ps-4">Roll #</th>
+            <th>Student Profile</th>
+            <th>Admission No.</th>
+            <th style="width: 220px;" class="text-center">Attendance Status</th>
+            <th style="width: 320px;">Remarks / Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in student_rows %}
+            <tr id="row-{{ row.enrollment.id }}">
+              <td class="ps-4 fw-bold text-primary">#{{ row.enrollment.roll_number|default:forloop.counter }}</td>
+              <td>
+                <div class="fw-bold text-dark">{{ row.enrollment.student.full_name }}</div>
+                <span class="text-muted small">{{ row.enrollment.student.gender }} &bull; DOB: {{ row.enrollment.student.date_of_birth|date:"d M Y"|default:"N/A" }}</span>
+              </td>
+              <td class="small fw-semibold text-secondary">{{ row.enrollment.student.admission_number }}</td>
+              <td class="text-center">
+                <!-- Hidden input storing current selected status for form POST -->
+                <input type="hidden" name="status_{{ row.enrollment.id }}" id="input-status-{{ row.enrollment.id }}" value="{{ row.status }}">
+                
+                <!-- Clickable Interactive Pill Badge -->
+                <div class="status-badge-interactive badge-{{ row.status|lower|cut:'_' }}" 
+                     id="badge-{{ row.enrollment.id }}"
+                     onclick="cycleStatus('{{ row.enrollment.id }}')"
+                     title="Click to cycle status: P → A → L → HD → LV">
+                  <span id="letter-{{ row.enrollment.id }}">{{ row.status_conf.letter }}</span>
+                </div>
+              </td>
+              <td>
+                <input type="text" name="remarks_{{ row.enrollment.id }}" class="form-control form-control-sm rounded-3" placeholder="Optional notes (e.g. medical, sports)..." value="{{ row.remarks }}">
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-5">
+                <i class="fa-solid fa-user-slash fs-2 text-muted d-block mb-2"></i>
+                No active students enrolled in {{ selected_section.full_name }}.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-footer bg-light p-3 d-flex justify-content-between align-items-center">
+      <span class="text-muted small"><i class="fa-solid fa-circle-info me-1 text-primary"></i> Changes will be finalized to the general register upon clicking Save.</span>
+      <button type="submit" class="btn btn-primary px-4 fw-bold rounded-3">
+        <i class="fa-solid fa-floppy-disk me-1"></i> Save Daily Attendance Register
+      </button>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const STATUS_CYCLE = ['PRESENT', 'ABSENT', 'LATE', 'HALF_DAY', 'EXCUSED_LEAVE'];
+  const STATUS_META = {
+    'PRESENT': { letter: 'P', cls: 'badge-p' },
+    'ABSENT': { letter: 'A', cls: 'badge-a' },
+    'LATE': { letter: 'L', cls: 'badge-l' },
+    'HALF_DAY': { letter: 'HD', cls: 'badge-hd' },
+    'EXCUSED_LEAVE': { letter: 'LV', cls: 'badge-lv' }
+  };
+
+  function cycleStatus(enrollId) {
+    const input = document.getElementById('input-status-' + enrollId);
+    const badge = document.getElementById('badge-' + enrollId);
+    const letter = document.getElementById('letter-' + enrollId);
+    if (!input || !badge || !letter) return;
+
+    let cur = input.value;
+    let idx = STATUS_CYCLE.indexOf(cur);
+    let next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
+
+    applyStatus(enrollId, next);
+    recalculateTotals();
+  }
+
+  function applyStatus(enrollId, nextStatus) {
+    const input = document.getElementById('input-status-' + enrollId);
+    const badge = document.getElementById('badge-' + enrollId);
+    const letter = document.getElementById('letter-' + enrollId);
+    if (!input || !badge || !letter) return;
+
+    input.value = nextStatus;
+    const meta = STATUS_META[nextStatus] || STATUS_META['PRESENT'];
+    letter.textContent = meta.letter;
+
+    // Reset class list and add current badge class
+    badge.className = 'status-badge-interactive ' + meta.cls;
+  }
+
+  function setAllRows(status) {
+    document.querySelectorAll('input[name^="status_"]').forEach(inp => {
+      const enrollId = inp.id.replace('input-status-', '');
+      applyStatus(enrollId, status);
+    });
+    recalculateTotals();
+  }
+
+  function recalculateTotals() {
+    let p = 0, a = 0, l = 0, hd = 0, lv = 0;
+    const allInputs = document.querySelectorAll('input[name^="status_"]');
+    const total = allInputs.length;
+
+    allInputs.forEach(inp => {
+      if (inp.value === 'PRESENT') p++;
+      else if (inp.value === 'ABSENT') a++;
+      else if (inp.value === 'LATE') l++;
+      else if (inp.value === 'HALF_DAY') hd++;
+      else if (inp.value === 'EXCUSED_LEAVE') lv++;
+    });
+
+    const kpiP = document.getElementById('kpi-present');
+    const kpiA = document.getElementById('kpi-absent');
+    const kpiL = document.getElementById('kpi-late');
+    const kpiHD = document.getElementById('kpi-halfday');
+    const kpiLV = document.getElementById('kpi-leave');
+    const kpiPct = document.getElementById('kpi-pct');
+
+    if (kpiP) kpiP.textContent = p;
+    if (kpiA) kpiA.textContent = a;
+    if (kpiL) kpiL.textContent = l;
+    if (kpiHD) kpiHD.textContent = hd;
+    if (kpiLV) kpiLV.textContent = lv;
+
+    if (kpiPct && total > 0) {
+      const score = p + l + (hd * 0.5);
+      const pct = (score / total * 100).toFixed(1);
+      kpiPct.textContent = pct + '%';
+    }
+  }
+</script>
+{% endblock %}

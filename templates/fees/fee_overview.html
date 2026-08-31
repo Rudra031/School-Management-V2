@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Fees & Finance Overview{% endblock %}
+{% block page_heading %}Fees & Billing Operations{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Financial & Billing Overview</h5>
+    <p class="text-muted small mb-0">{{ academic_year.name|default:"Active Academic Session" }} | Institutional Invoicing & Collections</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'fees:structure_list' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-list-check me-1"></i> Fee Structures</a>
+    <a href="{% url 'fees:invoice_batch_generate' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-file-invoice-dollar me-1"></i> Generate Class Invoices</a>
+  </div>
+</div>
+
+<!-- Financial Summary Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-primary"><i class="fa-solid fa-file-invoice"></i></div>
+        <div>
+          <div class="text-muted small">Total Billed</div>
+          <h4 class="fw-bold mb-0 text-dark">₹{{ total_billed|floatformat:2 }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-success"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+        <div>
+          <div class="text-muted small">Total Collected</div>
+          <h4 class="fw-bold mb-0 text-success">₹{{ total_collected|floatformat:2 }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-danger"><i class="fa-solid fa-scale-unbalanced"></i></div>
+        <div>
+          <div class="text-muted small">Outstanding Balance</div>
+          <h4 class="fw-bold mb-0 text-danger">₹{{ total_outstanding|floatformat:2 }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-warning"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <div>
+          <div class="text-muted small">Unpaid Invoices</div>
+          <h4 class="fw-bold mb-0 text-warning">{{ unpaid_count }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Payment Transactions -->
+<div class="card-saas">
+  <div class="card-saas-header">
+    <span><i class="fa-solid fa-receipt text-primary me-2"></i> Recent Payment Receipts</span>
+    <a href="{% url 'fees:invoice_list' %}" class="small">View Invoices Directory</a>
+  </div>
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Receipt #</th>
+            <th>Student</th>
+            <th>Invoice Title</th>
+            <th>Payment Date</th>
+            <th>Method</th>
+            <th>Amount Paid (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pay in recent_payments %}
+            <tr>
+              <td class="fw-bold text-primary small">{{ pay.receipt_number }}</td>
+              <td class="fw-semibold">{{ pay.invoice.student_enrollment.student.full_name }}</td>
+              <td class="small text-muted">{{ pay.invoice.title }}</td>
+              <td class="small">{{ pay.payment_date|date:"d M Y" }}</td>
+              <td><span class="badge bg-light text-dark border">{{ pay.get_payment_method_display }}</span></td>
+              <td class="fw-bold text-success">₹{{ pay.amount_paid }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4 small">No recent payment receipts found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

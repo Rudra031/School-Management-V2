@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block title %}Fee Concessions & Scholarships - Horizon Public School{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+          <li class="breadcrumb-item"><a href="{% url 'fees:overview' %}" class="text-decoration-none text-muted">Fee Hub</a></li>
+          <li class="breadcrumb-item active text-primary fw-semibold" aria-current="page">Concessions &amp; Scholarships</li>
+        </ol>
+      </nav>
+      <h4 class="fw-bold mb-0 text-gradient-primary">
+        <i class="fa-solid fa-tags text-success me-2"></i> Fee Concessions &amp; Scholarship Schemes
+      </h4>
+      <p class="text-muted small mb-0">Configure discount quotas (Sibling 20%, Staff 50%, EWS 100%, Merit) and assign them to eligible students.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newSchemeModal">
+        <i class="fa-solid fa-plus me-1"></i> New Concession Scheme
+      </button>
+      <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#assignStudentModal">
+        <i class="fa-solid fa-user-check me-1"></i> Assign to Student
+      </button>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: Concession Schemes Cards -->
+    <div class="col-lg-5">
+      <h6 class="fw-bold small text-uppercase text-muted mb-3"><i class="fa-solid fa-layer-group text-primary me-1"></i> Active Concession Schemes</h6>
+      <div class="row g-2">
+        {% for c in concessions %}
+          <div class="col-12">
+            <div class="card-saas p-3 d-flex justify-content-between align-items-center">
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <span class="badge bg-success font-monospace">{{ c.code }}</span>
+                  <span class="fw-bold text-dark">{{ c.name }}</span>
+                </div>
+                <p class="text-muted small mb-0">{{ c.description|default:"Institutional waiver policy" }}</p>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-primary-subtle text-primary fs-6 font-monospace">
+                  {% if c.concession_type == 'PERCENTAGE' %}{{ c.discount_value }}% OFF{% else %}₹{{ c.discount_value }} Flat{% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12 text-center text-muted py-4">No concession schemes defined.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Right Column: Student Assigned Concession Register -->
+    <div class="col-lg-7">
+      <h6 class="fw-bold small text-uppercase text-muted mb-3"><i class="fa-solid fa-users-gear text-success me-1"></i> Active Student Beneficiaries</h6>
+      <div class="card-saas p-0 overflow-hidden">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" style="font-size:0.85rem;">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-3">Student Name</th>
+                <th>Class</th>
+                <th>Scheme Code</th>
+                <th>Discount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sc in student_concessions %}
+                <tr>
+                  <td class="ps-3">
+                    <div class="fw-bold">{{ sc.student_enrollment.student.full_name }}</div>
+                    <div class="text-muted" style="font-size:0.7rem;">Adm: {{ sc.student_enrollment.student.admission_number }}</div>
+                  </td>
+                  <td>{{ sc.student_enrollment.section.full_name|default:"—" }}</td>
+                  <td><span class="badge bg-success-subtle text-success font-monospace">{{ sc.concession.code }}</span></td>
+                  <td class="fw-bold text-primary">
+                    {% if sc.concession.concession_type == 'PERCENTAGE' %}{{ sc.concession.discount_value }}%{% else %}₹{{ sc.concession.discount_value }}{% endif %}
+                  </td>
+                  <td>
+                    {% if sc.is_active %}
+                      <span class="badge bg-success mini-chip">Active</span>
+                    {% else %}
+                      <span class="badge bg-secondary mini-chip">Inactive</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">No students currently assigned to concession schemes.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 1: Create Scheme -->
+<div class="modal fade" id="newSchemeModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{% url 'fees:concession_create' %}">
+        {% csrf_token %}
+        <div class="modal-header bg-primary text-white">
+          <h6 class="modal-title fw-bold">Create Concession Scheme</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          {{ concession_form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary btn-sm">Save Scheme</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 2: Assign Student -->
+<div class="modal fade" id="assignStudentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{% url 'fees:concession_assign' %}">
+        {% csrf_token %}
+        <div class="modal-header bg-success text-white">
+          <h6 class="modal-title fw-bold">Assign Concession to Student</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          {{ assign_form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success btn-sm">Assign Concession</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

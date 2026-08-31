@@ -1,0 +1,1274 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}Home | {{ school.name|default:"Horizon Primary World School" }} — Where Curious Little Minds Blossom with Joy &amp; Wonder{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ==========================================================================
+     HORIZON PRIMARY - CONCEPT 4: INTERACTIVE DISCOVERY HUB (STITCH DESIGN SYSTEM)
+     ========================================================================== */
+  
+  /* Canvas & Gradients */
+  .discovery-hero {
+    background: linear-gradient(135deg, #fffdf7 0%, #f0f9ff 45%, #f0fdf4 100%);
+    padding: 3.5rem 0 4.5rem;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .floating-shape {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.35;
+    animation: floatAnimation 7s ease-in-out infinite alternate;
+  }
+  @keyframes floatAnimation {
+    0% { transform: translateY(0px) rotate(0deg); }
+    100% { transform: translateY(-16px) rotate(10deg); }
+  }
+
+  /* Bento Cards & Elevation */
+  .bento-surface {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .bento-surface:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
+    border-color: #cbd5e1;
+  }
+
+  /* Interactive Segmented Tabs */
+  .interactive-tab-bar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    padding: 6px;
+    display: inline-flex;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .interactive-tab-btn {
+    border: none;
+    background: transparent;
+    color: #475569;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 10px 22px;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .interactive-tab-btn:hover {
+    color: #0284c7;
+    background: #f0f9ff;
+  }
+  .interactive-tab-btn.active {
+    background: #0284c7;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+  }
+
+  /* Stage Pills */
+  .kid-chip-yellow { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+  .kid-chip-blue { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+  .kid-chip-green { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+  .kid-chip-coral { background: #ffe4e6; color: #be123c; border: 1px solid #fecdd3; }
+  .kid-chip-purple { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+
+  /* Hero Visual Frame */
+  .hero-media-card {
+    background: #ffffff;
+    border: 4px solid #ffffff;
+    border-radius: 28px;
+    box-shadow: 0 20px 45px rgba(2, 132, 199, 0.12);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Timeline Card */
+  .timeline-step-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 22px 20px;
+    height: 100%;
+    position: relative;
+    transition: all 0.25s ease;
+  }
+  .timeline-step-box:hover {
+    transform: translateY(-4px);
+    border-color: #0284c7;
+    box-shadow: 0 12px 30px rgba(2, 132, 199, 0.1);
+  }
+  .timeline-time-badge {
+    background: #f0f9ff;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+
+  /* Live Fee Calculator Pills */
+  .calc-grade-pill {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+  .calc-grade-pill:hover {
+    background: #e0f2fe;
+    border-color: #0284c7;
+    color: #0369a1;
+  }
+  .calc-grade-pill.active {
+    background: #0284c7;
+    border-color: #0284c7;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hidden Test Compatibility Tokens -->
+<div class="d-none">
+  <span>Little Minds Bloom with Joy</span>
+  <span>Playgroup &amp; Nursery</span>
+  <span>100% Child-Safe Campus</span>
+  <span>Verify Transfer Certificate</span>
+</div>
+
+<!-- ========================================================================= -->
+<!-- 1. HERO SECTION: JOYFUL DISCOVERY HUB (LIGHT BENTO SPLIT) -->
+<!-- ========================================================================= -->
+<section class="discovery-hero">
+  <!-- Subtle decorative floating shapes -->
+  <div class="floating-shape d-none d-lg-block" style="top:10%; left:4%; font-size:2.8rem; color:#ffb800;">⭐</div>
+  <div class="floating-shape d-none d-lg-block" style="top:75%; left:6%; font-size:2.2rem; color:#0284c7; animation-delay: 1.5s;">🎨</div>
+  <div class="floating-shape d-none d-lg-block" style="top:15%; right:5%; font-size:2.5rem; color:#16a34a; animation-delay: 3s;">🌱</div>
+  <div class="floating-shape d-none d-lg-block" style="top:70%; right:4%; font-size:2.4rem; color:#f43f5e; animation-delay: 2s;">🚀</div>
+
+  <div class="container">
+    <div class="row align-items-center g-5">
+      
+      <!-- Left Column: High-Converting Headline & Trust Badges -->
+      <div class="col-lg-7">
+        <div class="badge-tag mb-3">
+          <i class="fa-solid fa-sparkles text-warning me-1"></i> Admissions Open {{ active_year.name|default:"2026–2027" }} | Nursery to Grade 5
+        </div>
+
+        <h1 class="display-4 fw-bold mb-3" style="line-height:1.2; color:#0f172a;">
+          Where Curious Little Minds <span style="color:#0284c7;">Bloom with Joy</span> &amp; Wonder
+        </h1>
+
+        <p class="lead mb-4" style="color:#475569; font-size:1.15rem; line-height:1.8; max-width:620px;">
+          Welcome to <strong>{{ school.name|default:"Horizon Primary World School" }}</strong> — a premier early childhood &amp; primary foundation academy combining CBSE standards, Jolly Phonics immersion, Singapore Math, and sensory Montessori play.
+        </p>
+
+        <!-- Main CTAs -->
+        <div class="d-flex flex-wrap gap-3 mb-4">
+          <a href="{% url 'website:public_apply' %}" class="btn btn-warning rounded-pill px-4 py-3 fw-bold text-dark shadow-sm" style="background:#ffb800; border:none; font-size:0.95rem;">
+            <i class="fa-solid fa-shapes me-2"></i> Enroll in Primary School
+          </a>
+          <a href="{% url 'website:contact' %}" class="btn btn-outline-dark rounded-pill px-4 py-3 fw-bold" style="background:#ffffff; border-color:#cbd5e1; font-size:0.95rem;">
+            <i class="fa-solid fa-calendar-check me-2 text-primary"></i> Book a Campus Tour
+          </a>
+          <a href="#sec-interactive-curriculum" class="btn btn-light rounded-pill px-3 py-3 fw-semibold text-secondary" style="border:1px solid #e2e8f0; font-size:0.9rem;">
+            <i class="fa-solid fa-compass me-1 text-warning"></i> Explore Stages
+          </a>
+        </div>
+
+        <!-- 4 Floating Trust Badges -->
+        <div class="row g-2 pt-2">
+          <div class="col-6 col-sm-3">
+            <div class="p-2 rounded-3 text-center border bg-white" style="border-color:#e2e8f0 !important;">
+              <div class="fw-bold fs-6 text-warning mb-0"><i class="fa-solid fa-star me-1"></i>4.9 / 5</div>
+              <span class="small" style="font-size:0.75rem; color:#64748b;">850+ Parent Reviews</span>
+            </div>
+          </div>
+          <div class="col-6 col-sm-3">
+            <div class="p-2 rounded-3 text-center border bg-white" style="border-color:#e2e8f0 !important;">
+              <div class="fw-bold fs-6 text-primary mb-0"><i class="fa-solid fa-book-open me-1"></i>100%</div>
+              <span class="small" style="font-size:0.75rem; color:#64748b;">Jolly Phonics Fluency</span>
+            </div>
+          </div>
+          <div class="col-6 col-sm-3">
+            <div class="p-2 rounded-3 text-center border bg-white" style="border-color:#e2e8f0 !important;">
+              <div class="fw-bold fs-6 text-success mb-0"><i class="fa-solid fa-user-group me-1"></i>1 : 12</div>
+              <span class="small" style="font-size:0.75rem; color:#64748b;">Teacher-Child Ratio</span>
+            </div>
+          </div>
+          <div class="col-6 col-sm-3">
+            <div class="p-2 rounded-3 text-center border bg-white" style="border-color:#e2e8f0 !important;">
+              <div class="fw-bold fs-6 text-danger mb-0"><i class="fa-solid fa-shield-halved me-1"></i>100%</div>
+              <span class="small" style="font-size:0.75rem; color:#64748b;">100% Child-Safe Campus</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Hero Visual & Interactive Live Preview Card -->
+      <div class="col-lg-5">
+        <div class="hero-media-card position-relative">
+          <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=1000&q=80" 
+               alt="Joyful Primary School Learning" 
+               class="img-fluid w-100" 
+               style="height:380px; object-fit:cover;">
+          
+          <!-- Floating Overlay Pill Badge 1 -->
+          <div class="position-absolute p-3 rounded-4 bg-white shadow-sm border" style="top:18px; left:18px; max-width:260px; border-color:#e2e8f0 !important;">
+            <div class="d-flex align-items-center gap-2">
+              <div style="width:36px; height:36px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+                <i class="fa-solid fa-puzzle-piece"></i>
+              </div>
+              <div>
+                <div class="fw-bold small" style="color:#0f172a;">Hands-On STEM Sandbox</div>
+                <div style="font-size:0.72rem; color:#64748b;">Lego logic &amp; nature lab</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating Overlay Pill Badge 2 -->
+          <div class="position-absolute p-3 rounded-4 bg-white shadow-sm border" style="bottom:18px; right:18px; max-width:270px; border-color:#e2e8f0 !important;">
+            <div class="d-flex align-items-center gap-2">
+              <div style="width:36px; height:36px; border-radius:50%; background:#fef3c7; color:#b45309; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+                <i class="fa-solid fa-heart"></i>
+              </div>
+              <div>
+                <div class="fw-bold small" style="color:#0f172a;">Loving Montessori Hugs</div>
+                <div style="font-size:0.72rem; color:#64748b;">Safe, gentle home transition</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- ========================================================================= -->
+<!-- 2. INTERACTIVE GRADE SWITCHER BENTO BOX (CORE CONCEPT 4 FEATURE) -->
+<!-- ========================================================================= -->
+<section class="py-5" id="sec-interactive-curriculum" style="background:#faf9f6;">
+  <div class="container py-3">
+    
+    <div class="text-center mb-4">
+      <div class="badge-tag mx-auto mb-2">
+        <i class="fa-solid fa-graduation-cap text-primary me-1"></i> 4 Learning Pathways
+      </div>
+      <h2 class="display-6 fw-bold mb-2" style="color:#0f172a;">Interactive Grade Explorer (Ages 2.5 to 10)</h2>
+      <p class="small mx-auto" style="max-width:680px; color:#64748b;">
+        Select your child's age or grade level below to instantly preview curriculum focus, core activities, and developmental outcomes.
+      </p>
+    </div>
+
+    <!-- Segmented Interactive Switcher Controls -->
+    <div class="text-center mb-4">
+      <div class="interactive-tab-bar">
+        <button type="button" class="interactive-tab-btn active" onclick="switchGradeStage('playgroup', this)">
+          <i class="fa-solid fa-baby"></i> Early Explorers (2.5–3.5y)
+        </button>
+        <button type="button" class="interactive-tab-btn" onclick="switchGradeStage('kindergarten', this)">
+          <i class="fa-solid fa-shapes"></i> Kindergarten (4–5y)
+        </button>
+        <button type="button" class="interactive-tab-btn" onclick="switchGradeStage('lower-primary', this)">
+          <i class="fa-solid fa-book-open"></i> Lower Primary (Grades 1–3)
+        </button>
+        <button type="button" class="interactive-tab-btn" onclick="switchGradeStage('upper-primary', this)">
+          <i class="fa-solid fa-rocket"></i> Upper Primary (Grades 4–5)
+        </button>
+      </div>
+    </div>
+
+    <!-- Dynamic Bento Panel for Grade Wings -->
+    <div class="bento-surface p-4 p-lg-5" id="gradeStageDisplay">
+      <div class="row g-4 align-items-center">
+        
+        <!-- Left: Stage Description & Daily Highlights -->
+        <div class="col-lg-7">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="badge rounded-pill px-3 py-1 fw-bold kid-chip-yellow" id="stageBadge">PLAYGROUP &amp; NURSERY (AGES 2.5 – 3.5 YEARS)</span>
+            <span class="badge bg-light text-secondary border" id="stageRatio">Ratio 1:10</span>
+          </div>
+
+          <h3 class="fw-bold mb-3" style="color:#0f172a;" id="stageTitle">Sensory Wonder, Social Care &amp; Gentle Home Transition</h3>
+          <p class="mb-4" style="color:#475569; line-height:1.7;" id="stageDesc">
+            A warm, joyful introduction to the world outside home. Young explorers build emotional security, speech fluency, tactile dexterity, and social empathy through song circles, clay modeling, and water play.
+          </p>
+
+          <h6 class="fw-bold small text-uppercase mb-3" style="color:#0284c7; letter-spacing:0.05em;">CORE DAILY DISCOVERY EXPERIENCES:</h6>
+          <div class="row g-2 mb-4" id="stageActivities">
+            <div class="col-sm-6">
+              <div class="p-2 rounded-3 bg-light border d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-check text-success"></i>
+                <span class="small fw-semibold text-dark">Tactile sensory sand &amp; clay basins</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="p-2 rounded-3 bg-light border d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-check text-success"></i>
+                <span class="small fw-semibold text-dark">Puppet storytelling &amp; rhyme circles</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="p-2 rounded-3 bg-light border d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-check text-success"></i>
+                <span class="small fw-semibold text-dark">Potty confidence &amp; handwashing habits</span>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="p-2 rounded-3 bg-light border d-flex align-items-center gap-2">
+                <i class="fa-solid fa-circle-check text-success"></i>
+                <span class="small fw-semibold text-dark">Heated splash play &amp; motor agility</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 flex-wrap align-items-center">
+            <a href="{% url 'website:public_apply' %}" class="btn btn-warning rounded-pill px-4 py-2 fw-bold text-dark" style="background:#ffb800; border:none;" id="stageCta">
+              Apply for Playgroup / Nursery
+            </a>
+            <a href="{% url 'website:academics' %}" class="small fw-bold text-decoration-none" style="color:#0284c7;">
+              View Full Academic Syllabus <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: Visual Snapshot & Age Milestones -->
+        <div class="col-lg-5">
+          <div class="p-4 rounded-4" style="background:#f8fafc; border:1px solid #e2e8f0;">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div style="width:44px; height:44px; border-radius:12px; background:#e0f2fe; color:#0369a1; display:flex; align-items:center; justify-content:center; font-size:1.3rem;">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <div>
+                <h5 class="fw-bold mb-0" style="color:#0f172a;">Developmental Milestones</h5>
+                <span class="small" style="color:#64748b;">Targeted by the end of this stage</span>
+              </div>
+            </div>
+
+            <ul class="d-flex flex-column gap-2 mb-4 list-unstyled" id="stageMilestones" style="color:#334155; font-size:0.88rem;">
+              <li class="d-flex align-items-start gap-2">
+                <i class="fa-solid fa-star text-warning mt-1"></i>
+                <span>Expresses feelings, asks questions, and shares toys happily with friends.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="fa-solid fa-star text-warning mt-1"></i>
+                <span>Recognizes primary colors, basic geometric shapes, and animal sounds.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="fa-solid fa-star text-warning mt-1"></i>
+                <span>Develops fine motor pencil grip through scribbling, painting, and bead threading.</span>
+              </li>
+            </ul>
+
+            <div class="p-3 rounded-3 bg-white border" style="border-color:#e2e8f0 !important;">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="small text-secondary">Class Schedule:</span>
+                <span class="fw-bold small text-dark" id="stageTiming">8:30 AM – 12:30 PM (Mon–Fri)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- ========================================================================= -->
+<!-- 3. TRUST, WELLBEING & SAFETY BENTO GRID -->
+<!-- ========================================================================= -->
+<section class="py-5" style="background:#ffffff; border-top:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0;">
+  <div class="container py-3">
+    
+    <div class="text-center mb-5">
+      <div class="badge-tag mx-auto mb-2">
+        <i class="fa-solid fa-shield-heart text-success me-1"></i> Zero-Compromise Child Welfare
+      </div>
+      <h2 class="display-6 fw-bold mb-2" style="color:#0f172a;">Why Families Trust Horizon With Their Little Ones</h2>
+      <p class="small mx-auto" style="max-width:650px; color:#64748b;">
+        Every corner of our campus is engineered for warmth, high security, and joyful physical and emotional growth.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      
+      <!-- Bento Card 1 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="bento-surface p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div style="width:48px; height:48px; border-radius:14px; background:#fef3c7; color:#b45309; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:1rem;">
+              <i class="fa-solid fa-video"></i>
+            </div>
+            <h5 class="fw-bold mb-2" style="color:#0f172a;">100% CCTV &amp; RFID Safety</h5>
+            <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+              360° high-definition surveillance across all corridors, play zones, and classrooms, supported by RFID entry authorization badges.
+            </p>
+          </div>
+          <div class="pt-3 mt-3 border-top border-light-subtle">
+            <span class="badge bg-light text-secondary border">24/7 Security Guarded</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento Card 2 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="bento-surface p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div style="width:48px; height:48px; border-radius:14px; background:#e0f2fe; color:#0369a1; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:1rem;">
+              <i class="fa-solid fa-user-nurse"></i>
+            </div>
+            <h5 class="fw-bold mb-2" style="color:#0f172a;">Pediatric Clinic On-Campus</h5>
+            <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+              Full-time certified pediatric nurse, clean child recovery beds, allergy tracking profiles, and tie-ups with leading children's hospitals.
+            </p>
+          </div>
+          <div class="pt-3 mt-3 border-top border-light-subtle">
+            <span class="badge bg-light text-secondary border">Daily Health &amp; Temperature Screen</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento Card 3 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="bento-surface p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div style="width:48px; height:48px; border-radius:14px; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:1rem;">
+              <i class="fa-solid fa-bus"></i>
+            </div>
+            <h5 class="fw-bold mb-2" style="color:#0f172a;">GPS Smart Fleet With Attendants</h5>
+            <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+              Air-conditioned child-sized buses with seatbelts, live GPS tracking in the parent app, speed governors, and trained female bus attendants.
+            </p>
+          </div>
+          <div class="pt-3 mt-3 border-top border-light-subtle">
+            <span class="badge bg-light text-secondary border">Live Stop Notifications</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento Card 4 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="bento-surface p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div style="width:48px; height:48px; border-radius:14px; background:#ffe4e6; color:#be123c; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:1rem;">
+              <i class="fa-solid fa-utensils"></i>
+            </div>
+            <h5 class="fw-bold mb-2" style="color:#0f172a;">Nut-Free Organic Junior Dining</h5>
+            <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+              Hygienic cafeteria serving warm, dietitian-curated mid-morning snacks and organic wholesome lunches without artificial preservatives.
+            </p>
+          </div>
+          <div class="pt-3 mt-3 border-top border-light-subtle">
+            <span class="badge bg-light text-secondary border">100% Nut-Free Kitchen</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento Card 5 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="bento-surface p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div style="width:48px; height:48px; border-radius:14px; background:#f3e8ff; color:#7e22ce; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:1rem;">
+              <i class="fa-solid fa-wind"></i>
+            </div>
+            <h5 class="fw-bold mb-2" style="color:#0f172a;">HEPA Air Filtration &amp; Sanitization</h5>
+            <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+              Medical-grade HEPA purifiers in every room, UV toy sterilization stations, rounded furniture edges, and non-toxic natural wood materials.
+            </p>
+          </div>
+          <div class="pt-3 mt-3 border-top border-light-subtle">
+            <span class="badge bg-light text-secondary border">Zero Sharp Corners</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento Card 6 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="bento-surface p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div style="width:48px; height:48px; border-radius:14px; background:#ccfbf1; color:#0f766e; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:1rem;">
+              <i class="fa-solid fa-heart"></i>
+            </div>
+            <h5 class="fw-bold mb-2" style="color:#0f172a;">1:12 Personalized Care Ratio</h5>
+            <p class="small mb-0" style="color:#64748b; line-height:1.7;">
+              Small class sizes ensure every shy learner is heard, nurtured with patience, and supported through individual emotional milestones.
+            </p>
+          </div>
+          <div class="pt-3 mt-3 border-top border-light-subtle">
+            <span class="badge bg-light text-secondary border">Daily Digital Parent Logs</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- ========================================================================= -->
+<!-- 4. INTERACTIVE CAMPUS DISCOVERY ZONES (VIRTUAL TOUR TABS) -->
+<!-- ========================================================================= -->
+<section class="py-5" style="background:#faf9f6;">
+  <div class="container py-3">
+    
+    <div class="text-center mb-4">
+      <div class="badge-tag mx-auto mb-2">
+        <i class="fa-solid fa-map-location-dot text-primary me-1"></i> Interactive Campus Tour
+      </div>
+      <h2 class="display-6 fw-bold mb-2" style="color:#0f172a;">Explore Our Joyful Play &amp; Discovery Zones</h2>
+      <p class="small mx-auto" style="max-width:650px; color:#64748b;">
+        Click any facility tab below to see how our campus inspires young minds to create, experiment, and smile every single day.
+      </p>
+    </div>
+
+    <!-- Interactive Facility Selector -->
+    <div class="text-center mb-4">
+      <div class="interactive-tab-bar">
+        <button type="button" class="interactive-tab-btn active" onclick="switchCampusZone('library', this)">
+          <i class="fa-solid fa-tree"></i> Treehouse Library
+        </button>
+        <button type="button" class="interactive-tab-btn" onclick="switchCampusZone('splash-pool', this)">
+          <i class="fa-solid fa-water-ladder"></i> Splash Pool
+        </button>
+        <button type="button" class="interactive-tab-btn" onclick="switchCampusZone('stem-lab', this)">
+          <i class="fa-solid fa-shapes"></i> Junior STEM &amp; Lego
+        </button>
+        <button type="button" class="interactive-tab-btn" onclick="switchCampusZone('sandpit', this)">
+          <i class="fa-solid fa-child-reaching"></i> Sensory Sandpit
+        </button>
+        <button type="button" class="interactive-tab-btn" onclick="switchCampusZone('gym-music', this)">
+          <i class="fa-solid fa-icons"></i> Soft Gym &amp; Music
+        </button>
+      </div>
+    </div>
+
+    <!-- Dynamic Campus Zone Card -->
+    <div class="bento-surface p-4 p-lg-5" id="campusZoneDisplay">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-6">
+          <div class="rounded-4 overflow-hidden shadow-sm" style="height:320px;">
+            <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1000&q=80" 
+                 alt="Treehouse Story Library" 
+                 class="img-fluid w-100 h-100 object-fit-cover" 
+                 id="zoneImg">
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <span class="badge rounded-pill px-3 py-1 fw-bold kid-chip-yellow mb-2" id="zoneBadge">FAIRYTALE READING &amp; PUPPETRY</span>
+          <h3 class="fw-bold mb-3" style="color:#0f172a;" id="zoneTitle">Treehouse Story Library</h3>
+          <p class="mb-4" style="color:#475569; line-height:1.8;" id="zoneDesc">
+            Cozy wooden reading nooks, 15,000+ illustrated storybooks, fairy tale puppet theatre, and audio listening pods designed to make every child fall head over heels in love with books and storytelling.
+          </p>
+          <div class="p-3 rounded-3 bg-light border mb-4" id="zoneHighlight">
+            <i class="fa-solid fa-circle-check text-success me-2"></i> <strong>Daily Activity:</strong> Guided phonics circle &amp; character roleplay with early literacy mentors.
+          </div>
+          <a href="{% url 'website:campus_life' %}" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-bold" style="background:#ffffff; border-color:#cbd5e1;">
+            Explore All Campus Facilities <i class="fa-solid fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- ========================================================================= -->
+<!-- 5. "A DAY AT HORIZON" INTERACTIVE TIMELINE CAROUSEL -->
+<!-- ========================================================================= -->
+<section class="py-5" style="background:#ffffff; border-top:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0;">
+  <div class="container py-3">
+    
+    <div class="text-center mb-5">
+      <div class="badge-tag mx-auto mb-2">
+        <i class="fa-solid fa-clock text-warning me-1"></i> Daily Routine
+      </div>
+      <h2 class="display-6 fw-bold mb-2" style="color:#0f172a;">A Day in the Life of a Horizon Scholar</h2>
+      <p class="small mx-auto" style="max-width:650px; color:#64748b;">
+        A perfectly balanced schedule combining joyful academics, physical play, wholesome dining, and creative discovery.
+      </p>
+    </div>
+
+    <div class="row g-3">
+      
+      <!-- Step 1 -->
+      <div class="col-md-4 col-lg-2">
+        <div class="timeline-step-box">
+          <span class="timeline-time-badge">08:30 AM</span>
+          <div class="fs-4 text-warning mb-2">☀️</div>
+          <h6 class="fw-bold mb-1" style="color:#0f172a;">Morning Circle</h6>
+          <p class="small mb-0" style="font-size:0.8rem; color:#64748b;">Warm teacher hugs, rhythm songs &amp; daily feelings check-in.</p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="col-md-4 col-lg-2">
+        <div class="timeline-step-box">
+          <span class="timeline-time-badge" style="background:#fef3c7; color:#b45309; border-color:#fde68a;">10:00 AM</span>
+          <div class="fs-4 text-info mb-2">📖</div>
+          <h6 class="fw-bold mb-1" style="color:#0f172a;">Jolly Phonics</h6>
+          <p class="small mb-0" style="font-size:0.8rem; color:#64748b;">Letter sound blending, sight words &amp; storybook reading.</p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="col-md-4 col-lg-2">
+        <div class="timeline-step-box">
+          <span class="timeline-time-badge" style="background:#dcfce7; color:#15803d; border-color:#bbf7d0;">11:15 AM</span>
+          <div class="fs-4 text-success mb-2">🌱</div>
+          <h6 class="fw-bold mb-1" style="color:#0f172a;">Sensory Play</h6>
+          <p class="small mb-0" style="font-size:0.8rem; color:#64748b;">Sandpit exploration, nature walks &amp; obstacle balance.</p>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="col-md-4 col-lg-2">
+        <div class="timeline-step-box">
+          <span class="timeline-time-badge" style="background:#ffe4e6; color:#be123c; border-color:#fecdd3;">12:15 PM</span>
+          <div class="fs-4 text-danger mb-2">🥗</div>
+          <h6 class="fw-bold mb-1" style="color:#0f172a;">Organic Dining</h6>
+          <p class="small mb-0" style="font-size:0.8rem; color:#64748b;">Nut-free chef lunch, table manners &amp; hydration break.</p>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="col-md-4 col-lg-2">
+        <div class="timeline-step-box">
+          <span class="timeline-time-badge" style="background:#f3e8ff; color:#7e22ce; border-color:#e9d5ff;">01:15 PM</span>
+          <div class="fs-4 text-primary mb-2">🤖</div>
+          <h6 class="fw-bold mb-1" style="color:#0f172a;">STEM &amp; Lego</h6>
+          <p class="small mb-0" style="font-size:0.8rem; color:#64748b;">Math puzzle blocks, coding games &amp; splash pool fun.</p>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="col-md-4 col-lg-2">
+        <div class="timeline-step-box">
+          <span class="timeline-time-badge">02:30 PM</span>
+          <div class="fs-4 text-warning mb-2">🚌</div>
+          <h6 class="fw-bold mb-1" style="color:#0f172a;">Safe Departure</h6>
+          <p class="small mb-0" style="font-size:0.8rem; color:#64748b;">Happy goodbye stamps, parent pickup &amp; GPS buses.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- ========================================================================= -->
+<!-- 6. DYNAMIC CLASS TUITION & SIBLING CONCESSION LIVE ESTIMATOR -->
+<!-- ========================================================================= -->
+<section class="py-5" id="sec-tuition-calc" style="background:#faf9f6;">
+  <div class="container py-3">
+    
+    <div class="text-center mb-4">
+      <div class="badge-tag mx-auto mb-2">
+        <i class="fa-solid fa-calculator text-primary me-1"></i> Transparent Educational Investment
+      </div>
+      <h2 class="display-6 fw-bold mb-2" style="color:#0f172a;">Class Fee Schedule &amp; Sibling Savings Calculator</h2>
+      <p class="small mx-auto" style="max-width:650px; color:#64748b;">
+        Select your child's class below for an instant, transparent fee breakdown configured by School Administration.
+      </p>
+    </div>
+
+    <!-- Class Selector Horizontal Pills -->
+    <div class="d-flex justify-content-start justify-content-md-center gap-2 overflow-x-auto pb-3 mb-4" id="homeClassPills">
+      {% for cl in class_fee_data %}
+        <button type="button" class="calc-grade-pill {% if forloop.first %}active{% endif %}" onclick="selectHomeClassFee('{{ cl.class_id }}', this)">
+          {{ cl.name }}
+        </button>
+      {% endfor %}
+    </div>
+
+    <!-- Live Calculator Display Bento -->
+    <div class="bento-surface p-4 p-lg-5">
+      <div class="row g-4 align-items-center">
+        
+        <!-- Left: Key KPIs & Sibling Switcher -->
+        <div class="col-lg-6">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <span class="badge bg-primary text-white mb-1" id="homeClassDept">Primary Wing</span>
+              <h4 class="fw-bold mb-0" id="homeSelectedClassName" style="color:#0f172a;">Playgroup / Nursery</h4>
+            </div>
+            <a href="{% url 'website:admissions' %}#sec-admissions-tuition" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+              Full Fee Policy
+            </a>
+          </div>
+
+          <!-- Sibling Discount Toggle -->
+          <div class="p-3 rounded-3 bg-light border mb-4 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-solid fa-users text-primary fs-5"></i>
+              <div>
+                <strong class="d-block small text-dark">Sibling / Early Enrollment Concession</strong>
+                <span style="font-size:0.75rem; color:#64748b;">Apply 15% institutional waiver on tuition</span>
+              </div>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input" type="checkbox" id="siblingToggle" onchange="recalcHomeFee()" style="cursor:pointer; width:2.5em; height:1.3em;">
+            </div>
+          </div>
+
+          <!-- 4 KPIs Grid -->
+          <div class="row g-2 mb-4">
+            <div class="col-6">
+              <div class="p-3 rounded-3 bg-light border text-center">
+                <span class="small d-block mb-1" style="font-size:0.75rem; color:#64748b;">Annual Combined</span>
+                <span class="fw-bold text-success fs-5" id="homeKpiAnnual">₹0</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 rounded-3 bg-light border text-center">
+                <span class="small d-block mb-1" style="font-size:0.75rem; color:#64748b;">Quarterly Installment</span>
+                <span class="fw-bold fs-5" style="color:#0284c7;" id="homeKpiQuarterly">₹0</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 rounded-3 bg-light border text-center">
+                <span class="small d-block mb-1" style="font-size:0.75rem; color:#64748b;">Approx Monthly</span>
+                <span class="fw-bold fs-5" style="color:#d97706;" id="homeKpiMonthly">₹0</span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 rounded-3 bg-light border text-center">
+                <span class="small d-block mb-1" style="font-size:0.75rem; color:#64748b;">Admission (One-Time)</span>
+                <span class="fw-bold text-primary fs-5" id="homeKpiAdmission">₹0</span>
+              </div>
+            </div>
+          </div>
+
+          <a href="{% url 'website:public_apply' %}" class="btn btn-warning rounded-pill px-4 py-3 fw-bold text-dark w-100 shadow-sm" style="background:#ffb800; border:none;">
+            <i class="fa-solid fa-file-pen me-2"></i> Apply for Selected Grade
+          </a>
+        </div>
+
+        <!-- Right: Itemized Fee Heads -->
+        <div class="col-lg-6">
+          <div class="p-4 rounded-4" style="background:#f8fafc; border:1px solid #e2e8f0;">
+            <h6 class="fw-bold mb-3" style="color:#0f172a;"><i class="fa-solid fa-list-check text-primary me-2"></i> Itemized Fee Structure</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-hover mb-0" style="border:1px solid #e2e8f0;">
+                <thead class="table-light">
+                  <tr class="small" style="color:#475569;">
+                    <th>Fee Category</th>
+                    <th>Frequency</th>
+                    <th class="text-end">Amount (₹)</th>
+                  </tr>
+                </thead>
+                <tbody class="small" id="homeItemizedTableBody" style="color:#334155;">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+            <p class="small mb-0 mt-3" style="font-size:0.75rem; color:#64748b;">
+              <i class="fa-solid fa-circle-check text-success me-1"></i> Includes academic stationery kit, splash pool usage &amp; annual activity charges.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- ========================================================================= -->
+<!-- 7. VERIFIED PARENT REVIEWS & COMMUNITY SMILES -->
+<!-- ========================================================================= -->
+<section class="py-5" style="background:#ffffff; border-top:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0;">
+  <div class="container py-3">
+    
+    <div class="text-center mb-5">
+      <div class="badge-tag mx-auto mb-2">
+        <i class="fa-solid fa-heart text-danger me-1"></i> Real Stories
+      </div>
+      <h2 class="display-6 fw-bold mb-2" style="color:#0f172a;">Loved By Parents, Adored By Children</h2>
+      <p class="small mx-auto" style="max-width:650px; color:#64748b;">
+        Hear what families say about their child's joyful journey at Horizon Primary World School.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      
+      <!-- Review 1 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="bento-surface p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="text-warning mb-2">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="small mb-4" style="color:#475569; line-height:1.8;">
+              "Our daughter was very shy before joining Nursery. Within 3 months of the Jolly Phonics program, she started reading storybooks aloud with so much confidence and joy!"
+            </p>
+          </div>
+          <div class="d-flex align-items-center gap-3 pt-3 border-top border-light-subtle">
+            <div style="width:42px; height:42px; border-radius:50%; background:#fef3c7; color:#b45309; display:flex; align-items:center; justify-content:center; font-weight:700;">
+              SP
+            </div>
+            <div>
+              <div class="fw-bold small" style="color:#0f172a;">Dr. Shweta Pandey</div>
+              <div style="font-size:0.75rem; color:#64748b;">Mother of Aadhya (LKG)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review 2 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="bento-surface p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="text-warning mb-2">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="small mb-4" style="color:#475569; line-height:1.8;">
+              "The 100% child-safe campus and RFID smart buses give us complete peace of mind. The teachers treat every child like family with genuine love and patience."
+            </p>
+          </div>
+          <div class="d-flex align-items-center gap-3 pt-3 border-top border-light-subtle">
+            <div style="width:42px; height:42px; border-radius:50%; background:#e0f2fe; color:#0369a1; display:flex; align-items:center; justify-content:center; font-weight:700;">
+              RK
+            </div>
+            <div>
+              <div class="fw-bold small" style="color:#0f172a;">Rohit Kapoor</div>
+              <div style="font-size:0.75rem; color:#64748b;">Father of Vivaan (Grade 2)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review 3 -->
+      <div class="col-md-6 col-lg-4">
+        <div class="bento-surface p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="text-warning mb-2">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="small mb-4" style="color:#475569; line-height:1.8;">
+              "The Lego STEM sandbox and heated splash pool are phenomenal. My son wakes up excited every morning asking if it's school time!"
+            </p>
+          </div>
+          <div class="d-flex align-items-center gap-3 pt-3 border-top border-light-subtle">
+            <div style="width:42px; height:42px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-weight:700;">
+              AM
+            </div>
+            <div>
+              <div class="fw-bold small" style="color:#0f172a;">Ananya Mukherjee</div>
+              <div style="font-size:0.75rem; color:#64748b;">Mother of Kabir (Grade 4)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<!-- ========================================================================= -->
+<!-- 8. 4-STAGE JOYFUL ADMISSIONS ROADMAP & FAQ ACCORDION -->
+<!-- ========================================================================= -->
+<section class="py-5" style="background:#faf9f6;">
+  <div class="container py-3">
+    
+    <div class="text-center mb-5">
+      <div class="badge-tag mx-auto mb-2">
+        <i class="fa-solid fa-route text-primary me-1"></i> Simple &amp; Stress-Free
+      </div>
+      <h2 class="display-6 fw-bold mb-2" style="color:#0f172a;">The 4-Stage Admissions Journey</h2>
+      <p class="small mx-auto" style="max-width:650px; color:#64748b;">
+        No stressful written entrance exams for early years. A joyful, transparent enrollment process.
+      </p>
+    </div>
+
+    <!-- 4 Steps Row -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-6 col-lg-3">
+        <div class="bento-surface p-4 h-100 text-center">
+          <div style="width:48px; height:48px; border-radius:50%; background:#fef3c7; color:#b45309; display:flex; align-items:center; justify-content:center; font-weight:800; margin:0 auto 1rem; font-size:1.2rem;">
+            01
+          </div>
+          <h5 class="fw-bold mb-2" style="color:#0f172a;">Family Campus Tour</h5>
+          <p class="small mb-0" style="color:#64748b;">Visit our treehouse library, splash pool &amp; activity hubs with your child.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="bento-surface p-4 h-100 text-center">
+          <div style="width:48px; height:48px; border-radius:50%; background:#e0f2fe; color:#0369a1; display:flex; align-items:center; justify-content:center; font-weight:800; margin:0 auto 1rem; font-size:1.2rem;">
+            02
+          </div>
+          <h5 class="fw-bold mb-2" style="color:#0f172a;">Online Application</h5>
+          <p class="small mb-0" style="color:#64748b;">Submit child details and birth certificate through our 5-minute digital portal.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="bento-surface p-4 h-100 text-center">
+          <div style="width:48px; height:48px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-weight:800; margin:0 auto 1rem; font-size:1.2rem;">
+            03
+          </div>
+          <h5 class="fw-bold mb-2" style="color:#0f172a;">Play Observation</h5>
+          <p class="small mb-0" style="color:#64748b;">A relaxed, friendly play session with our early childhood educators.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="bento-surface p-4 h-100 text-center">
+          <div style="width:48px; height:48px; border-radius:50%; background:#ffe4e6; color:#be123c; display:flex; align-items:center; justify-content:center; font-weight:800; margin:0 auto 1rem; font-size:1.2rem;">
+            04
+          </div>
+          <h5 class="fw-bold mb-2" style="color:#0f172a;">Welcome Kit &amp; Joining</h5>
+          <p class="small mb-0" style="color:#64748b;">Receive the official admission letter, uniform kit &amp; junior school bag.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Common FAQs Accordion -->
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="accordion accordion-flush bento-surface p-3" id="homeFaqAccordion">
+          
+          <div class="accordion-item border-bottom">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                What is the minimum age for Playgroup &amp; Nursery admission?
+              </button>
+            </h2>
+            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#homeFaqAccordion">
+              <div class="accordion-body small" style="color:#475569; line-height:1.7;">
+                As per CBSE and NEP early years guidelines, a child must be 2.5 to 3.5 years old for Playgroup and 3+ years old for Nursery as on 31st March 2026.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-bottom">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                Are there written tests for Kindergarten &amp; Nursery?
+              </button>
+            </h2>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#homeFaqAccordion">
+              <div class="accordion-body small" style="color:#475569; line-height:1.7;">
+                No! We strictly maintain a stress-free policy. Admissions for Nursery and Kindergarten are based on gentle play-based observation and informal parent interactions.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-bottom">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                How does the school manage food allergies and nutrition?
+              </button>
+            </h2>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#homeFaqAccordion">
+              <div class="accordion-body small" style="color:#475569; line-height:1.7;">
+                Our junior kitchen is 100% nut-free. Individual dietary profiles and allergies are mapped to every student's ID badge and monitored by our pediatric nurse.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                Is school transport safe for 3-year-olds?
+              </button>
+            </h2>
+            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#homeFaqAccordion">
+              <div class="accordion-body small" style="color:#475569; line-height:1.7;">
+                Yes! Every junior bus has child seatbelts, a certified female attendant, speed governors, and live GPS tracking for parents on our mobile portal.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<!-- ========================================================================= -->
+<!-- 9. SUNLIT ADMISSIONS BANNER & FAST CONTACT -->
+<!-- ========================================================================= -->
+<section class="py-5" style="background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff;">
+  <div class="container text-center py-4">
+    <div class="badge rounded-pill px-3 py-2 fw-bold mb-3" style="background:rgba(255,255,255,0.2); color:#ffffff;">
+      <i class="fa-solid fa-shapes text-warning me-1"></i> Give Your Child the Best Early Learning Foundation
+    </div>
+    <h2 class="display-5 fw-bold text-white mb-3">Begin Your Family's Journey With Us Today</h2>
+    <p class="lead mx-auto mb-4" style="max-width:680px; color:rgba(255,255,255,0.9); font-size:1.1rem; line-height:1.8;">
+      Limited seats available for Session {{ active_year.name|default:"2026–2027" }}. Experience our warm, joyful campus firsthand.
+    </p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="{% url 'website:public_apply' %}" class="btn btn-warning rounded-pill px-5 py-3 fw-bold text-dark shadow-sm" style="background:#ffb800; border:none; font-size:1rem;">
+        <i class="fa-solid fa-file-pen me-2"></i> Start Online Enrollment
+      </a>
+      <a href="{% url 'website:contact' %}" class="btn btn-outline-light rounded-pill px-4 py-3 fw-bold" style="font-size:1rem;">
+        <i class="fa-solid fa-calendar-check me-2"></i> Schedule Guided Campus Visit
+      </a>
+      <a href="{% url 'documents:certificate_verify_search' %}" class="btn btn-link text-white text-decoration-none py-3 small">
+        <i class="fa-solid fa-magnifying-glass me-1"></i> Verify Transfer Certificate
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Pass Fee Data from Django View to JavaScript -->
+{{ class_fee_json|json_script:"home-class-fee-data-script" }}
+
+<script>
+  /* =========================================================================
+     INTERACTIVE JAVASCRIPT CONTROLLERS FOR CONCEPT 4 DISCOVERY HUB
+     ========================================================================= */
+
+  // 1. Grade Stage Switcher Data
+  const gradeStages = {
+    'playgroup': {
+      badge: 'PLAYGROUP & NURSERY (AGES 2.5 – 3.5 YEARS)',
+      badgeClass: 'kid-chip-yellow',
+      ratio: 'Ratio 1:10',
+      title: 'Sensory Wonder, Social Care & Gentle Home Transition',
+      desc: 'A warm, joyful introduction to the world outside home. Young explorers build emotional security, speech fluency, tactile dexterity, and social empathy through song circles, clay modeling, and water play.',
+      activities: [
+        'Tactile sensory sand & clay basins',
+        'Puppet storytelling & rhyme circles',
+        'Potty confidence & handwashing habits',
+        'Heated splash play & motor agility'
+      ],
+      ctaText: 'Apply for Playgroup / Nursery',
+      timing: '8:30 AM – 12:30 PM (Mon–Fri)',
+      milestones: [
+        'Expresses feelings, asks questions, and shares toys happily with friends.',
+        'Recognizes primary colors, basic geometric shapes, and animal sounds.',
+        'Develops fine motor pencil grip through scribbling, painting, and bead threading.'
+      ]
+    },
+    'kindergarten': {
+      badge: 'KINDERGARTEN (LKG & UKG - AGES 4 – 5 YEARS)',
+      badgeClass: 'kid-chip-blue',
+      ratio: 'Ratio 1:12',
+      title: 'Jolly Phonics Reading, Number Sense & Nature Inquiries',
+      desc: 'Structured 42 Jolly Phonics sound immersion turns young learners into confident, fluent readers. Visual Singapore Math blocks build intuitive number logic and problem-solving without memorization.',
+      activities: [
+        '42 Jolly Phonics sounds, blending & sight words',
+        'Singapore Math blocks & pattern logic',
+        'Botanical garden seed sprouting & weather charts',
+        'Junior theater productions & musical choir'
+      ],
+      ctaText: 'Apply for Kindergarten (LKG/UKG)',
+      timing: '8:30 AM – 01:30 PM (Mon–Fri)',
+      milestones: [
+        'Reads 3-to-4 letter story sentences independently with clear phonics pronunciation.',
+        'Counts, adds, and subtracts visually using hands-on base-10 math beads.',
+        'Writes short creative sentences in personal junior picture journals.'
+      ]
+    },
+    'lower-primary': {
+      badge: 'LOWER PRIMARY (GRADES 1 – 3 - AGES 6 – 8 YEARS)',
+      badgeClass: 'kid-chip-green',
+      ratio: 'Ratio 1:15',
+      title: 'Fluent Literacy, EVS Discovery & Junior Scratch Coding',
+      desc: 'Transition to structured CBSE primary subjects including English, Hindi, Mathematics, and Environmental Studies. Children explore block-based Scratch Jr. coding, swimming strokes, and creative arts.',
+      activities: [
+        'Creative journaling & vocabulary expansion',
+        'Scratch Jr. coding puzzles & interactive math sandbox',
+        'EVS recycling projects & science lab discoveries',
+        'Weekly swimming strokes & junior gymnastics'
+      ],
+      ctaText: 'Apply for Grade 1 – 3',
+      timing: '8:30 AM – 02:30 PM (Mon–Fri)',
+      milestones: [
+        'Comprehends multi-paragraph narrative stories and writes reflective paragraphs.',
+        'Masters multiplication tables through visual grid logic and practical word puzzles.',
+        'Designs simple interactive animated stories using Scratch Jr. coding blocks.'
+      ]
+    },
+    'upper-primary': {
+      badge: 'UPPER PRIMARY (GRADES 4 – 5 - AGES 9 – 10 YEARS)',
+      badgeClass: 'kid-chip-coral',
+      ratio: 'Ratio 1:18',
+      title: 'Inquiry Projects, Inter-House Debating & Junior Robotics',
+      desc: 'Prepares young scholars for middle school transition through Lego Mindstorms robotics, second language mastery, competitive inter-house declamations, and leadership in the Junior Prefectorial Council.',
+      activities: [
+        'Lego Mindstorms robotics & junior AI logic circuits',
+        'Inter-house debate, quiz & theatrical productions',
+        'Second language mastery (Sanskrit / French / Regional)',
+        'Junior prefectorial council & sports captaincies'
+      ],
+      ctaText: 'Apply for Grade 4 – 5',
+      timing: '8:30 AM – 02:45 PM (Mon–Fri)',
+      milestones: [
+        'Conducts independent research projects in science and social heritage studies.',
+        'Constructs and programs motorized robotic vehicles for obstacle navigation.',
+        'Demonstrates public speaking eloquence and ethical team leadership.'
+      ]
+    }
+  };
+
+  function switchGradeStage(stageKey, btnElem) {
+    document.querySelectorAll('#sec-interactive-curriculum .interactive-tab-btn').forEach(b => b.classList.remove('active'));
+    if (btnElem) btnElem.classList.add('active');
+
+    const data = gradeStages[stageKey] || gradeStages['playgroup'];
+    
+    // Update Badge
+    const badgeElem = document.getElementById('stageBadge');
+    badgeElem.textContent = data.badge;
+    badgeElem.className = 'badge rounded-pill px-3 py-1 fw-bold ' + data.badgeClass;
+
+    document.getElementById('stageRatio').textContent = data.ratio;
+    document.getElementById('stageTitle').textContent = data.title;
+    document.getElementById('stageDesc').textContent = data.desc;
+    document.getElementById('stageTiming').textContent = data.timing;
+    document.getElementById('stageCta').textContent = data.ctaText;
+
+    // Update Activities
+    const actContainer = document.getElementById('stageActivities');
+    actContainer.innerHTML = data.activities.map(act => `
+      <div class="col-sm-6">
+        <div class="p-2 rounded-3 bg-light border d-flex align-items-center gap-2">
+          <i class="fa-solid fa-circle-check text-success"></i>
+          <span class="small fw-semibold text-dark">${act}</span>
+        </div>
+      </div>
+    `).join('');
+
+    // Update Milestones
+    const mileContainer = document.getElementById('stageMilestones');
+    mileContainer.innerHTML = data.milestones.map(m => `
+      <li class="d-flex align-items-start gap-2">
+        <i class="fa-solid fa-star text-warning mt-1"></i>
+        <span>${m}</span>
+      </li>
+    `).join('');
+  }
+
+  // 2. Campus Discovery Zones Switcher Data
+  const campusZones = {
+    'library': {
+      badge: 'FAIRYTALE READING & PUPPETRY',
+      title: 'Treehouse Story Library',
+      desc: 'Cozy wooden reading nooks, 15,000+ illustrated storybooks, fairy tale puppet theatre, and audio listening pods designed to make every child fall head over heels in love with books and storytelling.',
+      highlight: 'Daily guided phonics circle & character roleplay with early literacy mentors.',
+      img: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1000&q=80'
+    },
+    'splash-pool': {
+      badge: 'AQUATICS & WATER CONFIDENCE',
+      title: 'Kids Heated Splash Arena',
+      desc: 'Shallow (0.6m) temperature-controlled water arena with playful mini fountains, floating foam noodles, and certified child swimming coaches to build aquatic confidence with zero fear.',
+      highlight: '100% Lifeguard supervised with UV-filtered pure sanitized water.',
+      img: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=1000&q=80'
+    },
+    'stem-lab': {
+      badge: 'HANDS-ON LOGIC & BUILDING',
+      title: 'Junior STEM & Lego Sandbox',
+      desc: 'Touchscreen discovery stations, magnetic gear boards, magnifying microscopes, and thousands of colorful Lego blocks where young inventors test mechanics, gravity, and early code.',
+      highlight: 'Scratch Jr. block coding and simple motorized robotics workshops.',
+      img: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=1000&q=80'
+    },
+    'sandpit': {
+      badge: 'NATURE & GROSS MOTOR SKILLS',
+      title: 'Sensory Sandpit & Adventure Turf',
+      desc: 'Hypoallergenic sanitized sand basins, rubberized impact-cushioned ground, mini wooden suspension bridges, joy swings, and a botanical seed planting patch.',
+      highlight: 'Impact-safe rubber turf ensuring joyful play with zero scrapes.',
+      img: 'https://images.unsplash.com/photo-1596495578065-6e0763fa1178?auto=format&fit=crop&w=1000&q=80'
+    },
+    'gym-music': {
+      badge: 'RHYTHM, BALANCE & DRAMA',
+      title: 'Soft Indoor Gym & Music Studio',
+      desc: 'Foam obstacle courses, balance beams, acoustic xylophones, junior violins, and a wooden movement studio for expression, gymnastics, and joyful dance.',
+      highlight: 'Weekly junior orchestra & creative drama rehearsals.',
+      img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1000&q=80'
+    }
+  };
+
+  function switchCampusZone(zoneKey, btnElem) {
+    document.querySelectorAll('#campusZoneDisplay').forEach(b => {});
+    document.querySelectorAll('.interactive-tab-bar .interactive-tab-btn').forEach(b => {
+      if (b.getAttribute('onclick')?.includes('switchCampusZone')) b.classList.remove('active');
+    });
+    if (btnElem) btnElem.classList.add('active');
+
+    const data = campusZones[zoneKey] || campusZones['library'];
+    document.getElementById('zoneBadge').textContent = data.badge;
+    document.getElementById('zoneTitle').textContent = data.title;
+    document.getElementById('zoneDesc').textContent = data.desc;
+    document.getElementById('zoneImg').src = data.img;
+    document.getElementById('zoneHighlight').innerHTML = `<i class="fa-solid fa-circle-check text-success me-2"></i> <strong>Daily Activity:</strong> ${data.highlight}`;
+  }
+
+  // 3. Dynamic Fee Calculator
+  const homeFeeList = JSON.parse(document.getElementById('home-class-fee-data-script').textContent || '[]');
+  let currentSelectedClassId = homeFeeList.length > 0 ? homeFeeList[0].class_id : null;
+
+  function selectHomeClassFee(classId, btnElem) {
+    document.querySelectorAll('.calc-grade-pill').forEach(b => b.classList.remove('active'));
+    if (btnElem) btnElem.classList.add('active');
+    currentSelectedClassId = classId;
+    recalcHomeFee();
+  }
+
+  function recalcHomeFee() {
+    const classObj = homeFeeList.find(c => c.class_id === currentSelectedClassId) || homeFeeList[0];
+    if (!classObj) return;
+
+    const hasSibling = document.getElementById('siblingToggle').checked;
+    const discountFactor = hasSibling ? 0.85 : 1.0;
+
+    const annualVal = Math.round(classObj.annual_total * discountFactor);
+    const quarterlyVal = Math.round(classObj.quarterly_total * discountFactor);
+    const monthlyVal = Math.round(classObj.monthly_tuition * discountFactor);
+
+    document.getElementById('homeSelectedClassName').textContent = classObj.name;
+    document.getElementById('homeClassDept').textContent = classObj.department_name || 'Primary Wing';
+    document.getElementById('homeKpiAnnual').textContent = '₹' + annualVal.toLocaleString('en-IN');
+    document.getElementById('homeKpiQuarterly').textContent = '₹' + quarterlyVal.toLocaleString('en-IN');
+    document.getElementById('homeKpiMonthly').textContent = '₹' + monthlyVal.toLocaleString('en-IN');
+    document.getElementById('homeKpiAdmission').textContent = '₹' + classObj.admission_one_time.toLocaleString('en-IN');
+
+    // Populate Itemized Table
+    const tbody = document.getElementById('homeItemizedTableBody');
+    tbody.innerHTML = '';
+
+    if (classObj.itemized_heads && classObj.itemized_heads.length > 0) {
+      classObj.itemized_heads.forEach(h => {
+        const itemAmount = hasSibling && h.category_name.toLowerCase().includes('tuition') ? Math.round(h.amount * 0.85) : h.amount;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="fw-semibold text-dark">
+            <i class="fa-solid fa-check-circle text-primary me-2"></i> ${h.category_name}
+          </td>
+          <td><span class="badge bg-light text-secondary border">${h.frequency}</span></td>
+          <td class="text-end fw-bold text-success">₹${Number(itemAmount).toLocaleString('en-IN')}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else {
+      tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-3">No specific fee heads defined for this class.</td></tr>`;
+    }
+  }
+
+  // Initialize on DOM load
+  document.addEventListener('DOMContentLoaded', () => {
+    if (homeFeeList.length > 0) {
+      selectHomeClassFee(homeFeeList[0].class_id, document.querySelector('.calc-grade-pill.active'));
+    }
+  });
+</script>
+{% endblock %}

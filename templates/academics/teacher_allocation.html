@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Allocations{% endblock %}
+{% block page_heading %}Subject & Faculty Allocation Matrix{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Subject Teacher Allocations</h5>
+    <p class="text-muted small mb-0">Map educators to sections and subjects for academic delivery.</p>
+  </div>
+  <div>
+    <a href="{% url 'academics:allocation_create' %}" class="btn btn-saas-primary btn-sm">
+      <i class="fa-solid fa-plus me-1"></i> New Allocation
+    </a>
+  </div>
+</div>
+
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Academic Session</th>
+            <th>Class & Section</th>
+            <th>Subject</th>
+            <th>Assigned Teacher</th>
+            <th>Department</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for alloc in allocations %}
+            <tr>
+              <td class="small">{{ alloc.academic_year.name }}</td>
+              <td class="fw-semibold">{{ alloc.section.full_name }}</td>
+              <td class="text-primary fw-semibold">{{ alloc.subject.name }} ({{ alloc.subject.code }})</td>
+              <td>{{ alloc.teacher.full_name }}</td>
+              <td><span class="badge bg-light text-secondary border">{{ alloc.subject.department.name|default:"General" }}</span></td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4 small">No teacher allocations recorded yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

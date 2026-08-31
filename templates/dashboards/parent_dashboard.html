@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Parent Guardian Portal{% endblock %}
+
+{% block content %}
+
+<div class="page-hero reveal-up" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(6,182,212,0.08));">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <h4 class="fw-bold mb-1" style="font-family:'Geist',sans-serif;background:linear-gradient(135deg,var(--violet),var(--info));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+        <i class="fa-solid fa-users-rectangle"></i> Parent &amp; Guardian Portal
+      </h4>
+      <p class="mb-0" style="color:var(--text-muted);font-size:0.875rem;">
+        Welcome, <strong style="color:var(--text-main);">{{ user.get_full_name|default:user.email }}</strong> &nbsp;&bull;&nbsp; Guardian Monitoring Dashboard
+      </p>
+    </div>
+    {% if children %}
+      <div class="d-flex align-items-center gap-2">
+        <span class="small fw-semibold" style="color:var(--text-muted);">Active Ward:</span>
+        <div class="dropdown">
+          <button class="btn btn-saas-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fa-solid fa-child me-1"></i>
+            {{ active_child.full_name }} ({{ child_enrollment.section.full_name|default:"Student" }})
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" style="border-radius:14px;background:var(--card-bg);border-color:var(--card-border);overflow:hidden;">
+            {% for child in children %}
+              <li>
+                <a class="dropdown-item {% if child.id == active_child.id %}fw-bold{% endif %}"
+                   href="{% url 'parents:switch_child' child.id %}"
+                   style="color:var(--text-main);background:transparent;padding:0.6rem 1.25rem;">
+                  <i class="fa-solid fa-user-graduate me-2" style="color:var(--primary);"></i>
+                  {{ child.full_name }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if active_child %}
+  <div class="row g-4 mb-4">
+
+    <!-- Child Profile Card -->
+    <div class="col-lg-6 reveal-up delay-1">
+      <div class="card-saas h-100">
+        <div class="card-saas-header">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;">
+              <i class="fa-solid fa-id-card" style="color:var(--primary);font-size:0.8rem;"></i>
+            </div>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Student Profile</span>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="{% url 'examinations:admit_card' %}?student_id={{ active_child.pk }}" class="btn btn-sm btn-outline-dark" target="_blank" style="font-size:0.75rem;">
+              <i class="fa-solid fa-id-badge me-1"></i> Admit Card
+            </a>
+            <a href="{% url 'examinations:report_card' active_child.pk %}" class="btn btn-sm btn-outline-primary" style="font-size:0.75rem;">
+              <i class="fa-solid fa-file-invoice me-1"></i> Marksheet
+            </a>
+          </div>
+        </div>
+        <div class="card-saas-body">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--violet));display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;font-weight:700;box-shadow:0 4px 20px var(--primary-glow);flex-shrink:0;font-family:'Geist',sans-serif;">
+              {{ active_child.full_name|first }}
+            </div>
+            <div>
+              <h5 class="fw-bold mb-1" style="color:var(--text-main);font-family:'Geist',sans-serif;">{{ active_child.full_name }}</h5>
+              <p class="small mb-0" style="color:var(--text-muted);">{{ child_enrollment.section.full_name|default:"—" }} &bull; Roll #: {{ child_enrollment.roll_number|default:"—" }}</p>
+            </div>
+          </div>
+          <div style="background:var(--bg-main);border-radius:var(--radius-md);padding:1rem;">
+            <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--card-border);">
+              <span class="small" style="color:var(--text-muted);">Admission No.</span>
+              <strong class="small" style="color:var(--text-main);">{{ active_child.admission_number|default:"—" }}</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2">
+              <span class="small" style="color:var(--text-muted);">Emergency Contact</span>
+              <span class="small" style="color:var(--text-main);">{{ active_child.emergency_contact_phone|default:"—" }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Outstanding Fees -->
+    <div class="col-lg-6 reveal-up delay-2">
+      <div class="card-saas h-100">
+        <div class="card-saas-header">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:28px;height:28px;border-radius:8px;background:var(--danger-light);display:flex;align-items:center;justify-content:center;">
+              <i class="fa-solid fa-file-invoice-dollar" style="color:var(--danger);font-size:0.8rem;"></i>
+            </div>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Outstanding Fees</span>
+          </div>
+        </div>
+        <div class="card-saas-body p-0">
+          <table class="table-saas mb-0" style="font-size:0.83rem;">
+            <thead><tr><th>Title</th><th>Due</th><th>Balance</th><th></th></tr></thead>
+            <tbody>
+              {% for inv in child_invoices %}
+                <tr>
+                  <td class="fw-semibold" style="color:var(--text-main);">{{ inv.title }}</td>
+                  <td style="color:var(--text-muted);">{{ inv.due_date|date:"d M Y" }}</td>
+                  <td class="fw-bold" style="color:var(--danger);">₹{{ inv.balance_amount }}</td>
+                  <td><a href="{% url 'fees:invoice_detail' inv.pk %}" class="btn-saas-primary" style="padding:0.3rem 0.75rem;font-size:0.75rem;">Pay</a></td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-center py-5" style="color:var(--success);">
+                  <i class="fa-solid fa-circle-check mb-2 d-block" style="font-size:2rem;opacity:0.7;"></i>
+                  <span class="small fw-semibold">All fees paid!</span>
+                </td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grades + Notices -->
+  <div class="row g-4">
+    <div class="col-lg-6 reveal-up delay-1">
+      <div class="card-saas h-100">
+        <div class="card-saas-header">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;">
+              <i class="fa-solid fa-award" style="color:var(--primary);font-size:0.8rem;"></i>
+            </div>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Examination Marks</span>
+          </div>
+        </div>
+        <div class="card-saas-body p-0">
+          <table class="table-saas mb-0" style="font-size:0.83rem;">
+            <thead><tr><th>Subject</th><th>Term</th><th>Score</th><th>Grade</th></tr></thead>
+            <tbody>
+              {% for grade in child_grades %}
+                <tr>
+                  <td class="fw-semibold" style="color:var(--text-main);">{{ grade.exam_schedule.subject.name }}</td>
+                  <td style="color:var(--text-muted);">{{ grade.exam_schedule.exam_term.name }}</td>
+                  <td class="fw-bold">{{ grade.total_marks_obtained }}/{{ grade.exam_schedule.total_max_marks }}</td>
+                  <td><span style="background:var(--primary-light);color:var(--primary);padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">{{ grade.grade.grade_letter|default:"A" }}</span></td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-center py-4" style="color:var(--text-muted);">No marks published.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 reveal-up delay-2">
+      <div class="card-saas h-100">
+        <div class="card-saas-header">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:28px;height:28px;border-radius:8px;background:var(--info-light);display:flex;align-items:center;justify-content:center;">
+              <i class="fa-solid fa-bullhorn" style="color:var(--info);font-size:0.8rem;"></i>
+            </div>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">School Circulars</span>
+          </div>
+        </div>
+        <div class="card-saas-body p-0">
+          {% for notice in parent_notices %}
+            <div style="padding:1rem 1.35rem;border-bottom:1px solid var(--card-border);transition:background 0.15s;"
+                 onmouseover="this.style.background='var(--table-hover)'" onmouseout="this.style.background=''">
+              <strong class="small d-block mb-1" style="color:var(--text-main);">{{ notice.title }}</strong>
+              <p class="mb-0 small" style="color:var(--text-muted);">{{ notice.content|truncatechars:100 }}</p>
+            </div>
+          {% empty %}
+            <div class="text-center py-5" style="color:var(--text-muted);">
+              <i class="fa-regular fa-bell-slash mb-2 d-block" style="font-size:2rem;opacity:0.3;"></i>
+              <span class="small">No announcements</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% else %}
+  <div class="card-saas p-5 text-center reveal-up" style="color:var(--text-muted);">
+    <i class="fa-solid fa-users-slash mb-3 d-block" style="font-size:3rem;opacity:0.3;"></i>
+    <h6 class="fw-bold mb-2" style="color:var(--text-main);">No Students Linked</h6>
+    <p class="small mb-0">No active students are currently linked to this guardian profile.</p>
+  </div>
+{% endif %}
+
+{% endblock %}

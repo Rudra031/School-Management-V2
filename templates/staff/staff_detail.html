@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{{ staff.full_name }} | Staff Profile{% endblock %}
+{% block page_heading %}Staff Member Profile{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">{{ staff.full_name }}</h5>
+    <p class="text-muted small mb-0">{{ staff.employee_id }} | {{ staff.designation.title }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'staff:staff_edit' staff.pk %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-pen-to-square me-1"></i> Edit Record</a>
+    <a href="{% url 'staff:staff_list' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Back to Directory</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Left Identity Card -->
+  <div class="col-lg-4">
+    <div class="card-saas p-4 text-center">
+      <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 80px; height: 80px; font-size: 2rem; font-weight: 700;">
+        {{ staff.first_name|first }}{{ staff.last_name|first }}
+      </div>
+      <h5 class="fw-bold mb-1">{{ staff.full_name }}</h5>
+      <p class="text-muted small mb-2">{{ staff.email }}</p>
+      <div><span class="badge bg-primary-subtle text-primary">{{ staff.designation.title }}</span></div>
+
+      <hr class="my-3">
+
+      <div class="text-start small">
+        <div class="mb-2 d-flex justify-content-between">
+          <span class="text-muted">Department:</span>
+          <span class="fw-semibold">{{ staff.department.name|default:"General" }}</span>
+        </div>
+        <div class="mb-2 d-flex justify-content-between">
+          <span class="text-muted">Joining Date:</span>
+          <span class="fw-semibold">{{ staff.joining_date|date:"d M Y" }}</span>
+        </div>
+        <div class="mb-2 d-flex justify-content-between">
+          <span class="text-muted">Contract:</span>
+          <span class="fw-semibold">{{ staff.get_contract_type_display }}</span>
+        </div>
+        <div class="mb-2 d-flex justify-content-between">
+          <span class="text-muted">Experience:</span>
+          <span class="fw-semibold">{{ staff.experience_years }} Years</span>
+        </div>
+        <div class="mb-2 d-flex justify-content-between">
+          <span class="text-muted">Blood Group:</span>
+          <span class="fw-semibold">{{ staff.blood_group|default:"-" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Details & Allocations -->
+  <div class="col-lg-8">
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-chalkboard text-primary me-2"></i> Current Teaching & Class Allocations</span>
+      </div>
+      <div class="card-saas-body p-0">
+        <div class="table-responsive">
+          <table class="table-saas mb-0">
+            <thead>
+              <tr>
+                <th>Session</th>
+                <th>Class & Section</th>
+                <th>Subject</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for sec in assigned_sections %}
+                <tr>
+                  <td class="small">{{ sec.class_level.name }}</td>
+                  <td class="fw-semibold text-primary">Section {{ sec.name }}</td>
+                  <td>Classroom Teacher</td>
+                  <td><span class="badge bg-success-subtle text-success">Head Class Teacher</span></td>
+                </tr>
+              {% endfor %}
+              {% for alloc in allocations %}
+                <tr>
+                  <td class="small">{{ alloc.academic_year.name }}</td>
+                  <td class="fw-semibold">{{ alloc.section.full_name }}</td>
+                  <td class="text-primary">{{ alloc.subject.name }}</td>
+                  <td><span class="badge bg-primary-subtle text-primary">Subject Instructor</span></td>
+                </tr>
+              {% empty %}
+                {% if not assigned_sections %}
+                  <tr>
+                    <td colspan="4" class="text-center text-muted py-4 small">No active class allocations recorded.</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

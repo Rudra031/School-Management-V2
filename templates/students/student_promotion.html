@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Cohort Promotion Wizard{% endblock %}
+{% block page_heading %}Batch Student Promotion Engine{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-arrow-up-right-dots text-primary me-2"></i> Academic Year Promotion Wizard</span>
+      </div>
+      <div class="card-saas-body">
+        <div class="alert alert-info small mb-4">
+          <i class="fa-solid fa-circle-info me-2"></i>
+          <strong>Safe Academic Rollover:</strong> Promoting a cohort marks their previous enrollment as <code>PROMOTED</code> and creates a brand new <code>StudentEnrollment</code> under the destination academic year. Past report cards, attendance, and fee history are completely preserved.
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-4 mb-4">
+            <!-- Source Class -->
+            <div class="col-md-6 border-end">
+              <h6 class="fw-bold text-secondary mb-3">1. Source Class (Current Placement)</h6>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Current Academic Session</label>
+                {{ form.from_academic_year }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Current Class & Section</label>
+                {{ form.from_section }}
+              </div>
+            </div>
+
+            <!-- Destination Class -->
+            <div class="col-md-6">
+              <h6 class="fw-bold text-primary mb-3">2. Destination Class (Promote To)</h6>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Promote to Session</label>
+                {{ form.to_academic_year }}
+              </div>
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Promote to Section</label>
+                {{ form.to_section }}
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center border-top pt-3">
+            <a href="{% url 'students:student_list' %}" class="btn btn-saas-secondary">Cancel</a>
+            <button type="submit" class="btn btn-saas-primary" data-confirm="Are you sure you want to promote all active students in the selected section?">
+              <i class="fa-solid fa-arrow-right me-2"></i> Execute Batch Promotion
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

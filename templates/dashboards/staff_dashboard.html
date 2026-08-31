@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Staff Self-Service{% endblock %}
+
+{% block content %}
+
+<div class="page-hero reveal-up" style="background:linear-gradient(135deg,rgba(100,116,139,0.08),rgba(79,70,229,0.08));">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <h4 class="fw-bold mb-1" style="font-family:'Geist',sans-serif;background:linear-gradient(135deg,var(--primary),var(--info));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+        <i class="fa-solid fa-id-badge"></i> Staff Self-Service Portal
+      </h4>
+      <p class="mb-0" style="color:var(--text-muted);font-size:0.875rem;">
+        Welcome, <strong style="color:var(--text-main);">{{ user.get_full_name|default:user.email }}</strong>
+        &nbsp;&bull;&nbsp; {{ user.get_user_type_display }} &nbsp;&bull;&nbsp; Operations &amp; Support
+      </p>
+    </div>
+    <div>
+      <a href="{% url 'leave:apply' %}" class="btn btn-saas-primary btn-sm">
+        <i class="fa-solid fa-paper-plane"></i> Apply for Leave
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+
+  <!-- Leave Applications -->
+  <div class="col-lg-6 reveal-up delay-1">
+    <div class="card-saas h-100">
+      <div class="card-saas-header">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-calendar-minus" style="color:var(--primary);font-size:0.8rem;"></i>
+          </div>
+          <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">My Leave Applications</span>
+        </div>
+        <a href="{% url 'leave:list' %}" style="font-size:0.8rem;color:var(--primary);font-weight:500;">View All →</a>
+      </div>
+      <div class="card-saas-body p-0">
+        <table class="table-saas mb-0" style="font-size:0.83rem;">
+          <thead><tr><th>Type</th><th>Dates</th><th>Days</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for req in my_leaves %}
+              <tr>
+                <td class="fw-semibold" style="color:var(--text-main);">{{ req.leave_type.name }}</td>
+                <td style="color:var(--text-muted);white-space:nowrap;">{{ req.start_date|date:"d M" }} – {{ req.end_date|date:"d M Y" }}</td>
+                <td class="fw-bold" style="color:var(--primary);">{{ req.total_days }}</td>
+                <td>
+                  {% if req.status == 'APPROVED' %}
+                    <span style="background:var(--success-light);color:var(--success);padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:600;">Approved</span>
+                  {% elif req.status == 'PENDING' %}
+                    <span style="background:var(--warning-light);color:var(--warning);padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:600;">Pending</span>
+                  {% else %}
+                    <span style="background:var(--danger-light);color:var(--danger);padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:600;">Rejected</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="4" class="text-center py-5" style="color:var(--text-muted);">
+                <i class="fa-regular fa-calendar mb-2 d-block" style="font-size:2rem;opacity:0.3;"></i>
+                <span class="small">No leave requests submitted</span>
+              </td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assigned Assets -->
+  <div class="col-lg-6 reveal-up delay-2">
+    <div class="card-saas h-100">
+      <div class="card-saas-header">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:28px;height:28px;border-radius:8px;background:var(--info-light);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-boxes-stacked" style="color:var(--info);font-size:0.8rem;"></i>
+          </div>
+          <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">My Assigned Equipment</span>
+        </div>
+      </div>
+      <div class="card-saas-body p-0">
+        <table class="table-saas mb-0" style="font-size:0.83rem;">
+          <thead><tr><th>Equipment / Asset</th><th>SKU</th><th>Qty</th><th>Date</th></tr></thead>
+          <tbody>
+            {% for alloc in assigned_assets %}
+              <tr>
+                <td class="fw-semibold" style="color:var(--text-main);">{{ alloc.item.name }}</td>
+                <td style="color:var(--text-muted);">{{ alloc.item.item_code }}</td>
+                <td class="fw-bold" style="color:var(--primary);">{{ alloc.quantity }}</td>
+                <td style="color:var(--text-muted);">{{ alloc.allocated_date|date:"d M Y" }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="4" class="text-center py-5" style="color:var(--text-muted);">
+                <i class="fa-solid fa-boxes-stacked mb-2 d-block" style="font-size:2rem;opacity:0.3;"></i>
+                <span class="small">No equipment assigned</span>
+              </td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Staff Notices -->
+<div class="card-saas reveal-up delay-1">
+  <div class="card-saas-header">
+    <div class="d-flex align-items-center gap-2">
+      <div style="width:28px;height:28px;border-radius:8px;background:var(--warning-light);display:flex;align-items:center;justify-content:center;">
+        <i class="fa-solid fa-bullhorn" style="color:var(--warning);font-size:0.8rem;"></i>
+      </div>
+      <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Staff Announcements &amp; Circulars</span>
+    </div>
+  </div>
+  <div class="card-saas-body p-0">
+    <div class="row g-0">
+      {% for notice in staff_notices %}
+        <div class="col-12">
+          <div style="padding:1rem 1.35rem;border-bottom:1px solid var(--card-border);transition:background 0.15s;"
+               onmouseover="this.style.background='var(--table-hover)'" onmouseout="this.style.background=''">
+            <strong class="small d-block mb-1" style="color:var(--text-main);">{{ notice.title }}</strong>
+            <p class="mb-0 small" style="color:var(--text-muted);">{{ notice.content|truncatechars:120 }}</p>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12 text-center py-5" style="color:var(--text-muted);">
+          <i class="fa-regular fa-bell-slash mb-2 d-block" style="font-size:2rem;opacity:0.3;"></i>
+          <span class="small">No announcements posted</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

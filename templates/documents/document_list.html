@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Documents Repository{% endblock %}
+{% block page_heading %}Institutional Document Repository{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Central Documents Repository</h5>
+    <p class="text-muted small mb-0">Total {{ paginator.count }} documents and circulars available.</p>
+  </div>
+  <div>
+    {% if not user.is_student and not user.is_parent %}
+      <a href="{% url 'documents:upload' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-cloud-arrow-up me-1"></i> Upload Document</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Search & Category Filter -->
+<div class="card-saas p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-6">
+      <input type="text" name="search" class="form-control form-control-sm" placeholder="Search by document title or description..." value="{{ search_query }}">
+    </div>
+    <div class="col-md-4">
+      <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-saas-primary btn-sm w-100">Search</button>
+      <a href="{% url 'documents:list' %}" class="btn btn-saas-secondary btn-sm">Reset</a>
+    </div>
+  </form>
+</div>
+
+<!-- Documents Table -->
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Document Title</th>
+            <th>Category</th>
+            <th>Access Level</th>
+            <th>Uploaded By</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for doc in documents %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="fa-solid fa-file-lines text-primary fs-5"></i>
+                  <div>
+                    <div class="fw-semibold text-dark">{{ doc.title }}</div>
+                    {% if doc.description %}<small class="text-muted">{{ doc.description|truncatechars:40 }}</small>{% endif %}
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge bg-light text-secondary border">{{ doc.category.name|default:"General" }}</span></td>
+              <td>
+                {% if doc.access_level == 'PUBLIC' %}
+                  <span class="badge bg-success-subtle text-success">Public</span>
+                {% elif doc.access_level == 'RESTRICTED_ADMIN' %}
+                  <span class="badge bg-danger-subtle text-danger">Admin Only</span>
+                {% else %}
+                  <span class="badge bg-primary-subtle text-primary">{{ doc.get_access_level_display }}</span>
+                {% endif %}
+              </td>
+              <td class="small">{{ doc.uploaded_by.email|default:"System" }}</td>
+              <td class="small text-muted">{{ doc.uploaded_at|date:"d M Y" }}</td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <a href="{{ doc.document_file.url }}" class="btn btn-outline-primary py-0" download><i class="fa-solid fa-download me-1"></i> Download</a>
+                  {% if user.is_superadmin or user.is_school_admin %}
+                    <form method="post" action="{% url 'documents:delete' doc.pk %}" class="d-inline ms-1">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-outline-danger py-0" data-confirm="Remove this document from the repository?">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4 small">No documents found matching criteria.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

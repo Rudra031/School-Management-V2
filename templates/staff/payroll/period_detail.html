@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Payroll {{ payroll_period.get_month_display }} {{ payroll_period.year }} | Horizon SMS{% endblock %}
+{% block page_heading %}Payroll Disbursement Cycle{% endblock %}
+
+{% block content %}
+
+<!-- Header & Action Bar -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div class="d-flex align-items-center gap-2">
+    <a href="{% url 'staff:payroll_dashboard' %}" class="btn btn-sm btn-saas-secondary">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <div>
+      <h5 class="fw-bold mb-0" style="color:var(--text-main);">
+        Payroll: {{ payroll_period.get_month_display }} {{ payroll_period.year }}
+      </h5>
+      <span class="text-muted small">Session: {{ payroll_period.academic_year.name }} &bull; Disbursed on: {{ payroll_period.payment_date|date:"M d, Y" }}</span>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    {% if payroll_period.status == 'GENERATED' %}
+      <form method="post" action="{% url 'staff:payroll_period_approve' payroll_period.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-outline-info">
+          <i class="fa-solid fa-check me-1"></i> Approve Payroll
+        </button>
+      </form>
+    {% endif %}
+
+    {% if payroll_period.status != 'PAID' %}
+      <form method="post" action="{% url 'staff:payroll_period_disburse' payroll_period.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-success">
+          <i class="fa-solid fa-money-bill-wave me-1"></i> Mark as Disbursed / Paid
+        </button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Financial Summary Strip -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="card-saas p-3">
+      <span class="text-muted small text-uppercase fw-bold">Employees</span>
+      <h3 class="fw-bold text-primary my-1">{{ slips.count }}</h3>
+      <span class="text-muted" style="font-size:0.75rem;">Slips Generated</span>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="card-saas p-3">
+      <span class="text-muted small text-uppercase fw-bold">Total Gross Pay</span>
+      <h3 class="fw-bold text-info my-1">₹{{ total_gross|floatformat:2 }}</h3>
+      <span class="text-muted" style="font-size:0.75rem;">Basic + All Allowances</span>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="card-saas p-3">
+      <span class="text-muted small text-uppercase fw-bold">Total Deductions</span>
+      <h3 class="fw-bold text-danger my-1">-₹{{ total_deductions|floatformat:2 }}</h3>
+      <span class="text-muted" style="font-size:0.75rem;">Taxes, PF, Insurance</span>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="card-saas p-3">
+      <span class="text-muted small text-uppercase fw-bold">Net Total Disbursed</span>
+      <h3 class="fw-bold text-success my-1">₹{{ total_net|floatformat:2 }}</h3>
+      <span class="badge bg-success-subtle text-success mt-1">{{ payroll_period.get_status_display }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Salary Slips Table -->
+<div class="card-saas p-0 overflow-hidden">
+  <div class="p-3 border-bottom border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+    <h6 class="fw-bold mb-0" style="color:var(--text-main);"><i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i> Employee Pay Stubs / Salary Slips</h6>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead class="table-light">
+        <tr class="small text-muted">
+          <th>SLIP NUMBER</th>
+          <th>EMPLOYEE</th>
+          <th>DESIGNATION</th>
+          <th>BASIC (₹)</th>
+          <th>ALLOWANCES (₹)</th>
+          <th>DEDUCTIONS (₹)</th>
+          <th>NET SALARY (₹)</th>
+          <th>STATUS</th>
+          <th class="text-end">ACTION</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for slip in slips %}
+          <tr>
+            <td class="fw-bold font-monospace">
+              <a href="{% url 'staff:salary_slip_detail' slip.pk %}" class="text-primary text-decoration-none">
+                {{ slip.slip_number }}
+              </a>
+            </td>
+            <td>
+              <div class="fw-semibold" style="color:var(--text-main);">{{ slip.staff_member.full_name }}</div>
+              <div class="text-muted font-monospace" style="font-size:0.72rem;">{{ slip.staff_member.employee_id }}</div>
+            </td>
+            <td class="small">{{ slip.staff_member.designation.title }}</td>
+            <td class="fw-semibold">₹{{ slip.basic_salary|floatformat:2 }}</td>
+            <td class="text-success small fw-semibold">+₹{{ slip.total_allowances|floatformat:2 }}</td>
+            <td class="text-danger small fw-semibold">-₹{{ slip.total_deductions|floatformat:2 }}</td>
+            <td class="fw-bold text-primary">₹{{ slip.net_salary|floatformat:2 }}</td>
+            <td>
+              {% if slip.payment_status == 'PAID' %}
+                <span class="badge bg-success-subtle text-success">PAID</span>
+              {% else %}
+                <span class="badge bg-warning-subtle text-warning">{{ slip.get_payment_status_display }}</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <a href="{% url 'staff:salary_slip_detail' slip.pk %}" class="btn btn-xs btn-outline-primary me-1" title="View Slip">
+                <i class="fa-solid fa-eye"></i>
+              </a>
+              <a href="{% url 'staff:salary_slip_print' slip.pk %}" target="_blank" class="btn btn-xs btn-outline-secondary" title="Print Salary Slip">
+                <i class="fa-solid fa-print"></i>
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="9" class="text-center py-4 text-muted">
+              No salary slips generated for this period.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

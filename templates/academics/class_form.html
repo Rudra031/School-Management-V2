@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Add Grade Level{% endblock %}
+{% block page_heading %}Add Grade Level{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-graduation-cap text-primary me-2"></i> Class Level Details</span>
+      </div>
+      <div class="card-saas-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Class Name</label>
+            {{ form.name }}
+            {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Numeric Level (for sorting/promotion)</label>
+            {{ form.numeric_level }}
+            {% if form.numeric_level.errors %}<div class="text-danger small">{{ form.numeric_level.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Department</label>
+            {{ form.department }}
+            {% if form.department.errors %}<div class="text-danger small">{{ form.department.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Description</label>
+            {{ form.description }}
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'academics:class_manage' %}" class="btn btn-saas-secondary">Cancel</a>
+            <button type="submit" class="btn btn-saas-primary">Save Class</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

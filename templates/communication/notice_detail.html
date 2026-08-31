@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{{ notice.title }}{% endblock %}
+{% block page_heading %}Campus Announcement{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">{{ notice.title }}</h5>
+    <p class="text-muted small mb-0">Published on {{ notice.published_at|date:"d F Y, H:i" }} | Target: {{ notice.get_target_audience_display }}</p>
+  </div>
+  <div>
+    <a href="{% url 'communication:notice_board' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Notice Board</a>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="card-saas p-5 bg-white shadow-sm border">
+      <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+        <div>
+          <span class="badge bg-primary-subtle text-primary">{{ notice.get_target_audience_display }}</span>
+          {% if notice.is_pinned %}
+            <span class="badge bg-primary ms-1"><i class="fa-solid fa-thumbtack me-1"></i> Pinned</span>
+          {% endif %}
+        </div>
+        <div class="small text-muted">
+          Author: <strong>{{ notice.created_by.get_full_name|default:notice.created_by.email }}</strong>
+        </div>
+      </div>
+
+      <div class="fs-6 mb-5" style="line-height: 1.8; white-space: pre-wrap;">{{ notice.content }}</div>
+
+      {% if notice.attachment %}
+        <div class="p-3 bg-light border rounded d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-paperclip text-primary fs-5"></i>
+            <div>
+              <div class="fw-semibold small">Official Circular Attachment</div>
+              <small class="text-muted">Click to view or download file</small>
+            </div>
+          </div>
+          <a href="{{ notice.attachment.url }}" class="btn btn-sm btn-saas-primary" download><i class="fa-solid fa-download me-1"></i> Download Attachment</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

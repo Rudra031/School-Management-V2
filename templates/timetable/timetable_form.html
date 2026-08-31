@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Allocate Timetable Period | Horizon SMS{% endblock %}
+{% block page_heading %}Schedule Period Allocation{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <a href="{% url 'timetable:overview' %}" class="btn btn-sm btn-saas-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Timetable
+      </a>
+      <span class="badge bg-primary-subtle text-primary">Conflict-Free Engine</span>
+    </div>
+
+    <div class="card-saas p-4">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--violet));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
+          <i class="fa-solid fa-calendar-plus"></i>
+        </div>
+        <div>
+          <h5 class="fw-bold mb-0" style="color:var(--text-main);">Schedule Period Allocation</h5>
+          <span class="text-muted small">Allocate subject and teacher to class time slot with automated conflict detection</span>
+        </div>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-muted">{{ form.academic_year.label }}</label>
+          {{ form.academic_year }}
+          {% if form.academic_year.errors %}<div class="text-danger small">{{ form.academic_year.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">{{ form.section.label }}</label>
+            {{ form.section }}
+            {% if form.section.errors %}<div class="text-danger small">{{ form.section.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">{{ form.day_of_week.label }}</label>
+            {{ form.day_of_week }}
+            {% if form.day_of_week.errors %}<div class="text-danger small">{{ form.day_of_week.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">{{ form.time_slot.label }}</label>
+            {{ form.time_slot }}
+            {% if form.time_slot.errors %}<div class="text-danger small">{{ form.time_slot.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">{{ form.subject.label }}</label>
+            {{ form.subject }}
+            {% if form.subject.errors %}<div class="text-danger small">{{ form.subject.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">{{ form.teacher.label }}</label>
+            {{ form.teacher }}
+            {% if form.teacher.errors %}<div class="text-danger small">{{ form.teacher.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">{{ form.room_number.label }}</label>
+            {{ form.room_number }}
+            {% if form.room_number.errors %}<div class="text-danger small">{{ form.room_number.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between pt-3 border-top border-secondary border-opacity-10">
+          <a href="{% url 'timetable:overview' %}" class="btn btn-saas-secondary">Cancel</a>
+          <button type="submit" class="btn btn-saas-primary">
+            <i class="fa-solid fa-save me-1"></i> Save Period Allocation
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

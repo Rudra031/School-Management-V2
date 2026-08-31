@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Medical Record | {{ student.full_name }}{% endblock %}
+{% block page_heading %}Confidential Student Medical Record{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1"><i class="fa-solid fa-heart-pulse text-danger me-2"></i> {{ student.full_name }}</h5>
+    <p class="text-muted small mb-0">Strictly Restricted Health & Incident Information | {{ student.admission_number }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'students:student_detail' student.pk %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Back to Student Profile</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Medical Details Form -->
+  <div class="col-lg-6">
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-notes-medical text-primary me-2"></i> Health Profile & Allergies</span>
+      </div>
+      <div class="card-saas-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Allergies (Food, Drug, Environmental)</label>
+            {{ health_form.allergies_summary }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Chronic Conditions (Asthma, Diabetes, etc.)</label>
+            {{ health_form.chronic_conditions }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Current Regular Medications</label>
+            {{ health_form.medications }}
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Primary Physician Name</label>
+              {{ health_form.doctor_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Physician Phone</label>
+              {{ health_form.doctor_phone }}
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Insurance Policy / Number</label>
+            {{ health_form.insurance_policy_number }}
+          </div>
+          <button type="submit" class="btn btn-saas-primary w-100">Update Health Record</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medical Incidents Log & Quick Report -->
+  <div class="col-lg-6">
+    <!-- Log Incident Card -->
+    <div class="card-saas mb-4">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-plus-circle text-danger me-2"></i> Log Campus Medical Incident</span>
+      </div>
+      <div class="card-saas-body">
+        <form method="post" action="{% url 'students:incident_create' student.pk %}">
+          {% csrf_token %}
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Incident Date & Time</label>
+              {{ incident_form.incident_date }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Incident Title</label>
+              {{ incident_form.title }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Description of Occurrence</label>
+            {{ incident_form.description }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">First-Aid / Treatment Given</label>
+            {{ incident_form.treatment_given }}
+          </div>
+          <div class="form-check mb-3">
+            {{ incident_form.referred_to_hospital }}
+            <label class="form-check-label small" for="{{ incident_form.referred_to_hospital.id_for_label }}">
+              Emergency hospital referral required
+            </label>
+          </div>
+          <button type="submit" class="btn btn-outline-danger btn-sm">Record Medical Incident</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Past Incidents Table -->
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i> Past Medical Incidents</span>
+      </div>
+      <div class="card-saas-body p-0">
+        <div class="table-responsive">
+          <table class="table-saas mb-0">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Incident</th>
+                <th>Treatment</th>
+                <th>Hospitalized</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for inc in incidents %}
+                <tr>
+                  <td class="small">{{ inc.incident_date|date:"d M Y H:i" }}</td>
+                  <td class="fw-semibold text-danger">{{ inc.title }}</td>
+                  <td class="small text-muted">{{ inc.treatment_given|truncatechars:40 }}</td>
+                  <td>
+                    {% if inc.referred_to_hospital %}
+                      <span class="badge bg-danger">Yes</span>
+                    {% else %}
+                      <span class="badge bg-light text-secondary border">No</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted py-3 small">No recorded incidents on file.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

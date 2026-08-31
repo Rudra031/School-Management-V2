@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Official Marksheet & Report Card | {{ student.full_name }}{% endblock %}
+{% block page_heading %}Official Student Academic Report Card{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 no-print">
+  <div>
+    <h5 class="fw-bold mb-1 text-dark"><i class="fa-solid fa-award text-warning me-2"></i> Academic Performance Transcript</h5>
+    <p class="text-muted small mb-0">{{ student.full_name }} &bull; {{ enrollment.section.full_name }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'examinations:report_card_pdf' student.pk %}?term={{ selected_term.id }}" target="_blank" class="btn btn-danger btn-sm fw-bold px-3">
+      <i class="fa-solid fa-file-pdf me-1"></i> Download Stamped PDF Marksheet
+    </a>
+    <button onclick="window.print()" class="btn btn-primary btn-sm fw-bold px-3"><i class="fa-solid fa-print me-1"></i> Print</button>
+    <a href="{% url 'examinations:tabulation_sheet' %}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-table-cells me-1"></i> Tabulation Master</a>
+    <a href="{% url 'students:student_detail' student.pk %}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Back to Profile</a>
+  </div>
+</div>
+
+<!-- Term Selector -->
+<div class="card-saas p-3 mb-4 no-print">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-6">
+      <label class="form-label small fw-bold">Select Examination Assessment Cycle</label>
+      <select name="term" class="form-select form-select-sm" onchange="this.form.submit()">
+        {% for t in terms %}
+          <option value="{{ t.id }}" {% if selected_term.id == t.id %}selected{% endif %}>{{ t.title }} ({{ t.academic_year.name }})</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+</div>
+
+<!-- Printable Official Report Card Document -->
+<div class="card-saas p-5 bg-white shadow-sm report-card-printable border border-2 border-dark">
+  <!-- School Brand Header -->
+  <div class="text-center border-bottom border-dark border-2 pb-3 mb-4">
+    <div class="d-flex align-items-center justify-content-center gap-3 mb-1">
+      <div class="rounded bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width:48px; height:48px; font-size:1.3rem;">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+      <div>
+        <h3 class="fw-bold text-dark mb-0 text-uppercase" style="letter-spacing: 1px;">{{ school_setting.name|default:"HORIZON PUBLIC SCHOOL" }}</h3>
+        <p class="text-muted small mb-0 fw-semibold">Affiliated to CBSE, New Delhi &bull; Affiliation No. 2130894 &bull; School Code: 07040</p>
+      </div>
+    </div>
+    <p class="text-muted small mb-2">{{ school_setting.address|default:"Sector 14, Urban Estate, Rohini, New Delhi - 110085" }} | Tel: {{ school_setting.phone|default:"+91 98765 43210" }}</p>
+    <div class="badge bg-dark text-white text-uppercase px-4 py-2" style="font-size: 0.85rem; letter-spacing: 1.5px;">
+      {{ selected_term.title|default:"ANNUAL ACADEMIC PERFORMANCE TRANSCRIPT" }}
+    </div>
+  </div>
+
+  <!-- Student Demographic Grid -->
+  <div class="row g-3 mb-4 small bg-light p-3 rounded border" style="font-size:0.8rem;">
+    <div class="col-md-6">
+      <div class="mb-1"><span class="text-muted">Student Name:</span> <strong class="text-dark fs-6">{{ student.full_name }}</strong></div>
+      <div class="mb-1"><span class="text-muted">Admission No:</span> <strong class="text-primary font-monospace">{{ student.admission_number }}</strong></div>
+      <div class="mb-1"><span class="text-muted">Roll Number:</span> <strong class="text-danger font-monospace">#{{ enrollment.roll_number|default:"-" }}</strong></div>
+      <div><span class="text-muted">Aadhaar / PEN ID:</span> <span class="font-monospace">{{ student.national_id|default:"07040108902PEN" }}</span></div>
+    </div>
+    <div class="col-md-6 text-md-end">
+      <div class="mb-1"><span class="text-muted">Class &amp; Section:</span> <strong>{{ enrollment.section.full_name|default:"-" }}</strong></div>
+      <div class="mb-1"><span class="text-muted">Academic Session:</span> <strong>{{ selected_term.academic_year.name }}</strong></div>
+      <div class="mb-1"><span class="text-muted">Father / Guardian:</span> {{ student.emergency_contact_name|default:"Parent / Guardian" }}</div>
+      <div><span class="text-muted">Date of Issue:</span> <strong class="text-dark">{% now "d F Y" %}</strong></div>
+    </div>
+  </div>
+
+  <!-- Part 1: Scholastic Areas Table -->
+  <h6 class="fw-bold text-dark text-uppercase small mb-2" style="letter-spacing:0.04em;">
+    <i class="fa-solid fa-book-open text-primary me-1"></i> Part 1: Scholastic Performance
+  </h6>
+  <div class="table-responsive mb-4">
+    <table class="table table-bordered mb-0 align-middle text-center" style="font-size:0.8rem;">
+      <thead class="table-dark">
+        <tr>
+          <th style="width: 80px;">Code</th>
+          <th class="text-start">Subject Title</th>
+          <th style="width: 85px;">Theory (Max)</th>
+          <th style="width: 85px;">Practical</th>
+          <th style="width: 85px;">Internal / IA</th>
+          <th style="width: 90px;">Total (Max)</th>
+          <th style="width: 100px;">Marks Obtained</th>
+          <th style="width: 75px;">Grade</th>
+          <th style="width: 85px;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in marks_entries %}
+          <tr>
+            <td class="fw-semibold text-muted font-monospace">{{ entry.exam_schedule.subject.code }}</td>
+            <td class="text-start fw-bold text-dark">{{ entry.exam_schedule.subject.name }}</td>
+            <td>{{ entry.theory_marks_obtained|floatformat:0 }} <span class="text-muted">({{ entry.exam_schedule.theory_marks_max|floatformat:0 }})</span></td>
+            <td>{{ entry.practical_marks_obtained|floatformat:0 }} <span class="text-muted">({{ entry.exam_schedule.practical_marks_max|floatformat:0 }})</span></td>
+            <td>{{ entry.internal_marks_obtained|floatformat:0 }} <span class="text-muted">({{ entry.exam_schedule.internal_marks_max|floatformat:0 }})</span></td>
+            <td class="text-muted font-monospace">{{ entry.exam_schedule.max_marks|floatformat:0 }}</td>
+            <td class="fw-bold text-primary fs-6 font-monospace">{{ entry.total_marks_obtained|floatformat:0 }}</td>
+            <td>
+              <span class="badge bg-primary-subtle text-primary">{{ entry.grade.grade_letter|default:"-" }}</span>
+            </td>
+            <td>
+              {% if entry.is_absent %}
+                <span class="badge bg-secondary">Absent</span>
+              {% elif entry.is_medical_leave %}
+                <span class="badge bg-warning text-dark">Medical</span>
+              {% elif entry.is_passed %}
+                <span class="badge bg-success text-white">Pass</span>
+              {% else %}
+                <span class="badge bg-danger text-white">Fail</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4 small">No examination marks recorded for this assessment cycle yet.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Part 2: Co-Scholastic Activities & Discipline -->
+  <h6 class="fw-bold text-dark text-uppercase small mb-2" style="letter-spacing:0.04em;">
+    <i class="fa-solid fa-palette text-success me-1"></i> Part 2: Co-Scholastic Activities (3-Point Grading Scale: A = Outstanding, B = Very Good, C = Fair)
+  </h6>
+  <div class="table-responsive mb-4">
+    <table class="table table-bordered table-sm mb-0 align-middle" style="font-size:0.75rem;">
+      <thead class="table-light">
+        <tr>
+          <th>Co-Scholastic Activity Area</th>
+          <th style="width: 120px;" class="text-center">Grade Awarded</th>
+          <th>Faculty Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fw-semibold">2(A) Work Education / Digital Skills</td>
+          <td class="text-center fw-bold text-primary">A</td>
+          <td class="text-muted">Demonstrates exceptional problem-solving and IT laboratory initiative.</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold">2(B) Art &amp; Cultural Expression</td>
+          <td class="text-center fw-bold text-primary">A</td>
+          <td class="text-muted">Active contributor to institutional exhibitions and visual arts.</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold">2(C) Health &amp; Physical Education (Sports / Yoga)</td>
+          <td class="text-center fw-bold text-primary">A</td>
+          <td class="text-muted">Displays strong teamwork, physical fitness, and athletic discipline.</td>
+        </tr>
+        <tr>
+          <td class="fw-semibold">2(D) Institutional Discipline &amp; Values</td>
+          <td class="text-center fw-bold text-primary">A</td>
+          <td class="text-muted">Maintains exemplary campus punctuality, courtesy, and civic sense.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Evaluation Summary & Remarks -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-7">
+      <div class="p-3 border rounded h-100" style="font-size:0.75rem;">
+        <h6 class="fw-bold text-dark mb-1">Class Teacher's Evaluative Remarks:</h6>
+        <p class="text-dark mb-2">
+          "{{ student.first_name }} has demonstrated consistent intellectual curiosity and academic rigor across all scholastic disciplines. Keep striving for excellence in future semesters!"
+        </p>
+        <div class="text-muted pt-2 border-top">
+          <strong>Grading Scale:</strong> A1 (91-100) &bull; A2 (81-90) &bull; B1 (71-80) &bull; B2 (61-70) &bull; C1 (51-60) &bull; C2 (33-50) &bull; D/E (&lt;33 Fail)
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="p-3 bg-light border rounded text-end" style="font-size:0.8rem;">
+        <div class="mb-1"><span class="text-muted">Aggregate Total:</span> <strong class="fs-6">{{ total_obtained|floatformat:0 }} / {{ total_max|floatformat:0 }}</strong></div>
+        <div class="mb-1"><span class="text-muted">Overall Percentage:</span> <strong class="fs-5 text-primary font-monospace">{{ overall_percentage }}%</strong></div>
+        <div class="mb-1"><span class="text-muted">Overall Grade:</span> <strong class="fs-5 text-dark">{{ overall_grade.grade_letter|default:"A" }}</strong></div>
+        <div class="mt-2 pt-1 border-top">
+          <span class="text-muted">Academic Result:</span>
+          {% if is_pass %}
+            <span class="badge bg-success fs-6 px-3 py-1 ms-1">PASSED &amp; QUALIFIED</span>
+          {% else %}
+            <span class="badge bg-danger fs-6 px-3 py-1 ms-1">COMPARTMENT / FAIL</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signatures Footer -->
+  <div class="row pt-5 mt-4 text-center small text-muted">
+    <div class="col-4">
+      <div class="border-top border-dark pt-2 mx-3"><strong>Class Teacher Signature</strong></div>
+    </div>
+    <div class="col-4">
+      <div class="border-top border-dark pt-2 mx-3"><strong>Examination Controller</strong></div>
+    </div>
+    <div class="col-4">
+      <div class="border-top border-dark pt-2 mx-3"><strong>Principal &amp; Institutional Seal</strong></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

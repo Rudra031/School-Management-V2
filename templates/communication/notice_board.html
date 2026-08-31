@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Notice Board{% endblock %}
+{% block page_heading %}Campus Notice Board{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Official Announcements & Circulars</h5>
+    <p class="text-muted small mb-0">Total {{ paginator.count }} announcements posted.</p>
+  </div>
+  <div>
+    {% if user.is_superadmin or user.is_school_admin or user.is_principal %}
+      <a href="{% url 'communication:notice_create' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-bullhorn me-1"></i> Post Announcement</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Search & Audience Filter -->
+<div class="card-saas p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-6">
+      <input type="text" name="search" class="form-control form-control-sm" placeholder="Search notices by title or keywords..." value="{{ search_query }}">
+    </div>
+    <div class="col-md-4">
+      <select name="audience" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">All Audiences</option>
+        {% for aud_val, aud_label in audiences %}
+          <option value="{{ aud_val }}" {% if selected_audience == aud_val %}selected{% endif %}>{{ aud_label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-saas-primary btn-sm w-100">Search</button>
+      <a href="{% url 'communication:notice_board' %}" class="btn btn-saas-secondary btn-sm">Reset</a>
+    </div>
+  </form>
+</div>
+
+<!-- Notices Grid -->
+<div class="row g-4">
+  {% for notice in notices %}
+    <div class="col-md-6">
+      <div class="card-saas h-100 p-4 {% if notice.is_pinned %}border-primary border-2 shadow-sm{% endif %}">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            {% if notice.is_pinned %}
+              <span class="badge bg-primary me-1"><i class="fa-solid fa-thumbtack me-1"></i> Pinned</span>
+            {% endif %}
+            <span class="badge bg-light text-secondary border">{{ notice.get_target_audience_display }}</span>
+          </div>
+          <small class="text-muted">{{ notice.published_at|date:"d M Y" }}</small>
+        </div>
+
+        <h5 class="fw-bold mb-2">
+          <a href="{% url 'communication:notice_detail' notice.pk %}" class="text-dark text-decoration-none">
+            {{ notice.title }}
+          </a>
+        </h5>
+
+        <p class="text-muted small mb-3">{{ notice.content|truncatechars:180 }}</p>
+
+        <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto small">
+          <span class="text-muted">By: {{ notice.created_by.get_full_name|default:notice.created_by.email }}</span>
+          <div class="d-flex gap-2">
+            {% if notice.attachment %}
+              <a href="{{ notice.attachment.url }}" class="text-primary fw-semibold" download><i class="fa-solid fa-paperclip me-1"></i> Attachment</a>
+            {% endif %}
+            <a href="{% url 'communication:notice_detail' notice.pk %}" class="btn btn-sm btn-outline-primary py-0">Read More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+      <i class="fa-solid fa-bullhorn fs-2 mb-2 text-secondary opacity-50"></i>
+      <p>No announcements currently posted.</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

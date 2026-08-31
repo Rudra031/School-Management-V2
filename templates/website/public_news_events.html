@@ -1,0 +1,110 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}News, Official Circulars &amp; Events | {{ school.name|default:"Horizon Premier Public School" }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="py-5" style="background:radial-gradient(circle at 50% 0%, rgba(12, 12, 115, 0.3) 0%, rgba(0, 31, 92, 0.95) 70%, #001230 100%);">
+  <div class="container text-center py-4">
+    <div class="badge-tag mx-auto mb-3">
+      <i class="fa-solid fa-newspaper text-warning me-1"></i> Official Newsroom &amp; Happenings
+    </div>
+    <h1 class="display-5 fw-bold text-white mt-2">Dispatches, Circulars &amp; Events</h1>
+    <p class="text-white-50 max-w-800 mx-auto" style="font-size:1.1rem; line-height:1.8;">
+      Stay informed with scholastic achievements, administrative notifications, CBSE examination circulars, and upcoming campus celebrations.
+    </p>
+  </div>
+</div>
+
+<div class="container py-5">
+  
+  <!-- Category Filter Pills -->
+  <div class="d-flex justify-content-center flex-wrap gap-2 mb-5">
+    <a href="{% url 'website:news_events' %}" class="btn btn-sm {% if selected_category == 'ALL' %}btn-warning fw-bold text-dark{% else %}btn-site-glass{% endif %}" style="border-radius:20px;">
+      All Circulars
+    </a>
+    {% for code, name in categories %}
+      <a href="{% url 'website:news_events' %}?category={{ code }}" class="btn btn-sm {% if selected_category == code %}btn-warning fw-bold text-dark{% else %}btn-site-glass{% endif %}" style="border-radius:20px;">
+        {{ name }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="row g-4 mb-5">
+    
+    <!-- News Articles Column -->
+    <div class="col-lg-8">
+      <h4 class="fw-bold text-white mb-4"><i class="fa-solid fa-bullhorn text-warning me-2"></i>Recent Dispatches &amp; Circulars</h4>
+      <div class="d-flex flex-column gap-4">
+        {% for article in news_articles %}
+          <div class="glass-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+              <span class="badge bg-primary bg-opacity-25 text-info" style="font-size:0.75rem;">{{ article.get_category_display }}</span>
+              <span class="text-white-50 small"><i class="fa-solid fa-calendar me-1 text-warning"></i>{{ article.published_at|date:"d F Y" }}</span>
+            </div>
+            <h4 class="fw-bold text-white mb-2">
+              <a href="{% url 'website:news_detail' slug=article.slug %}" class="text-white text-decoration-none hover-primary">
+                {{ article.title }}
+              </a>
+            </h4>
+            <p class="text-white-50 small mb-3" style="line-height:1.7;">
+              {{ article.excerpt }}
+            </p>
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary border-opacity-25 flex-wrap gap-2">
+              <span class="text-white-50 small"><i class="fa-solid fa-feather-pointed me-1 text-warning"></i>{{ article.author_name }}</span>
+              <a href="{% url 'website:news_detail' slug=article.slug %}" class="btn-site-glass btn-sm">
+                <span>Read Full Circular</span>
+                <i class="fa-solid fa-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+        {% empty %}
+          <div class="glass-card p-5 text-center text-white-50">
+            <i class="fa-solid fa-inbox fs-1 text-secondary mb-3 d-block"></i>
+            No official dispatches found under the selected category.
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Upcoming Events Column -->
+    <div class="col-lg-4">
+      <h4 class="fw-bold text-white mb-4"><i class="fa-solid fa-calendar-star text-warning me-2"></i>Upcoming Events</h4>
+      <div class="d-flex flex-column gap-3">
+        {% for ev in upcoming_events %}
+          <div class="glass-card p-3">
+            <div class="d-flex align-items-start gap-3">
+              <div class="text-center p-2 rounded" style="background:linear-gradient(135deg, #0c0c73, #002f79); min-width:56px; border:1px solid rgba(56,189,248,0.3);">
+                <span class="d-block text-warning fw-bold small text-uppercase" style="font-size:0.7rem;">{{ ev.start_datetime|date:"M" }}</span>
+                <span class="d-block text-white fw-bold fs-4" style="line-height:1.1;">{{ ev.start_datetime|date:"d" }}</span>
+              </div>
+              <div>
+                <span class="badge bg-secondary bg-opacity-25 text-warning mb-1" style="font-size:0.68rem;">{{ ev.get_category_display }}</span>
+                <h6 class="fw-bold text-white mb-1" style="font-size:0.92rem;">{{ ev.title }}</h6>
+                <span class="text-white-50 small d-block" style="font-size:0.76rem;"><i class="fa-solid fa-location-dot me-1 text-primary"></i>{{ ev.location }}</span>
+                <span class="text-white-50 small d-block" style="font-size:0.72rem;"><i class="fa-solid fa-clock me-1 text-info"></i>{{ ev.start_datetime|date:"h:i A" }}</span>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="glass-panel p-4 text-center text-white-50 small">
+            No upcoming events currently scheduled.
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="glass-panel p-4 mt-4 text-center">
+        <h6 class="fw-bold text-white mb-2"><i class="fa-solid fa-bell text-warning me-1"></i> Subscribe to SMS Circulars</h6>
+        <p class="text-white-50 small mb-3">Enrolled parents receive real-time SMS &amp; WhatsApp alerts through the parent ERP portal.</p>
+        <a href="{% url 'accounts:login' %}" class="btn-site-primary btn-sm w-100 justify-content-center">
+          <i class="fa-solid fa-lock me-1"></i> Parent ERP Sign In
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+

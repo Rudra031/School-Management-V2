@@ -1,0 +1,553 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In | {{ school.name|default:"Horizon Premier Public School" }}</title>
+  
+  <!-- Google Fonts: Poppins & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.9)), 
+                  url('https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+      background-size: cover;
+      background-attachment: fixed;
+      padding: 20px;
+      position: relative;
+    }
+
+    /* Ambient animated particle overlay */
+    .bg-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.15), transparent 40%),
+                  radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.2), transparent 40%);
+      pointer-events: none;
+    }
+
+    /* Top Navigation bar */
+    .top-nav {
+      position: fixed;
+      top: 20px;
+      left: 30px;
+      right: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 8px 18px;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      transition: all 0.3s ease;
+    }
+
+    .brand-badge:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: #38bdf8;
+      color: #0f172a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .brand-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .home-btn {
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 8px 18px;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .home-btn:hover {
+      background: #38bdf8;
+      color: #0f172a;
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+
+    /* Main Glassmorphic Wrapper matching YouTube Video */
+    .wrapper {
+      position: relative;
+      width: 420px;
+      max-width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 24px;
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5),
+                  0 0 20px rgba(56, 189, 248, 0.15);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 45px 35px 35px;
+      z-index: 10;
+      animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .form-box {
+      width: 100%;
+    }
+
+    .form-box h2 {
+      font-size: 2.2em;
+      color: #fff;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .form-subtitle {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 0.88rem;
+      margin-bottom: 25px;
+      font-weight: 400;
+    }
+
+    /* Error Messages Alert Box */
+    .alert-glass {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #fecaca;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    /* Classic Codehal Input Box with Animated Floating Labels */
+    .input-box {
+      position: relative;
+      width: 100%;
+      height: 52px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+      margin: 28px 0;
+    }
+
+    .input-box label {
+      position: absolute;
+      top: 50%;
+      left: 5px;
+      transform: translateY(-50%);
+      font-size: 1em;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 400;
+      pointer-events: none;
+      transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .input-box input:focus ~ label,
+    .input-box input:valid ~ label,
+    .input-box input:not(:placeholder-shown) ~ label {
+      top: -6px;
+      font-size: 0.82em;
+      color: #38bdf8;
+      font-weight: 600;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+    }
+
+    .input-box input {
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 1em;
+      color: #fff;
+      font-weight: 500;
+      padding: 0 35px 0 5px;
+    }
+
+    /* Remove chrome autofill yellow styling */
+    .input-box input:-webkit-autofill,
+    .input-box input:-webkit-autofill:hover, 
+    .input-box input:-webkit-autofill:focus {
+      -webkit-text-fill-color: #fff;
+      -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    .input-box .icon {
+      position: absolute;
+      right: 8px;
+      font-size: 1.2em;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 52px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .input-box input:focus ~ .icon {
+      color: #38bdf8;
+    }
+
+    /* Remember Me & Forgot Password */
+    .remember-forgot {
+      font-size: 0.88em;
+      color: #fff;
+      font-weight: 400;
+      margin: -10px 0 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .remember-forgot label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      user-select: none;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .remember-forgot label input {
+      accent-color: #38bdf8;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .remember-forgot a {
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .remember-forgot a:hover {
+      text-decoration: underline;
+      color: #38bdf8;
+    }
+
+    /* Glowing Pill Submit Button */
+    .btn-login {
+      width: 100%;
+      height: 48px;
+      background: #ffffff;
+      border: none;
+      outline: none;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 1.05em;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-login:hover {
+      background: #38bdf8;
+      color: #0f172a;
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.7);
+      transform: translateY(-2px);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    /* Fast Role Fill Selector (Helpful for School Staff & Admins) */
+    .quick-roles {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      text-align: center;
+    }
+
+    .quick-roles-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .role-pills {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .role-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.85);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .role-btn:hover {
+      background: rgba(56, 189, 248, 0.25);
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 576px) {
+      .top-nav {
+        left: 15px;
+        right: 15px;
+        top: 15px;
+      }
+      .brand-name {
+        display: none;
+      }
+      .wrapper {
+        padding: 35px 25px 25px;
+        margin-top: 40px;
+      }
+      .form-box h2 {
+        font-size: 1.8em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-overlay"></div>
+
+  <!-- Top Header Navigation -->
+  <header class="top-nav">
+    <a href="/" class="brand-badge">
+      <div class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+      <span class="brand-name">{{ school.name|default:"Horizon Premier Public School" }}</span>
+    </a>
+    <a href="/" class="home-btn">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>Public Portal</span>
+    </a>
+  </header>
+
+  <!-- Transparent Glassmorphic Login Container -->
+  <main class="wrapper">
+    <div class="form-box">
+      <h2>Login</h2>
+      <p class="form-subtitle">Enterprise Academic &amp; Staff Portal</p>
+
+      {% if form.errors or form.non_field_errors %}
+        <div class="alert-glass">
+          <i class="fa-solid fa-circle-exclamation fs-5"></i>
+          <div>
+            {% for error in form.non_field_errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+            {% for field in form %}
+              {% for error in field.errors %}
+                <div>{{ field.label }}: {{ error }}</div>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <form method="POST" action="{% url 'accounts:login' %}" autocomplete="on">
+        {% csrf_token %}
+
+        <!-- User ID / Email Input -->
+        <div class="input-box">
+          <span class="icon"><i class="fa-solid fa-envelope"></i></span>
+          <input type="text" name="login_id" id="id_login_id" required placeholder=" " value="{{ form.login_id.value|default:'' }}" autofocus>
+          <label for="id_login_id">Email or User ID</label>
+        </div>
+
+        <!-- Password Input -->
+        <div class="input-box">
+          <span class="icon" id="togglePasswordBtn" title="Toggle password visibility">
+            <i class="fa-solid fa-lock" id="lockIcon"></i>
+          </span>
+          <input type="password" name="password" id="id_password" required placeholder=" ">
+          <label for="id_password">Password</label>
+        </div>
+
+        <!-- Remember Me & Forgot Password -->
+        <div class="remember-forgot">
+          <label for="id_remember_me">
+            <input type="checkbox" name="remember_me" id="id_remember_me" {% if form.remember_me.value %}checked{% endif %}>
+            Remember me
+          </label>
+          <a href="#" onclick="alert('Please contact your School Administration Office (admin@horizon.edu.in) to securely reset your credentials.')">
+            Forgot Password?
+          </a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-login" id="submitBtn">
+          <span>Sign In</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <!-- Quick Fill Role Chips (For Testing / School Admin) -->
+        <div class="quick-roles">
+          <div class="quick-roles-title">Demo Fast-Fill (Click to auto-fill)</div>
+          <div class="role-pills">
+            <button type="button" class="role-btn" onclick="fillCredentials('admin@school.edu', 'Password@123', this)">
+              <i class="fa-solid fa-shield-halved"></i> Superadmin
+            </button>
+            <button type="button" class="role-btn" onclick="fillCredentials('principal@school.edu', 'Password@123', this)">
+              <i class="fa-solid fa-user-tie"></i> Principal
+            </button>
+            <button type="button" class="role-btn" onclick="fillCredentials('teacher@school.edu', 'Password@123', this)">
+              <i class="fa-solid fa-chalkboard-user"></i> Teacher
+            </button>
+            <button type="button" class="role-btn" onclick="fillCredentials('accountant@school.edu', 'Password@123', this)">
+              <i class="fa-solid fa-receipt"></i> Accountant
+            </button>
+            <button type="button" class="role-btn" onclick="fillCredentials('student@school.edu', 'Password@123', this)">
+              <i class="fa-solid fa-user-graduate"></i> Student
+            </button>
+            <button type="button" class="role-btn" onclick="fillCredentials('parent@school.edu', 'Password@123', this)">
+              <i class="fa-solid fa-users"></i> Parent
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Toggle Password Visibility
+    const toggleBtn = document.getElementById('togglePasswordBtn');
+    const passwordInput = document.getElementById('id_password');
+    const lockIcon = document.getElementById('lockIcon');
+
+    if (toggleBtn && passwordInput && lockIcon) {
+      toggleBtn.addEventListener('click', function () {
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          lockIcon.classList.remove('fa-lock');
+          lockIcon.classList.add('fa-lock-open');
+          lockIcon.style.color = '#38bdf8';
+        } else {
+          passwordInput.type = 'password';
+          lockIcon.classList.remove('fa-lock-open');
+          lockIcon.classList.add('fa-lock');
+          lockIcon.style.color = 'rgba(255, 255, 255, 0.8)';
+        }
+      });
+    }
+
+    // Quick Fill Helper for Demo Roles
+    function fillCredentials(id, pass, btn) {
+      const idInput = document.getElementById('id_login_id') || document.getElementById('id_email');
+      const passInput = document.getElementById('id_password');
+      if (idInput && passInput) {
+        idInput.value = id;
+        passInput.value = pass;
+        
+        // Trigger both input and change events to activate floating labels
+        idInput.dispatchEvent(new Event('input', { bubbles: true }));
+        idInput.dispatchEvent(new Event('change', { bubbles: true }));
+        passInput.dispatchEvent(new Event('input', { bubbles: true }));
+        passInput.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Visual feedback on clicked button
+        document.querySelectorAll('.role-btn').forEach(b => {
+          b.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+          b.style.background = 'rgba(255, 255, 255, 0.08)';
+        });
+        if (btn) {
+          btn.style.borderColor = '#38bdf8';
+          btn.style.background = 'rgba(56, 189, 248, 0.3)';
+        }
+        
+        idInput.focus();
+      }
+    }
+  </script>
+</body>
+</html>

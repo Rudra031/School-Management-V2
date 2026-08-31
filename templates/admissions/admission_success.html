@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Admission Confirmed | Horizon SMS{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center py-4">
+  <div class="col-lg-8">
+    <!-- Main Confirmation Card -->
+    <div class="card-saas p-4 text-center reveal-up">
+      <!-- Big Checkmark -->
+      <div class="mx-auto mb-3" style="width:72px;height:72px;border-radius:50%;background:var(--success-light);display:flex;align-items:center;justify-content:center;color:var(--success);font-size:2.2rem;">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+
+      <h3 class="fw-bold mb-1" style="font-family:'Geist',sans-serif;color:var(--text-main);letter-spacing:-0.02em;">
+        Student Admission Confirmed &amp; Enrolled!
+      </h3>
+      <p class="text-muted mb-4" style="font-size:0.88rem;">
+        The student record has been created and registered in the institutional SIS database.
+      </p>
+
+      <!-- Student Enrollment Credentials Box -->
+      <div class="p-3 mb-4 rounded-3 text-start" style="background:var(--card-bg);border:1px solid var(--card-border);">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-6">
+            <span class="text-muted small fw-semibold text-uppercase">Permanent Student ID</span>
+            <div class="fw-bold text-primary" style="font-family:'Geist Mono',monospace;font-size:1.3rem;">{{ roll_no }}</div>
+          </div>
+          <div class="col-md-6">
+            <span class="text-muted small fw-semibold text-uppercase">Admission Registry Number</span>
+            <div class="fw-bold text-main" style="font-family:'Geist Mono',monospace;font-size:1.1rem;">{{ admission_no }}</div>
+          </div>
+          <div class="col-12"><hr class="my-1" style="border-color:var(--card-border);"></div>
+          <div class="col-md-4">
+            <span class="text-muted small">Student Full Name:</span>
+            <div class="fw-semibold text-main">{{ student_name }}</div>
+          </div>
+          <div class="col-md-4">
+            <span class="text-muted small">Assigned Class / Grade:</span>
+            <div class="fw-semibold text-main">{{ class_name }}</div>
+          </div>
+          <div class="col-md-4">
+            <span class="text-muted small">Academic Session:</span>
+            <div class="fw-semibold text-main">2026–27</div>
+          </div>
+          <div class="col-md-6">
+            <span class="text-muted small">Quarter 1 Composite Fee Invoice:</span>
+            <div class="fw-semibold text-success"><i class="fa-solid fa-indian-rupee-sign me-1"></i> Generated (₹29,500.00 — Session 2026–27)</div>
+          </div>
+          <div class="col-md-6">
+            <span class="text-muted small">Enrollment Mode:</span>
+            <div>
+              {% if is_quick_mode %}
+                <span class="badge bg-warning text-dark"><i class="fa-solid fa-bolt me-1"></i> Quick Admission Track</span>
+              {% else %}
+                <span class="badge bg-success text-white"><i class="fa-solid fa-circle-check me-1"></i> Full Dossier Enrolled</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option to Continue Full Admission Process Banner -->
+      {% if app %}
+        <div class="p-3 mb-4 rounded-3 text-start d-flex justify-content-between align-items-center flex-wrap gap-3" style="background:linear-gradient(135deg, rgba(79,70,229,0.08) 0%, rgba(124,58,237,0.08) 100%); border:1.5px dashed rgba(79,70,229,0.35);">
+          <div style="max-width: 520px;">
+            <div class="fw-bold text-primary mb-1 d-flex align-items-center gap-2" style="font-size:0.92rem;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>Continue Full Admission Process for {{ student_name }}</span>
+            </div>
+            <p class="text-muted mb-0 small" style="font-size:0.8rem;line-height:1.5;">
+              Complete the remaining 10-step profile dossier: add second guardian details, medical history, TC &amp; previous marksheets, upload certificates, and configure transport/hostel routes.
+            </p>
+          </div>
+          <div>
+            <a href="{% url 'admissions:full_admission' %}?app_id={{ app.id }}" class="btn btn-sm btn-primary fw-bold px-3 py-2 text-nowrap d-inline-flex align-items-center gap-2" style="background:linear-gradient(135deg, #4f46e5, #7c3aed); border:none; box-shadow:0 4px 14px rgba(79,70,229,0.35);">
+              <i class="fa-solid fa-file-signature"></i>
+              <span>Continue Full Admission &rarr;</span>
+            </a>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Action Buttons -->
+      <div class="d-flex justify-content-center flex-wrap gap-2 mb-4">
+        {% if app %}
+          <a href="{% url 'admissions:print_admission' app.pk %}" target="_blank" class="btn btn-saas-secondary btn-sm px-3">
+            <i class="fa-solid fa-print me-1"></i> Print Official Admission Letter
+          </a>
+          <a href="{% url 'admissions:full_admission' %}?app_id={{ app.id }}" class="btn btn-saas-primary btn-sm px-3">
+            <i class="fa-solid fa-file-signature me-1"></i> Continue Full Admission
+          </a>
+        {% else %}
+          <button onclick="window.print()" class="btn btn-saas-primary btn-sm px-3">
+            <i class="fa-solid fa-print me-1"></i> Print Official Admission Letter
+          </button>
+        {% endif %}
+        <a href="{% url 'admissions:pipeline' %}" class="btn btn-outline-secondary btn-sm px-3">
+          <i class="fa-solid fa-table-list me-1"></i> Back to Applications
+        </a>
+        <a href="{% url 'admissions:quick_admission' %}" class="btn btn-outline-primary btn-sm px-3">
+          <i class="fa-solid fa-plus me-1"></i> Enroll Another Student
+        </a>
+      </div>
+
+      <!-- Post-Admission Operational Roadmap -->
+      <div class="text-start p-3 rounded" style="background:var(--primary-light, rgba(30,64,175,0.05));border:1px dashed var(--primary);">
+        <div class="fw-bold text-primary mb-2" style="font-size:0.82rem;"><i class="fa-solid fa-list-check me-1"></i> Immediate Next Steps Completed Automatically:</div>
+        <ul class="mb-0 text-muted" style="font-size:0.8rem;padding-left:1.2rem;">
+          <li>Student biometric record created in Class Register.</li>
+          <li>Fee schedule &amp; Term 1 tuition invoice attached to parent ledger.</li>
+          <li>Parent portal login invite email dispatched to registered address.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

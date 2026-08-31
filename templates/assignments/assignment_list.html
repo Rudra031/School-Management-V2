@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Assignments & Homework{% endblock %}
+{% block page_heading %}Assignments & Homework Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Homework & Coursework Hub</h5>
+    <p class="text-muted small mb-0">Track course assignments, submissions, and feedback.</p>
+  </div>
+  <div>
+    {% if user.is_teacher or user.is_superadmin or user.is_school_admin %}
+      <a href="{% url 'assignments:create' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Create Assignment</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card-saas p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-5">
+      <select name="section" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">All Class Sections</option>
+        {% for sec in sections %}
+          <option value="{{ sec.id }}" {% if request.GET.section == sec.id|stringformat:"s" %}selected{% endif %}>{{ sec.full_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-5">
+      <select name="subject" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">All Subjects</option>
+        {% for sub in subjects %}
+          <option value="{{ sub.id }}" {% if request.GET.subject == sub.id|stringformat:"s" %}selected{% endif %}>{{ sub.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <a href="{% url 'assignments:list' %}" class="btn btn-saas-secondary btn-sm w-100">Reset</a>
+    </div>
+  </form>
+</div>
+
+<!-- Assignment Cards Grid -->
+<div class="row g-4">
+  {% for item in assignments %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card-saas h-100 p-3 d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="badge bg-primary-subtle text-primary">{{ item.subject.name }}</span>
+          <span class="badge bg-light text-secondary border">{{ item.section.full_name }}</span>
+        </div>
+        
+        <h6 class="fw-bold mb-1 text-dark">{{ item.title }}</h6>
+        <p class="text-muted small flex-grow-1">{{ item.description|truncatewords:20 }}</p>
+
+        <hr class="my-2">
+
+        <div class="d-flex justify-content-between align-items-center small text-muted mb-3">
+          <div><i class="fa-regular fa-clock me-1"></i> Due: {{ item.due_date|date:"d M, H:i" }}</div>
+          <div><strong>{{ item.max_points }} Pts</strong></div>
+        </div>
+
+        <a href="{% url 'assignments:detail' item.pk %}" class="btn btn-outline-primary btn-sm w-100 mt-auto">
+          {% if user.is_student %}Submit / View Work{% else %}View Submissions ({{ item.total_submissions }}){% endif %}
+        </a>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+      <i class="fa-solid fa-folder-open fs-2 mb-2 text-secondary opacity-50"></i>
+      <p>No assignments found matching criteria.</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}Contact &amp; Early Admissions Helpdesk | {{ school.name|default:"Horizon Primary World School" }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="py-5" id="sec-contact-hero" style="background:radial-gradient(circle at 50% 0%, rgba(255, 184, 0, 0.25) 0%, rgba(2, 132, 199, 0.4) 60%, #031126 100%);">
+  <div class="container text-center py-4">
+    <div class="badge rounded-pill px-3 py-2 fw-bold kid-badge-yellow mx-auto mb-3" style="background:rgba(255,184,0,0.2); color:#ffc107; border:1px solid rgba(255,184,0,0.5);">
+      <i class="fa-solid fa-headset text-warning me-1"></i> Admissions Helpdesk &amp; Family Inquiries
+    </div>
+    <h1 class="display-5 fw-bold text-white mt-2" id="contact-headline-elem">Connect with Our Early Learning Counselors</h1>
+    <p class="text-white-50 max-w-800 mx-auto" style="font-size:1.1rem; line-height:1.8;" id="contact-subtitle-elem">
+      Whether you are planning a campus walkthrough, inquiring about Nursery &amp; Kindergarten seats, or exploring after-school daycare, our caring admissions counselors are here to help.
+    </p>
+  </div>
+</div>
+
+<div class="container py-5">
+  
+  {% if messages %}
+    <div class="mb-4">
+      {% for message in messages %}
+        <div class="alert alert-success bg-success bg-opacity-25 text-white border-0 shadow-sm">
+          <i class="fa-solid fa-circle-check me-2 text-success"></i>{{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="row g-4 mb-5">
+    
+    <!-- Contact Lead Form -->
+    <div class="col-lg-7" id="sec-contact-form">
+      <div class="glass-panel p-4 p-lg-5 h-100">
+        <h3 class="fw-bold text-white mb-2" id="contact-form-title-elem">Send an Admission Inquiry</h3>
+        <p class="text-white-50 small mb-4">Our friendly admissions mentor will connect with you within 24 business hours.</p>
+
+        <form method="POST" action="{% url 'website:contact' %}">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label text-white-50 small fw-semibold">Parent / Guardian Full Name *</label>
+              <input type="text" name="full_name" class="form-control bg-dark text-white border-secondary border-opacity-50" placeholder="e.g. Dr. Rajesh Kumar" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-white-50 small fw-semibold">Email Address *</label>
+              <input type="email" name="email" class="form-control bg-dark text-white border-secondary border-opacity-50" placeholder="e.g. parent@example.com" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-white-50 small fw-semibold">Mobile / WhatsApp Number *</label>
+              <input type="tel" name="phone" class="form-control bg-dark text-white border-secondary border-opacity-50" placeholder="+91 98765 43210" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-white-50 small fw-semibold">Inquiry Nature *</label>
+              <select name="inquiry_type" class="form-select bg-dark text-white border-secondary border-opacity-50">
+                <option value="ADMISSIONS">Primary Admission (Nursery – Grade 5)</option>
+                <option value="CAMPUS_TOUR">Book Family Campus Tour &amp; Splash Pool Visit</option>
+                <option value="ACADEMICS">Phonics, Singapore Math &amp; Curriculum Inquiry</option>
+                <option value="TRANSPORT">Junior GPS Bus Routes &amp; Safety</option>
+                <option value="GENERAL">General Early Childhood Inquiry</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label text-white-50 small fw-semibold">Target Grade / Level *</label>
+              <input type="text" name="grade_interested" class="form-control bg-dark text-white border-secondary border-opacity-50" placeholder="e.g. Playgroup, Nursery, LKG, UKG, or Class 1 to 5" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label text-white-50 small fw-semibold">Your Message / Questions *</label>
+              <textarea name="message" rows="4" class="form-control bg-dark text-white border-secondary border-opacity-50" placeholder="Ask about child age cutoff, sibling waivers, daycare timings, or daily nutrition snacks..." required></textarea>
+            </div>
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-warning w-100 justify-content-center py-3 fw-bold text-dark rounded-pill shadow">
+                <i class="fa-solid fa-paper-plane me-2"></i> Submit Official Inquiry
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Campus Information & Office Hours -->
+    <div class="col-lg-5" id="sec-contact-info">
+      <div class="glass-panel p-4 p-lg-5 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <h4 class="fw-bold text-white mb-4" id="contact-info-title-elem">Primary Admissions Directorate</h4>
+          
+          <div class="d-flex align-items-start gap-3 mb-4">
+            <div style="width:44px; height:44px; border-radius:10px; background:rgba(2, 132, 199, 0.2); border:1px solid rgba(56, 189, 248, 0.4); display:flex; align-items:center; justify-content:center; color:#38bdf8; font-size:1.2rem;">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div>
+              <h6 class="text-white fw-bold mb-1">Junior Campus Address</h6>
+              <p class="text-white-50 small mb-0">{{ theme.contact_address|default:"400 Horizon Knowledge City, Sector 21, Academic Enclave, New Delhi - 110001" }}</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 mb-4">
+            <div style="width:44px; height:44px; border-radius:10px; background:rgba(255, 184, 0, 0.2); border:1px solid rgba(255, 184, 0, 0.4); display:flex; align-items:center; justify-content:center; color:#ffc600; font-size:1.2rem;">
+              <i class="fa-solid fa-phone"></i>
+            </div>
+            <div>
+              <h6 class="text-white fw-bold mb-1">Admissions &amp; WhatsApp Helpline</h6>
+              <p class="text-white-50 small mb-0">{{ theme.contact_phone|default:"+91 (11) 2345-6789 / +91 98765 43210" }}</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 mb-4">
+            <div style="width:44px; height:44px; border-radius:10px; background:rgba(34, 197, 94, 0.2); border:1px solid rgba(34, 197, 94, 0.4); display:flex; align-items:center; justify-content:center; color:#4ade80; font-size:1.2rem;">
+              <i class="fa-solid fa-envelope"></i>
+            </div>
+            <div>
+              <h6 class="text-white fw-bold mb-1">Email Inquiries</h6>
+              <p class="text-white-50 small mb-0">{{ theme.contact_email|default:"admissions@horizonacademy.edu / info@horizonacademy.edu" }}</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3">
+            <div style="width:44px; height:44px; border-radius:10px; background:rgba(244, 63, 94, 0.2); border:1px solid rgba(251, 113, 133, 0.4); display:flex; align-items:center; justify-content:center; color:#fb7185; font-size:1.2rem;">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div>
+              <h6 class="text-white fw-bold mb-1">Counseling Office Hours</h6>
+              <p class="text-white-50 small mb-0">Monday – Saturday: 08:30 AM – 04:30 PM<br>Sunday: 10:00 AM – 01:00 PM (Prior Appointment)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-top border-secondary border-opacity-25 mt-4">
+          <a href="{% url 'website:public_apply' %}" class="btn btn-warning rounded-pill w-100 justify-content-center py-2 fw-bold text-dark shadow">
+            <i class="fa-solid fa-file-signature me-1"></i> Start Online Admission Form (2026–27)
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,1186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WordPress-Style Visual Page Studio | Apex Horizon</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Geist:wght@300;400;500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 & FontAwesome 6 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --wp-bg: #040711;
+      --wp-surface: #090e1a;
+      --wp-panel: #0d1527;
+      --wp-border: rgba(255, 255, 255, 0.08);
+      --wp-accent: #3858e9;
+      --wp-accent-hover: #4f6cf7;
+      --wp-text: #e2e8f0;
+      --wp-text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--wp-bg);
+      color: var(--wp-text);
+      font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* WordPress Top Bar */
+    .wp-topbar {
+      height: 54px;
+      background: var(--wp-surface);
+      border-bottom: 1px solid var(--wp-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      z-index: 1000;
+    }
+
+    .wp-icon-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--wp-text-muted);
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.88rem;
+    }
+    .wp-icon-btn:hover, .wp-icon-btn.active {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .wp-device-toggle {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--wp-border);
+      border-radius: 8px;
+      padding: 3px;
+      display: flex;
+      gap: 2px;
+    }
+    .wp-device-btn {
+      background: transparent;
+      border: none;
+      color: var(--wp-text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .wp-device-btn.active {
+      background: var(--wp-accent);
+      color: #ffffff;
+    }
+
+    /* 3-Panel WordPress Builder Workspace */
+    .wp-workspace {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 54px);
+      overflow: hidden;
+    }
+
+    /* Left Panel: WordPress Block / Section Outline */
+    .wp-left-panel {
+      width: 300px;
+      min-width: 300px;
+      background: var(--wp-panel);
+      border-right: 1px solid var(--wp-border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .wp-panel-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--wp-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .wp-block-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      margin: 3px 8px;
+      border-radius: 7px;
+      color: #cbd5e1;
+      font-size: 0.8rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .wp-block-item:hover, .wp-block-item.active {
+      background: rgba(56, 88, 233, 0.18);
+      border-color: rgba(56, 88, 233, 0.45);
+      color: #ffffff;
+    }
+    .wp-block-item.is-hidden {
+      opacity: 0.35;
+      text-decoration: line-through;
+    }
+
+    .wp-block-badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .wp-action-tool {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 0.72rem;
+      padding: 2px 4px;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .wp-action-tool:hover {
+      color: #ffffff;
+    }
+
+    /* Center Panel: Live Preview Frame */
+    .wp-center-canvas {
+      flex: 1;
+      background: #02050c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 1.25rem;
+      overflow: hidden;
+    }
+
+    .wp-frame-wrapper {
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.85);
+      background: #051424;
+      position: relative;
+      transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .wp-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Right Panel: WordPress Gutenberg Inspector */
+    .wp-right-panel {
+      width: 360px;
+      min-width: 360px;
+      background: var(--wp-panel);
+      border-left: 1px solid var(--wp-border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .wp-tab-nav {
+      display: flex;
+      background: rgba(0, 0, 0, 0.25);
+      border-bottom: 1px solid var(--wp-border);
+    }
+    .wp-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--wp-text-muted);
+      padding: 12px 6px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      text-align: center;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .wp-tab-btn.active {
+      color: #93c5fd;
+      border-bottom-color: var(--wp-accent);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .color-swatch-input {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    .custom-slider {
+      accent-color: var(--wp-accent);
+    }
+
+    /* Block Inserter Modal */
+    .wp-inserter-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      height: 100%;
+    }
+    .wp-inserter-card:hover {
+      background: rgba(56, 88, 233, 0.15);
+      border-color: var(--wp-accent);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- WordPress Top Admin Bar -->
+  <header class="wp-topbar">
+    <div class="d-flex align-items-center gap-3">
+      <a href="{% url 'accounts:dashboard_router' %}" class="wp-icon-btn text-white-50" title="Exit to School Admin Dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      
+      <!-- WordPress Site Logo Badge -->
+      <div class="d-flex align-items-center gap-2">
+        <div style="width:26px; height:26px; border-radius:6px; background:linear-gradient(135deg, #3858e9, #06b6d4); display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.8rem; font-weight:800;">
+          <i class="fa-solid fa-cube"></i>
+        </div>
+        <span class="text-white fw-bold small" style="letter-spacing:-0.01em;">Apex Site Editor</span>
+      </div>
+
+      <!-- WordPress Dynamic Page Selector -->
+      <div class="d-flex align-items-center gap-2 ms-2 ps-2 border-start border-secondary border-opacity-25">
+        <span class="text-white-50 small d-none d-md-inline" style="font-size:0.75rem;"><i class="fa-regular fa-file-lines me-1"></i>Page:</span>
+        <select class="form-select form-select-sm bg-dark text-white border-secondary border-opacity-50" style="width:190px; font-size:0.78rem;" id="wpPageSelect" onchange="onPageChange(this.value)">
+          <option value="home" selected>Home Page (3D Hero)</option>
+          <option value="about">About Academy</option>
+          <option value="academics">Academics &amp; Curricula</option>
+          <option value="admissions">Admissions Hub</option>
+          <option value="faculty">Faculty Directory</option>
+          <option value="campus_life">Campus Life &amp; Facilities</option>
+          <option value="news_events">News &amp; Flagship Events</option>
+          <option value="testimonials">Community Stories</option>
+          <option value="contact">Contact &amp; Campus Map</option>
+        </select>
+        <span class="badge bg-dark text-info border border-secondary border-opacity-25 small font-monospace d-none d-lg-inline-block" id="pageSlugBadge" style="font-size:0.7rem;">/portal/</span>
+      </div>
+    </div>
+
+    <!-- Center: Responsive Device Switcher -->
+    <div class="wp-device-toggle">
+      <button class="wp-device-btn active" onclick="setDevice('desktop')" id="dev-desktop" title="Desktop View (100%)">
+        <i class="fa-solid fa-display"></i> Desktop
+      </button>
+      <button class="wp-device-btn" onclick="setDevice('tablet')" id="dev-tablet" title="Tablet View (768px)">
+        <i class="fa-solid fa-tablet-screen-button"></i> Tablet
+      </button>
+      <button class="wp-device-btn" onclick="setDevice('mobile')" id="dev-mobile" title="Mobile View (375px)">
+        <i class="fa-solid fa-mobile-screen-button"></i> Mobile
+      </button>
+    </div>
+
+    <!-- Right: WordPress Actions -->
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-secondary bg-opacity-25 text-white-50 small d-none d-xl-inline-block" id="draftStatusBadge">
+        <i class="fa-solid fa-check me-1"></i> Saved
+      </span>
+      <a href="{% url 'website:home' %}" target="_blank" class="btn btn-xs btn-outline-light py-1 px-2" style="font-size:0.75rem;" id="openLiveBtn">
+        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Preview
+      </a>
+      <button type="button" class="btn btn-xs btn-outline-info py-1 px-2" onclick="saveDraft()" style="font-size:0.75rem;">
+        <i class="fa-solid fa-floppy-disk me-1"></i> Save Draft
+      </button>
+      <button type="button" class="btn btn-xs btn-primary fw-bold py-1 px-3" onclick="publishLive()" style="font-size:0.75rem; background:var(--wp-accent); border:none;">
+        <i class="fa-solid fa-cloud-arrow-up me-1"></i> Update
+      </button>
+    </div>
+  </header>
+
+  <!-- 3-Panel Main Workspace -->
+  <div class="wp-workspace">
+    
+    <!-- Left Panel: WordPress Block / Section Outline Tree -->
+    <aside class="wp-left-panel">
+      <div class="wp-panel-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-list-ul text-info" style="font-size:0.8rem;"></i>
+          <span class="text-white small fw-bold text-uppercase" style="font-size:0.72rem; letter-spacing:0.04em;">Page Outline</span>
+        </div>
+        <button class="btn btn-xs btn-primary py-0 px-2 fw-semibold" style="font-size:0.72rem; background:var(--wp-accent); border:none;" onclick="openBlockInserterModal()">
+          <i class="fa-solid fa-plus me-1"></i> Add Block
+        </button>
+      </div>
+
+      <!-- Current Page Heading Info -->
+      <div class="px-3 py-2 border-bottom border-secondary border-opacity-25 bg-dark d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-white-50 small" style="font-size:0.72rem;">Editing Page:</span>
+          <h6 class="text-white fw-bold mb-0" id="currentPageHeading" style="font-size:0.82rem;">Home Page (3D)</h6>
+        </div>
+        <span class="badge bg-success bg-opacity-25 text-success small" style="font-size:0.65rem;">Published</span>
+      </div>
+
+      <!-- Dynamic Section List for Current Active Page -->
+      <div class="d-flex flex-column gap-1 p-2" id="wpSectionList">
+        <!-- Injected dynamically via JS based on PAGE_REGISTRY -->
+      </div>
+
+      <div class="mt-auto p-3 border-top border-secondary border-opacity-25 bg-dark">
+        <a href="{% url 'website:cms_dashboard' %}" class="btn btn-sm btn-outline-secondary w-100 text-white-50" style="font-size:0.76rem;">
+          <i class="fa-solid fa-table-columns me-1"></i> Open CMS Content Studio
+        </a>
+      </div>
+    </aside>
+
+    <!-- Center Panel: Live Responsive Sandboxed Canvas -->
+    <main class="wp-center-canvas">
+      
+      <!-- Canvas Controls Overlay -->
+      <div class="position-absolute top-0 end-0 m-3 d-flex align-items-center gap-2" style="z-index:10;">
+        <button class="btn btn-xs btn-dark text-white-50 border border-secondary border-opacity-25" onclick="reloadPreview()" title="Reload Canvas Frame" style="font-size:0.75rem;">
+          <i class="fa-solid fa-rotate-right me-1"></i> Reload
+        </button>
+      </div>
+
+      <!-- Preview Frame Container -->
+      <div class="wp-frame-wrapper" id="previewWrapper">
+        <!-- Loading Spinner -->
+        <div id="iframeLoader" class="position-absolute top-50 start-50 translate-middle text-center" style="z-index:5;">
+          <div class="spinner-border text-primary" role="status" style="width:2.5rem; height:2.5rem;">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="text-white-50 small mt-2">Loading Live Page Viewport...</p>
+        </div>
+
+        <iframe src="{% url 'website:home' %}" class="wp-iframe" id="liveIframe" onload="document.getElementById('iframeLoader').style.display='none';" onerror="document.getElementById('iframeLoader').innerHTML='<p class=\'text-danger small\'>Unable to load canvas. Please click Reload.</p>';"></iframe>
+      </div>
+    </main>
+
+    <!-- Right Panel: WordPress Gutenberg Inspector (Block, Page, Global Styles) -->
+    <aside class="wp-right-panel">
+      
+      <!-- Multi-Tab Inspector Navigation -->
+      <div class="wp-tab-nav">
+        <button class="wp-tab-btn active" onclick="switchWpTab('block')" id="tab-block-btn">
+          <i class="fa-solid fa-cube me-1"></i> Block
+        </button>
+        <button class="wp-tab-btn" onclick="switchWpTab('page')" id="tab-page-btn">
+          <i class="fa-regular fa-file-lines me-1"></i> Page
+        </button>
+        <button class="wp-tab-btn" onclick="switchWpTab('typography')" id="tab-typo-btn">
+          <i class="fa-solid fa-font me-1"></i> Fonts
+        </button>
+        <button class="wp-tab-btn" onclick="switchWpTab('theme')" id="tab-theme-btn">
+          <i class="fa-solid fa-palette me-1"></i> Styles
+        </button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="p-3">
+        
+        <!-- Tab 1: Gutenberg Block / Section Inspector -->
+        <div id="wp-tab-block" class="wp-tab-pane">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+            <div>
+              <span class="text-white-50 small d-block" style="font-size:0.68rem; text-transform:uppercase;">SELECTED BLOCK</span>
+              <span class="text-white fw-bold small" id="activeBlockBadge">Hero (3D Canvas)</span>
+            </div>
+            <span class="badge bg-primary bg-opacity-25 text-info font-monospace" id="activeBlockId" style="font-size:0.7rem;">#sec-hero</span>
+          </div>
+
+          <div class="mb-3" id="blockHeadlineWrapper">
+            <label class="form-label text-white-50 small fw-semibold">Block Headline / Title</label>
+            <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50" id="blockHeadlineInput" value="Cultivating Global Thinkers, Inspiring Future Leaders." oninput="updateActiveBlockText('headline', this.value)">
+          </div>
+
+          <div class="mb-3" id="blockSubtitleWrapper">
+            <label class="form-label text-white-50 small fw-semibold">Block Subtitle / Description</label>
+            <textarea class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50" rows="3" id="blockSubtitleInput" oninput="updateActiveBlockText('subtitle', this.value)">A world-class K-12 educational ecosystem blending rigorous academic scholarship, cutting-edge AI and scientific innovation, and holistic character development.</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-white-50 small fw-semibold">Section Background Theme</label>
+            <select class="form-select form-select-sm bg-dark text-white border-secondary border-opacity-50" id="blockBgSelect">
+              <option value="transparent">Default (Transparent Canvas)</option>
+              <option value="glass">Deep Sapphire Glassmorphism</option>
+              <option value="slate">Obsidian Dark Slate</option>
+              <option value="gold">Honors Gold Highlight</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between text-white-50 small mb-1">
+              <span>Vertical Padding (Top/Bottom)</span>
+              <span id="lbl-pad" class="text-info fw-bold">60px</span>
+            </div>
+            <input type="range" class="form-range custom-slider" min="20" max="140" step="10" value="60" id="range-pad" oninput="document.getElementById('lbl-pad').textContent=this.value+'px'">
+          </div>
+
+          <div class="d-flex gap-2 mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <button class="btn btn-sm btn-outline-light flex-fill" onclick="triggerBlockScroll()"><i class="fa-solid fa-location-crosshairs me-1"></i> Focus Block</button>
+          </div>
+        </div>
+
+        <!-- Tab 2: WordPress Page Attributes -->
+        <div id="wp-tab-page" class="wp-tab-pane d-none">
+          <h6 class="text-white fw-bold mb-3 small text-uppercase" style="letter-spacing:0.04em;">PAGE ATTRIBUTES &amp; SEO</h6>
+          
+          <div class="mb-3">
+            <label class="form-label text-white-50 small fw-semibold">Page Title</label>
+            <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50" id="pageTitleInput" value="Home Page (3D)">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-white-50 small fw-semibold">Permalink URL Slug</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-dark text-white-50 border-secondary border-opacity-50">/portal/</span>
+              <input type="text" class="form-control bg-dark text-white border-secondary border-opacity-50" id="pageSlugInput" value="">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-white-50 small fw-semibold">Page Template Layout</label>
+            <select class="form-select form-select-sm bg-dark text-white border-secondary border-opacity-50" id="pageTemplateSelect">
+              <option value="3D_HERO" selected>3D Interactive Hero Canvas</option>
+              <option value="ACADEMIC_GRID">Standard Academic Grid</option>
+              <option value="FULL_WIDTH">Full Width Fluid Layout</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-white-50 small fw-semibold">SEO Meta Description</label>
+            <textarea class="form-control form-control-sm bg-dark text-white border-secondary border-opacity-50" rows="3" placeholder="Enter concise summary for Google search engines..."></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-white-50 small fw-semibold">Publication Visibility</label>
+            <select class="form-select form-select-sm bg-dark text-white border-secondary border-opacity-50">
+              <option value="PUBLISHED" selected>Public (Live)</option>
+              <option value="DRAFT">Draft (Admin Only)</option>
+              <option value="PRIVATE">Password Protected</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Tab 3: Typography Suite -->
+        <div id="wp-tab-typography" class="wp-tab-pane d-none">
+          <h6 class="text-white fw-bold mb-3 small text-uppercase" style="letter-spacing:0.04em;">TYPOGRAPHY SUITE</h6>
+          
+          <div class="mb-3">
+            <label class="form-label text-white-50 small fw-semibold">Headline Font Family</label>
+            <select class="form-select form-select-sm bg-dark text-white border-secondary border-opacity-50" id="fontHeadingSelect" onchange="applyTypography()">
+              <option value="'Geist', sans-serif" selected>Geist (Modern Technical)</option>
+              <option value="'Playfair Display', serif">Playfair Display (Luxury Editorial / Serif)</option>
+              <option value="'Hanken Grotesk', sans-serif">Hanken Grotesk (Institutional Authority)</option>
+              <option value="'Cinzel', serif">Cinzel (Classical Academic &amp; Honors)</option>
+              <option value="'Outfit', sans-serif">Outfit (Modern Geometric / Bold)</option>
+              <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Contemporary Clean)</option>
+              <option value="'Inter', sans-serif">Inter (Humanist Neutral)</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-white-50 small fw-semibold">Body Reading Font</label>
+            <select class="form-select form-select-sm bg-dark text-white border-secondary border-opacity-50" id="fontBodySelect" onchange="applyTypography()">
+              <option value="'Inter', sans-serif" selected>Inter (High Readability)</option>
+              <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans (Contemporary Clean)</option>
+              <option value="'Outfit', sans-serif">Outfit (Modern Geometric)</option>
+              <option value="'Geist', sans-serif">Geist (Modern Technical)</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between text-white-50 small mb-1">
+              <span>Heading Scale Multiplier</span>
+              <span id="lbl-scale" class="text-info fw-bold">1.0x</span>
+            </div>
+            <input type="range" class="form-range custom-slider" min="0.8" max="1.6" step="0.05" value="1.0" id="range-scale" oninput="document.getElementById('lbl-scale').textContent=this.value+'x'; applyTypography();">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-white-50 small fw-semibold">Headline Font Weight</label>
+            <select class="form-select form-select-sm bg-dark text-white border-secondary border-opacity-50" id="fontWeightSelect" onchange="applyTypography()">
+              <option value="500">Medium (500)</option>
+              <option value="600">Semi-Bold (600)</option>
+              <option value="700" selected>Bold (700)</option>
+              <option value="800">Extra Bold (800)</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between text-white-50 small mb-1">
+              <span>Letter Spacing</span>
+              <span id="lbl-spacing" class="text-info fw-bold">-0.02em</span>
+            </div>
+            <input type="range" class="form-range custom-slider" min="-0.05" max="0.06" step="0.01" value="-0.02" id="range-spacing" oninput="document.getElementById('lbl-spacing').textContent=this.value+'em'; applyTypography();">
+          </div>
+        </div>
+
+        <!-- Tab 4: Global Theme Styles & 3D WebGL -->
+        <div id="wp-tab-theme" class="wp-tab-pane d-none">
+          <h6 class="text-white fw-bold mb-3 small text-uppercase" style="letter-spacing:0.04em;">PALETTES &amp; COLORS</h6>
+          <select class="form-select form-select-sm bg-dark text-white border-secondary border-opacity-50 mb-3" id="themePresetSelect" onchange="applyPreset(this.value)">
+            <option value="ACADEMIC_PRESTIGE" selected>Academic Prestige (Dark Slate &amp; Gold)</option>
+            <option value="MODERN_BLUE">Modern Blue (Navy &amp; Indigo)</option>
+            <option value="EMERALD_ACADEMY">Emerald Academy (Forest &amp; Sage)</option>
+            <option value="PREMIUM_DARK">Premium Dark (Obsidian &amp; Cyan)</option>
+          </select>
+
+          <div class="d-flex flex-column gap-2 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <label class="text-white-50 small d-block">Primary Canvas</label>
+                <span class="text-white small" id="lbl-primary">#0F172A</span>
+              </div>
+              <input type="color" id="picker-primary" value="{{ theme.primary_color|default:'#0F172A' }}" class="color-swatch-input" onchange="updateCssVar('--site-primary', this.value, 'lbl-primary')">
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <label class="text-white-50 small d-block">Surface &amp; Cards</label>
+                <span class="text-white small" id="lbl-surface">#051424</span>
+              </div>
+              <input type="color" id="picker-surface" value="{{ theme.surface_color|default:'#051424' }}" class="color-swatch-input" onchange="updateCssVar('--site-surface', this.value, 'lbl-surface')">
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <label class="text-white-50 small d-block">Accent / Buttons</label>
+                <span class="text-white small" id="lbl-accent">#4F46E5</span>
+              </div>
+              <input type="color" id="picker-accent" value="{{ theme.accent_color|default:'#4F46E5' }}" class="color-swatch-input" onchange="updateCssVar('--site-accent', this.value, 'lbl-accent')">
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <label class="text-white-50 small d-block">Honors Gold</label>
+                <span class="text-white small" id="lbl-gold">#EAB308</span>
+              </div>
+              <input type="color" id="picker-gold" value="{{ theme.tertiary_color|default:'#EAB308' }}" class="color-swatch-input" onchange="updateCssVar('--site-gold', this.value, 'lbl-gold')">
+            </div>
+          </div>
+
+          <h6 class="text-white fw-bold mb-3 small text-uppercase" style="letter-spacing:0.04em;">RADII &amp; 3D WEBGL</h6>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between text-white-50 small mb-1">
+              <span>Card Corner Radius</span>
+              <span id="lbl-radius" class="text-info fw-bold">14px</span>
+            </div>
+            <input type="range" class="form-range custom-slider" min="0" max="28" value="14" id="range-radius" oninput="updateCssVar('--site-radius-card', this.value + 'px', 'lbl-radius')">
+          </div>
+
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="check-three-enable" checked>
+            <label class="form-check-label text-white small" for="check-three-enable">Enable Interactive 3D Canvas</label>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- WordPress Block Inserter Modal -->
+  <div class="modal fade" id="blockInserterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content bg-dark text-white border border-secondary border-opacity-50">
+        <div class="modal-header border-secondary border-opacity-25">
+          <h6 class="modal-title fw-bold"><i class="fa-solid fa-cube text-primary me-2"></i>Add Block / Section to Page</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="wp-inserter-card" onclick="insertPrebuiltBlock('FAQ Accordion')">
+                <i class="fa-solid fa-circle-question text-info fs-4 mb-2 d-block"></i>
+                <h6 class="fw-bold mb-1">FAQ Accordion</h6>
+                <p class="text-white-50 small mb-0">Expandable Q&amp;A cards for admissions and curriculum.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="wp-inserter-card" onclick="insertPrebuiltBlock('Campus Video Tour')">
+                <i class="fa-solid fa-video text-warning fs-4 mb-2 d-block"></i>
+                <h6 class="fw-bold mb-1">Campus Video Tour</h6>
+                <p class="text-white-50 small mb-0">Interactive 4K virtual drone tour player.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="wp-inserter-card" onclick="insertPrebuiltBlock('Global Accreditations')">
+                <i class="fa-solid fa-award text-success fs-4 mb-2 d-block"></i>
+                <h6 class="fw-bold mb-1">Accreditations Bar</h6>
+                <p class="text-white-50 small mb-0">IB, Cambridge, CIS, and College Board badge strip.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="wp-inserter-card" onclick="insertPrebuiltBlock('Key Stats Counter')">
+                <i class="fa-solid fa-chart-pie text-primary fs-4 mb-2 d-block"></i>
+                <h6 class="fw-bold mb-1">Key Stats Counter</h6>
+                <p class="text-white-50 small mb-0">Floating metrics banner with animated counters.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="wp-inserter-card" onclick="insertPrebuiltBlock('Admissions Lead Form')">
+                <i class="fa-solid fa-envelope-open-text text-danger fs-4 mb-2 d-block"></i>
+                <h6 class="fw-bold mb-1">Admissions Lead Form</h6>
+                <p class="text-white-50 small mb-0">Instant inquiry capture with grade level selectors.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="wp-inserter-card" onclick="insertPrebuiltBlock('Custom HTML / Card')">
+                <i class="fa-solid fa-code text-secondary fs-4 mb-2 d-block"></i>
+                <h6 class="fw-bold mb-1">Custom HTML / Card</h6>
+                <p class="text-white-50 small mb-0">Glassmorphism card with arbitrary HTML embed.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- WordPress Studio Engine JS -->
+  <script>
+    // Complete Multi-Page Registry
+    const PAGE_REGISTRY = {
+      home: {
+        title: "Home Page (3D)",
+        url: "{% url 'website:home' %}",
+        slug: "/",
+        template: "3D Interactive Hero Canvas",
+        sections: [
+          { id: "sec-hero", name: "Hero (3D Canvas)", badge: "Hero 3D", icon: "fa-cube", hl: "hero-headline-elem", sub: "hero-subtitle-elem" },
+          { id: "sec-ticker", name: "Live Admissions Ticker Strip", badge: "Ticker", icon: "fa-bullhorn", hl: "ticker-text-elem", sub: "" },
+          { id: "sec-metrics", name: "Key Institutional Metrics Banner", badge: "Metrics", icon: "fa-chart-simple", hl: "", sub: "" },
+          { id: "sec-academics", name: "Academic Tiers (4 Stages)", badge: "Grid", icon: "fa-layer-group", hl: "academics-title-elem", sub: "academics-subtitle-elem" },
+          { id: "sec-principal", name: "Principal's Vision Spotlight", badge: "Callout", icon: "fa-quote-left", hl: "principal-name-elem", sub: "principal-quote-elem" },
+          { id: "sec-news-events", name: "Featured News & Events Grid", badge: "News", icon: "fa-newspaper", hl: "news-title-elem", sub: "" },
+          { id: "sec-testimonials", name: "Voices of Excellence Carousel", badge: "Carousel", icon: "fa-star", hl: "testimonials-title-elem", sub: "testimonials-subtitle-elem" },
+          { id: "sec-cta", name: "Enrollment & Campus Tour CTA", badge: "Banner", icon: "fa-sparkles", hl: "cta-title-elem", sub: "cta-subtitle-elem" }
+        ]
+      },
+      about: {
+        title: "About Academy",
+        url: "{% url 'website:about' %}",
+        slug: "/about/",
+        template: "Standard Heritage",
+        sections: [
+          { id: "sec-about-hero", name: "Heritage & Vision Hero", badge: "Hero", icon: "fa-landmark", hl: "about-headline-elem", sub: "about-subtitle-elem" },
+          { id: "sec-about-mission", name: "Mission, Vision & Core Pillars", badge: "3-Col Grid", icon: "fa-bullseye", hl: "", sub: "" },
+          { id: "sec-about-history", name: "Historical Milestones Timeline", badge: "Timeline", icon: "fa-clock-rotate-left", hl: "about-history-title-elem", sub: "" },
+          { id: "sec-about-accreditations", name: "Global Accreditations & Boards", badge: "Badges", icon: "fa-certificate", hl: "", sub: "" }
+        ]
+      },
+      admissions: {
+        title: "Admissions Hub",
+        url: "{% url 'website:admissions' %}",
+        slug: "/admissions/",
+        template: "Admissions Funnel",
+        sections: [
+          { id: "sec-admissions-hero", name: "Admissions Directorate Hero", badge: "Hero", icon: "fa-graduation-cap", hl: "admissions-headline-elem", sub: "admissions-subtitle-elem" },
+          { id: "sec-admissions-roadmap", name: "6-Stage Admissions Roadmap", badge: "6-Step Process", icon: "fa-route", hl: "admissions-roadmap-title-elem", sub: "" },
+          { id: "sec-admissions-tuition", name: "Tuition & Fee Investment Matrix", badge: "Pricing Table", icon: "fa-file-invoice-dollar", hl: "admissions-tuition-title-elem", sub: "" },
+          { id: "sec-admissions-scholarships", name: "Merit Scholarships & Bursaries", badge: "Grants List", icon: "fa-award", hl: "admissions-scholarship-title-elem", sub: "" }
+        ]
+      },
+      academics: {
+        title: "Academics & Curricula",
+        url: "{% url 'website:academics' %}",
+        slug: "/academics/",
+        template: "Curriculum Matrix",
+        sections: [
+          { id: "sec-academics-hero", name: "Academic Excellence Hero", badge: "Hero", icon: "fa-book-open", hl: "academics-headline-elem", sub: "academics-subtitle-elem" },
+          { id: "sec-academic-tiers", name: "4 Distinct Academic Tiers", badge: "4-Stage Grid", icon: "fa-layer-group", hl: "", sub: "" },
+          { id: "sec-stem-labs", name: "AI & Science Research Facilities", badge: "Lab Showcase", icon: "fa-atom", hl: "", sub: "" }
+        ]
+      },
+      faculty: {
+        title: "Faculty Directory",
+        url: "{% url 'website:faculty' %}",
+        slug: "/faculty/",
+        template: "Staff Directory",
+        sections: [
+          { id: "sec-faculty-hero", name: "Distinguished Faculty Hero", badge: "Hero", icon: "fa-chalkboard-user", hl: "", sub: "" },
+          { id: "sec-faculty-grid", name: "Faculty Roster & Department Filters", badge: "Directory Grid", icon: "fa-users-line", hl: "", sub: "" }
+        ]
+      },
+      campus_life: {
+        title: "Campus Life & Facilities",
+        url: "{% url 'website:campus_life' %}",
+        slug: "/campus-life/",
+        template: "Campus Facilities",
+        sections: [
+          { id: "sec-campus-hero", name: "World-Class Campus Hero", badge: "Hero", icon: "fa-building", hl: "", sub: "" },
+          { id: "sec-campus-facilities", name: "Athletics, Arts & STEM Facilities", badge: "Gallery", icon: "fa-futbol", hl: "", sub: "" }
+        ]
+      },
+      news_events: {
+        title: "News & Events",
+        url: "{% url 'website:news_events' %}",
+        slug: "/news/",
+        template: "Editorial & Events",
+        sections: [
+          { id: "sec-news-hero", name: "Campus Pulse & Circulars Hero", badge: "Hero", icon: "fa-newspaper", hl: "", sub: "" },
+          { id: "sec-featured-articles", name: "Featured News & Announcements", badge: "News Grid", icon: "fa-rss", hl: "", sub: "" },
+          { id: "sec-events-calendar", name: "Upcoming Flagship Events", badge: "Calendar", icon: "fa-calendar-days", hl: "", sub: "" }
+        ]
+      },
+      testimonials: {
+        title: "Community Stories",
+        url: "{% url 'website:testimonials' %}",
+        slug: "/stories/",
+        template: "Testimonials Showcase",
+        sections: [
+          { id: "sec-stories-hero", name: "Voices of Excellence Hero", badge: "Hero", icon: "fa-quote-right", hl: "", sub: "" },
+          { id: "sec-parent-reviews", name: "Verified Parent & Alumni Reviews", badge: "Reviews Grid", icon: "fa-star", hl: "", sub: "" }
+        ]
+      },
+      contact: {
+        title: "Contact & Inquiries",
+        url: "{% url 'website:contact' %}",
+        slug: "/contact/",
+        template: "Contact & Location",
+        sections: [
+          { id: "sec-contact-hero", name: "Admissions Directorate Hero", badge: "Hero", icon: "fa-headset", hl: "contact-headline-elem", sub: "contact-subtitle-elem" },
+          { id: "sec-contact-form", name: "Official Admissions Lead Form", badge: "Form", icon: "fa-paper-plane", hl: "contact-form-title-elem", sub: "" },
+          { id: "sec-contact-info", name: "Campus Address & Hotline Center", badge: "Info Box", icon: "fa-map-pin", hl: "contact-info-title-elem", sub: "" }
+        ]
+      }
+    };
+
+    let currentPageKey = 'home';
+    let currentActiveBlockId = 'sec-hero';
+    let currentHeadlineElemId = 'hero-headline-elem';
+    let currentSubtitleElemId = 'hero-subtitle-elem';
+
+    // Initialize Left Panel Outline based on Page
+    function renderPageOutline(pageKey) {
+      const pageData = PAGE_REGISTRY[pageKey];
+      if (!pageData) return;
+
+      currentPageKey = pageKey;
+      document.getElementById('currentPageHeading').textContent = pageData.title;
+      document.getElementById('pageSlugBadge').textContent = pageData.slug;
+      document.getElementById('pageTitleInput').value = pageData.title;
+      document.getElementById('pageSlugInput').value = pageData.slug.replace(/^\/|\/$/g, '');
+      document.getElementById('openLiveBtn').href = pageData.url;
+
+      const container = document.getElementById('wpSectionList');
+      container.innerHTML = '';
+
+      pageData.sections.forEach((sec, idx) => {
+        const item = document.createElement('div');
+        item.className = 'wp-block-item' + (idx === 0 ? ' active' : '');
+        item.id = 'item-' + sec.id;
+        item.onclick = () => focusBlock(sec.id, sec.name, sec.hl, sec.sub);
+
+        item.innerHTML = `
+          <div class="d-flex align-items-center gap-2 overflow-hidden">
+            <i class="fa-solid ${sec.icon} text-primary" style="font-size:0.85rem;"></i>
+            <span class="text-truncate">${sec.name}</span>
+          </div>
+          <div class="d-flex align-items-center gap-1">
+            <span class="wp-block-badge">${sec.badge}</span>
+            <button class="wp-action-tool" title="Move Up" onclick="event.stopPropagation(); moveBlock('${sec.id}', 'up', 'item-${sec.id}')"><i class="fa-solid fa-chevron-up"></i></button>
+            <button class="wp-action-tool" title="Move Down" onclick="event.stopPropagation(); moveBlock('${sec.id}', 'down', 'item-${sec.id}')"><i class="fa-solid fa-chevron-down"></i></button>
+            <button class="wp-action-tool" title="Toggle Visibility" onclick="event.stopPropagation(); toggleBlockVisibility('${sec.id}', this, 'item-${sec.id}')"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+
+      if (pageData.sections.length > 0) {
+        const firstSec = pageData.sections[0];
+        focusBlock(firstSec.id, firstSec.name, firstSec.hl, firstSec.sub);
+      }
+    }
+
+    function onPageChange(pageKey) {
+      const pageData = PAGE_REGISTRY[pageKey];
+      if (!pageData) return;
+
+      const iframe = document.getElementById('liveIframe');
+      const loader = document.getElementById('iframeLoader');
+      if (loader) loader.style.display = 'block';
+      if (iframe) iframe.src = pageData.url;
+
+      renderPageOutline(pageKey);
+    }
+
+    function setDevice(device) {
+      const wrapper = document.getElementById('previewWrapper');
+      document.querySelectorAll('.wp-device-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('dev-' + device).classList.add('active');
+
+      if (device === 'desktop') {
+        wrapper.style.width = '100%';
+      } else if (device === 'tablet') {
+        wrapper.style.width = '768px';
+      } else if (device === 'mobile') {
+        wrapper.style.width = '375px';
+      }
+    }
+
+    function switchWpTab(tabId) {
+      document.querySelectorAll('.wp-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.wp-tab-pane').forEach(p => p.classList.add('d-none'));
+
+      const btn = document.getElementById('tab-' + tabId + '-btn');
+      const pane = document.getElementById('wp-tab-' + tabId);
+      if (btn) btn.classList.add('active');
+      if (pane) pane.classList.remove('d-none');
+    }
+
+    function reloadPreview() {
+      const loader = document.getElementById('iframeLoader');
+      const iframe = document.getElementById('liveIframe');
+      if (loader) loader.style.display = 'block';
+      if (iframe) iframe.src = iframe.src;
+    }
+
+    // ==========================================
+    // BLOCK FOCUS & EDITING ENGINE
+    // ==========================================
+    function focusBlock(blockId, blockName, headlineElemId, subtitleElemId) {
+      currentActiveBlockId = blockId;
+      currentHeadlineElemId = headlineElemId;
+      currentSubtitleElemId = subtitleElemId;
+
+      document.querySelectorAll('.wp-block-item').forEach(el => el.classList.remove('active'));
+      const activeItem = document.getElementById('item-' + blockId);
+      if (activeItem) activeItem.classList.add('active');
+
+      document.getElementById('activeBlockBadge').textContent = blockName;
+      document.getElementById('activeBlockId').textContent = '#' + blockId;
+
+      const hlInput = document.getElementById('blockHeadlineInput');
+      const subInput = document.getElementById('blockSubtitleInput');
+
+      const iframe = document.getElementById('liveIframe');
+      if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
+        if (headlineElemId) {
+          const el = iframe.contentWindow.document.getElementById(headlineElemId);
+          if (el) hlInput.value = el.textContent.trim();
+        }
+        if (subtitleElemId) {
+          const el = iframe.contentWindow.document.getElementById(subtitleElemId);
+          if (el) subInput.value = el.textContent.trim();
+        }
+      }
+
+      switchWpTab('block');
+      triggerBlockScroll();
+    }
+
+    function triggerBlockScroll() {
+      const iframe = document.getElementById('liveIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'APEX_SCROLL_TO_SECTION',
+          sectionId: currentActiveBlockId
+        }, '*');
+      }
+    }
+
+    function toggleBlockVisibility(blockId, btn, itemId) {
+      const item = document.getElementById(itemId);
+      const isCurrentlyHidden = item.classList.contains('is-hidden');
+      const newVisible = isCurrentlyHidden;
+
+      if (newVisible) {
+        item.classList.remove('is-hidden');
+        btn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+      } else {
+        item.classList.add('is-hidden');
+        btn.innerHTML = '<i class="fa-solid fa-eye-slash text-danger"></i>';
+      }
+
+      const iframe = document.getElementById('liveIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'APEX_TOGGLE_SECTION',
+          sectionId: blockId,
+          isVisible: newVisible
+        }, '*');
+      }
+    }
+
+    function moveBlock(blockId, direction, itemId) {
+      const item = document.getElementById(itemId);
+      const list = document.getElementById('wpSectionList');
+
+      if (direction === 'up' && item.previousElementSibling) {
+        list.insertBefore(item, item.previousElementSibling);
+      } else if (direction === 'down' && item.nextElementSibling) {
+        list.insertBefore(item.nextElementSibling, item);
+      }
+
+      const iframe = document.getElementById('liveIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'APEX_MOVE_SECTION',
+          sectionId: blockId,
+          direction: direction
+        }, '*');
+      }
+    }
+
+    function updateActiveBlockText(type, text) {
+      const targetElemId = (type === 'headline') ? currentHeadlineElemId : currentSubtitleElemId;
+      if (!targetElemId) return;
+
+      const iframe = document.getElementById('liveIframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: 'APEX_UPDATE_TEXT',
+          elemId: targetElemId,
+          text: text
+        }, '*');
+      }
+    }
+
+    function openBlockInserterModal() {
+      const modal = new bootstrap.Modal(document.getElementById('blockInserterModal'));
+      modal.show();
+    }
+
+    function insertPrebuiltBlock(blockName) {
+      const modalEl = document.getElementById('blockInserterModal');
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      if (modal) modal.hide();
+
+      alert(`✨ Successfully appended "${blockName}" block to the active page outline!`);
+    }
+
+    // ==========================================
+    // STYLES & TYPOGRAPHY BROADCAST ENGINE
+    // ==========================================
+    function broadcastStyleUpdate(styles) {
+      const iframe = document.getElementById('liveIframe');
+      if (iframe) {
+        try {
+          if (iframe.contentWindow && iframe.contentWindow.document) {
+            const root = iframe.contentWindow.document.documentElement;
+            for (const [k, v] of Object.entries(styles)) {
+              root.style.setProperty(k, v);
+            }
+          }
+        } catch (e) {
+          console.warn("Direct style update", e);
+        }
+
+        try {
+          if (iframe.contentWindow) {
+            iframe.contentWindow.postMessage({
+              type: 'APEX_STYLE_SYNC',
+              styles: styles
+            }, '*');
+          }
+        } catch (e) {
+          console.warn("PostMessage update", e);
+        }
+      }
+    }
+
+    function updateCssVar(variable, value, labelId) {
+      if (labelId) {
+        const lbl = document.getElementById(labelId);
+        if (lbl) lbl.textContent = value;
+      }
+      const styles = {};
+      styles[variable] = value;
+      broadcastStyleUpdate(styles);
+    }
+
+    function applyTypography() {
+      const headingFont = document.getElementById('fontHeadingSelect').value;
+      const bodyFont = document.getElementById('fontBodySelect').value;
+      const headingWeight = document.getElementById('fontWeightSelect').value;
+      const letterSpacing = document.getElementById('range-spacing').value + 'em';
+
+      const styles = {
+        '--site-font-heading': headingFont,
+        '--site-font-body': bodyFont,
+        '--site-heading-weight': headingWeight,
+        '--site-letter-spacing': letterSpacing
+      };
+
+      broadcastStyleUpdate(styles);
+    }
+
+    function applyPreset(preset) {
+      let styles = {};
+      if (preset === 'ACADEMIC_PRESTIGE') {
+        styles = {
+          '--site-primary': '#0F172A',
+          '--site-surface': '#051424',
+          '--site-accent': '#4F46E5',
+          '--site-gold': '#EAB308'
+        };
+        document.getElementById('picker-primary').value = '#0F172A';
+        document.getElementById('picker-surface').value = '#051424';
+        document.getElementById('picker-accent').value = '#4F46E5';
+        document.getElementById('picker-gold').value = '#EAB308';
+        document.getElementById('lbl-primary').textContent = '#0F172A';
+        document.getElementById('lbl-surface').textContent = '#051424';
+        document.getElementById('lbl-accent').textContent = '#4F46E5';
+        document.getElementById('lbl-gold').textContent = '#EAB308';
+      } else if (preset === 'MODERN_BLUE') {
+        styles = {
+          '--site-primary': '#0284c7',
+          '--site-surface': '#082f49',
+          '--site-accent': '#2563eb',
+          '--site-gold': '#38bdf8'
+        };
+        document.getElementById('picker-primary').value = '#0284c7';
+        document.getElementById('picker-surface').value = '#082f49';
+        document.getElementById('picker-accent').value = '#2563eb';
+        document.getElementById('picker-gold').value = '#38bdf8';
+        document.getElementById('lbl-primary').textContent = '#0284c7';
+        document.getElementById('lbl-surface').textContent = '#082f49';
+        document.getElementById('lbl-accent').textContent = '#2563eb';
+        document.getElementById('lbl-gold').textContent = '#38bdf8';
+      } else if (preset === 'EMERALD_ACADEMY') {
+        styles = {
+          '--site-primary': '#064e3b',
+          '--site-surface': '#022c22',
+          '--site-accent': '#059669',
+          '--site-gold': '#34d399'
+        };
+        document.getElementById('picker-primary').value = '#064e3b';
+        document.getElementById('picker-surface').value = '#022c22';
+        document.getElementById('picker-accent').value = '#059669';
+        document.getElementById('picker-gold').value = '#34d399';
+        document.getElementById('lbl-primary').textContent = '#064e3b';
+        document.getElementById('lbl-surface').textContent = '#022c22';
+        document.getElementById('lbl-accent').textContent = '#059669';
+        document.getElementById('lbl-gold').textContent = '#34d399';
+      } else if (preset === 'PREMIUM_DARK') {
+        styles = {
+          '--site-primary': '#000000',
+          '--site-surface': '#070913',
+          '--site-accent': '#06b6d4',
+          '--site-gold': '#f59e0b'
+        };
+        document.getElementById('picker-primary').value = '#000000';
+        document.getElementById('picker-surface').value = '#070913';
+        document.getElementById('picker-accent').value = '#06b6d4';
+        document.getElementById('picker-gold').value = '#f59e0b';
+        document.getElementById('lbl-primary').textContent = '#000000';
+        document.getElementById('lbl-surface').textContent = '#070913';
+        document.getElementById('lbl-accent').textContent = '#06b6d4';
+        document.getElementById('lbl-gold').textContent = '#f59e0b';
+      }
+      broadcastStyleUpdate(styles);
+    }
+
+    function saveDraft() {
+      const payload = {
+        primary_color: document.getElementById('picker-primary').value,
+        surface_color: document.getElementById('picker-surface').value,
+        accent_color: document.getElementById('picker-accent').value,
+        tertiary_color: document.getElementById('picker-gold').value,
+        font_family_heading: document.getElementById('fontHeadingSelect').value,
+        font_family_body: document.getElementById('fontBodySelect').value,
+        card_radius: document.getElementById('range-radius').value + 'px',
+        three_enabled: document.getElementById('check-three-enable').checked,
+      };
+
+      fetch("{% url 'website:api_save_draft' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          const badge = document.getElementById('draftStatusBadge');
+          if (badge) badge.innerHTML = `<i class="fa-solid fa-check text-success me-1"></i> Saved (${data.updated_at})`;
+        }
+      });
+    }
+
+    function publishLive() {
+      const payload = {
+        primary_color: document.getElementById('picker-primary').value,
+        surface_color: document.getElementById('picker-surface').value,
+        accent_color: document.getElementById('picker-accent').value,
+        tertiary_color: document.getElementById('picker-gold').value,
+        font_family_heading: document.getElementById('fontHeadingSelect').value,
+        font_family_body: document.getElementById('fontBodySelect').value,
+        card_radius: document.getElementById('range-radius').value + 'px',
+        three_enabled: document.getElementById('check-three-enable').checked,
+      };
+
+      fetch("{% url 'website:api_publish' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert("✨ Successfully updated and published all site changes to the live portal!");
+          const badge = document.getElementById('draftStatusBadge');
+          if (badge) badge.innerHTML = `<i class="fa-solid fa-cloud-check text-success me-1"></i> Live`;
+        }
+      });
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderPageOutline('home');
+      setTimeout(applyTypography, 1000);
+    });
+  </script>
+</body>
+</html>

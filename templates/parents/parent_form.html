@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Register Parent / Guardian{% endblock %}
+{% block page_heading %}Register Parent / Guardian{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-user-shield text-primary me-2"></i> Parent / Guardian Profile & Account</span>
+      </div>
+      <div class="card-saas-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Portal Login Credentials</h6>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Email Address / Login ID</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Initial Password</label>
+              {{ form.password }}
+            </div>
+          </div>
+
+          <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Guardian Details</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">First Name</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}<div class="text-danger small">{{ form.first_name.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Last Name</label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}<div class="text-danger small">{{ form.last_name.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Primary Phone Number</label>
+              {{ form.primary_phone }}
+              {% if form.primary_phone.errors %}<div class="text-danger small">{{ form.primary_phone.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Secondary Phone</label>
+              {{ form.secondary_phone }}
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Occupation</label>
+              {{ form.occupation }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Annual Income</label>
+              {{ form.annual_income }}
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Residential Address</label>
+            {{ form.residential_address }}
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'parents:parent_list' %}" class="btn btn-saas-secondary">Cancel</a>
+            <button type="submit" class="btn btn-saas-primary">Save Parent Record</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

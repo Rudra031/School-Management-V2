@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Fee Invoices Directory{% endblock %}
+{% block page_heading %}Student Fee Invoices{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Student Fee Invoices</h5>
+    <p class="text-muted small mb-0">Total {{ paginator.count }} invoices on record.</p>
+  </div>
+  <div>
+    {% if user.is_accountant or user.is_superadmin or user.is_school_admin %}
+      <a href="{% url 'fees:invoice_batch_generate' %}" class="btn btn-saas-primary btn-sm">
+        <i class="fa-solid fa-plus me-1"></i> Generate Invoices
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card-saas p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-5">
+      <input type="text" name="search" class="form-control form-control-sm" placeholder="Search by student name, admission #, or invoice #..." value="{{ search_query }}">
+    </div>
+    <div class="col-md-4">
+      <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">All Invoicing Statuses</option>
+        <option value="UNPAID" {% if selected_status == 'UNPAID' %}selected{% endif %}>Unpaid</option>
+        <option value="PARTIAL" {% if selected_status == 'PARTIAL' %}selected{% endif %}>Partially Paid</option>
+        <option value="PAID" {% if selected_status == 'PAID' %}selected{% endif %}>Fully Paid</option>
+      </select>
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button type="submit" class="btn btn-saas-primary btn-sm w-100">Search</button>
+      <a href="{% url 'fees:invoice_list' %}" class="btn btn-saas-secondary btn-sm">Reset</a>
+    </div>
+  </form>
+</div>
+
+<!-- Invoices Table -->
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Student</th>
+            <th>Class</th>
+            <th>Title</th>
+            <th>Due Date</th>
+            <th>Total (₹)</th>
+            <th>Balance (₹)</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inv in invoices %}
+            <tr>
+              <td class="fw-bold text-primary small">{{ inv.invoice_number }}</td>
+              <td>
+                <div class="fw-semibold text-dark">{{ inv.student_enrollment.student.full_name }}</div>
+                <small class="text-muted">{{ inv.student_enrollment.student.admission_number }}</small>
+              </td>
+              <td><span class="badge bg-light text-secondary border">{{ inv.student_enrollment.section.full_name }}</span></td>
+              <td class="small">{{ inv.title }}</td>
+              <td class="small text-muted">{{ inv.due_date|date:"d M Y" }}</td>
+              <td class="fw-semibold">₹{{ inv.total_amount }}</td>
+              <td class="fw-bold text-danger">₹{{ inv.balance_amount }}</td>
+              <td>
+                {% if inv.status == 'PAID' %}
+                  <span class="badge bg-success-subtle text-success">Paid</span>
+                {% elif inv.status == 'PARTIAL' %}
+                  <span class="badge bg-warning-subtle text-warning">Partial</span>
+                {% else %}
+                  <span class="badge bg-danger-subtle text-danger">Unpaid</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'fees:invoice_detail' inv.pk %}" class="btn btn-sm btn-outline-primary py-0">View Invoice</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9" class="text-center text-muted py-4 small">No fee invoices found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

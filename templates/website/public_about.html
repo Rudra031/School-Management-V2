@@ -1,0 +1,239 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}About Early Learning | {{ school.name|default:"Horizon Primary World School" }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section (Clean Light Theme) -->
+<div class="py-5" id="sec-about-hero" style="background:linear-gradient(135deg, #fffbeb 0%, #f0f9ff 50%, #f0fdf4 100%); border-bottom:1px solid #e2e8f0;">
+  <div class="container text-center py-4">
+    <div class="badge rounded-pill px-3 py-2 fw-bold mx-auto mb-3" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">
+      <i class="fa-solid fa-shapes text-warning me-1"></i> Early Childhood Philosophy &amp; Vision
+    </div>
+    <h1 class="display-5 fw-bold mt-2" id="about-headline-elem" style="color:#0f172a;">
+      Cultivating Curiosity, Joy &amp; Character Since 1998
+    </h1>
+    <p class="max-w-800 mx-auto" style="font-size:1.1rem; line-height:1.8; color:#475569;" id="about-subtitle-elem">
+      {{ school.name|default:"Horizon Primary World School" }} is a premier English-medium early childhood and primary institution (Playgroup to Grade 5) affiliated to CBSE (Affil No. 2430089) and Montessori accredited. We inspire joyful inquiry, moral empathy, and foundational literacy.
+    </p>
+    <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+      <a href="{% url 'website:public_apply' %}" class="btn btn-warning rounded-pill px-4 py-2 fw-bold text-dark shadow-sm" style="background:#ffb800; border:none;">
+        <i class="fa-solid fa-shapes me-1"></i> Enroll for 2026–27
+      </a>
+      <a href="{% url 'website:admissions' %}#sec-admissions-tuition" class="btn btn-outline-dark rounded-pill px-4 py-2" style="background:#ffffff; border-color:#cbd5e1;">
+        <i class="fa-solid fa-receipt me-1 text-warning"></i> Primary Fee Matrix
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+
+  <!-- Mission, Vision & Core Pillars -->
+  <div class="row g-4 mb-5" id="sec-about-mission">
+    <div class="col-md-4">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div style="width:48px; height:48px; border-radius:12px; background:#e0f2fe; border:1px solid #bae6fd; display:flex; align-items:center; justify-content:center; color:#0369a1; font-size:1.3rem;">
+            <i class="fa-solid fa-seedling"></i>
+          </div>
+          <h4 class="fw-bold mb-0" style="color:#0f172a;">Our Mission</h4>
+        </div>
+        <p class="small" style="color:#64748b; line-height:1.7;">
+          To create a secure, joyful garden of learning where young children discover their natural curiosity, build foundational reading and numeracy confidence, and develop kind social empathy.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div style="width:48px; height:48px; border-radius:12px; background:#fef3c7; border:1px solid #fde68a; display:flex; align-items:center; justify-content:center; color:#b45309; font-size:1.3rem;">
+            <i class="fa-solid fa-sun"></i>
+          </div>
+          <h4 class="fw-bold mb-0" style="color:#0f172a;">Our Vision</h4>
+        </div>
+        <p class="small" style="color:#64748b; line-height:1.7;">
+          To be the premier benchmark in progressive primary education, celebrated for child-first teaching, vibrant creative arts, phonics mastery, and safe play infrastructure.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div style="width:48px; height:48px; border-radius:12px; background:#dcfce7; border:1px solid #bbf7d0; display:flex; align-items:center; justify-content:center; color:#15803d; font-size:1.3rem;">
+            <i class="fa-solid fa-shield-heart"></i>
+          </div>
+          <h4 class="fw-bold mb-0" style="color:#0f172a;">School Motto</h4>
+        </div>
+        <p class="small" style="color:#64748b; line-height:1.7;">
+          <strong style="color:#0284c7;">"Where Little Minds Bloom"</strong> &bull; Celebrating every child's unique spark through compassionate mentorship and positive habit cultivation.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historical Timeline -->
+  <div class="glass-panel p-4 p-lg-5 mb-5" id="sec-about-history">
+    <div class="text-center mb-5">
+      <span class="badge rounded-pill px-3 py-2 fw-bold mb-2" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;"><i class="fa-solid fa-timeline text-warning me-1"></i> Milestones of Early Education</span>
+      <h2 class="display-6 fw-bold mt-1" id="about-history-title-elem" style="color:#0f172a;">Our 28-Year Legacy</h2>
+      <p class="small" style="color:#64748b;">Key milestones of {{ school.name|default:"Horizon Primary World School" }} in early childhood and primary education.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="p-3 rounded-3 border-start border-warning border-3 h-100" style="background:#f8fafc; border-color:#ffb800 !important;">
+          <span class="fw-bold fs-4" style="color:#b45309;">1998</span>
+          <h5 class="fw-bold mt-1" style="color:#0f172a;">Foundation</h5>
+          <p class="small mb-0" style="color:#64748b;">Founded under the Horizon Educational Society with a dedicated Nursery &amp; Kindergarten play school campus.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="p-3 rounded-3 border-start border-3 h-100" style="background:#f8fafc; border-color:#0284c7 !important;">
+          <span class="fw-bold fs-4" style="color:#0369a1;">2006</span>
+          <h5 class="fw-bold mt-1" style="color:#0f172a;">Primary Expansion</h5>
+          <p class="small mb-0" style="color:#64748b;">Expanded to Grades 1–5 with specialized Phonics labs, junior discovery sandboxes, and splash pool amenities.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="p-3 rounded-3 border-start border-3 h-100" style="background:#f8fafc; border-color:#16a34a !important;">
+          <span class="fw-bold fs-4" style="color:#15803d;">2018</span>
+          <h5 class="fw-bold mt-1" style="color:#0f172a;">STEM Discovery Hub</h5>
+          <p class="small mb-0" style="color:#64748b;">Inauguration of the junior robotics lab, smart interactive touchboards, and treehouse children's library.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="p-3 rounded-3 border-start border-3 h-100" style="background:#f8fafc; border-color:#f43f5e !important;">
+          <span class="fw-bold fs-4" style="color:#be123c;">2026</span>
+          <h5 class="fw-bold mt-1" style="color:#0f172a;">Joyful Smart Campus</h5>
+          <p class="small mb-0" style="color:#64748b;">100% CCTV safety integration, real-time parent mobile communication, and holistic developmental growth portfolios.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leadership Desks: Founder, Headmistress, Mentors -->
+  <div class="mb-5" id="sec-about-leadership">
+    <div class="text-center mb-5">
+      <span class="badge rounded-pill px-3 py-2 fw-bold mb-2" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;"><i class="fa-solid fa-heart me-1"></i> Loving Care &amp; Guidance</span>
+      <h2 class="display-6 fw-bold mb-1" style="color:#0f172a;">Early Education Leadership</h2>
+      <p class="small" style="color:#64748b;">Compassionate educators shaping joyful learning journeys every day.</p>
+    </div>
+
+    <!-- Founder Section -->
+    <div class="glass-panel p-4 p-lg-5 mb-4" id="founder">
+      <div class="row align-items-center g-4">
+        <div class="col-md-4 text-center">
+          <div style="width:120px; height:120px; border-radius:50%; background:linear-gradient(135deg, #ffb800, #f59e0b); display:inline-flex; align-items:center; justify-content:center; color:#000; font-size:3rem; margin-bottom:1rem; box-shadow:0 8px 25px rgba(255,184,0,0.2);">
+            <i class="fa-solid fa-shapes"></i>
+          </div>
+          <h4 class="fw-bold mb-1" style="color:#0f172a;">Dr. S. K. Vance</h4>
+          <span class="small d-block fw-semibold" style="color:#b45309;">Founder President, Horizon Educational Society</span>
+          <span class="badge bg-light text-secondary border mt-2">Ph.D. Early Childhood Education</span>
+        </div>
+        <div class="col-md-8 border-start-md border-light-subtle ps-md-4">
+          <h5 class="fw-bold mb-2" style="color:#b45309;"><i class="fa-solid fa-quote-left me-2"></i>Founder's Philosophy</h5>
+          <p style="color:#475569; line-height:1.8; font-size:0.95rem;">
+            "A school for young children is not an examination mill; it is a sunny garden where each little sprout receives the love, patience, and nourishment needed to blossom naturally. When children feel safe and cherished, learning becomes an effortless joy that stays with them throughout life."
+          </p>
+          <span class="small fw-semibold" style="color:#64748b;">— From the Founder's Desk</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Headmistress Section -->
+    <div class="glass-panel p-4 p-lg-5 mb-4" id="principal">
+      <div class="row align-items-center g-4">
+        <div class="col-md-4 text-center">
+          <div style="width:120px; height:120px; border-radius:50%; background:linear-gradient(135deg, #0284c7, #38bdf8); display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:3rem; margin-bottom:1rem; box-shadow:0 8px 25px rgba(2,132,199,0.2);">
+            <i class="fa-solid fa-chalkboard-user"></i>
+          </div>
+          <h4 class="fw-bold mb-1" style="color:#0f172a;">Mrs. Eleanor Vance</h4>
+          <span class="small d-block fw-semibold" style="color:#0369a1;">Headmistress &amp; Primary Director</span>
+          <span class="badge bg-light text-secondary border mt-2">M.Ed., Early Childhood &amp; Montessori Certified</span>
+        </div>
+        <div class="col-md-8 border-start-md border-light-subtle ps-md-4">
+          <h5 class="fw-bold mb-2" style="color:#0369a1;"><i class="fa-solid fa-quote-left me-2"></i>Headmistress Desk</h5>
+          <p style="color:#475569; line-height:1.8; font-size:0.95rem;">
+            "Welcome to {{ school.name|default:'Horizon Primary World School' }}. We believe that the primary years (Ages 2.5 to 10) form the bedrock of a child's confidence, emotional resilience, and lifelong curiosity. With an optimal 1:12 teacher ratio, phonics immersion, and play-based inquiry, our caring educators partner with parents to ensure every child thrives with smiles."
+          </p>
+          <a href="{% url 'website:faculty' %}" class="small fw-bold text-decoration-none" style="color:#0284c7;">
+            Meet our Caring Teachers &amp; Counselors <i class="fa-solid fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Values & Child Safety Standards -->
+  <div class="glass-panel p-4 p-lg-5 mb-5" id="values">
+    <div class="text-center mb-4">
+      <span class="badge rounded-pill px-3 py-2 fw-bold mb-2" style="background:#ffe4e6; color:#be123c; border:1px solid #fecdd3;"><i class="fa-solid fa-shield-heart me-1"></i> Child Safety &amp; Care</span>
+      <h2 class="display-6 fw-bold mb-1" style="color:#0f172a;">Values &amp; Safety Standards</h2>
+      <p class="small" style="color:#64748b;">Our strict protocols ensuring every child is safe, respected, and nurtured.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="d-flex gap-3">
+          <div class="text-warning fs-4"><i class="fa-solid fa-video"></i></div>
+          <div>
+            <h6 class="fw-bold mb-1" style="color:#0f172a;">100% CCTV &amp; Child Protection Protocol</h6>
+            <p class="small" style="color:#64748b; line-height:1.6;">Full CCTV coverage across classrooms, activity hubs, and playparks. Female attendants in all washrooms and background-verified staff.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex gap-3">
+          <div class="text-info fs-4"><i class="fa-solid fa-heart-circle-check"></i></div>
+          <div>
+            <h6 class="fw-bold mb-1" style="color:#0f172a;">Zero Tolerance for Harsh Discipline</h6>
+            <p class="small" style="color:#64748b; line-height:1.6;">No corporal punishment or shaming. Emotional behavioral guidance through positive reinforcement, empathy circles, and child psychology support.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex gap-3">
+          <div class="text-success fs-4"><i class="fa-solid fa-apple-whole"></i></div>
+          <div>
+            <h6 class="fw-bold mb-1" style="color:#0f172a;">Organic Junior Nutrition &amp; Hygiene</h6>
+            <p class="small" style="color:#64748b; line-height:1.6;">Nut-free, sanitized cafeteria providing fresh fruits and wholesome warm meals curated by pediatric dieticians.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex gap-3">
+          <div class="text-danger fs-4"><i class="fa-solid fa-kit-medical"></i></div>
+          <div>
+            <h6 class="fw-bold mb-1" style="color:#0f172a;">24/7 Pediatric Infirmary &amp; Doctor-on-Call</h6>
+            <p class="small" style="color:#64748b; line-height:1.6;">Full-time certified pediatric nurses, child emergency care beds, regular dental and eyesight health checkup camps.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accreditations & Affiliations -->
+  <div class="text-center py-4" id="sec-about-accreditations">
+    <span class="small text-uppercase fw-bold" style="color:#64748b; letter-spacing:0.06em;">Recognized by National &amp; Global Early Childhood Frameworks</span>
+    <div class="d-flex justify-content-center align-items-center gap-3 gap-lg-4 flex-wrap mt-3">
+      <span class="badge bg-white text-dark border px-3 py-2 fs-6 shadow-sm"><i class="fa-solid fa-shapes me-2 text-warning"></i>CBSE Primary Wing (Affil. 2430089)</span>
+      <span class="badge bg-white text-dark border px-3 py-2 fs-6 shadow-sm"><i class="fa-solid fa-award me-2 text-info"></i>Early Childhood Montessori Accredited</span>
+      <span class="badge bg-white text-dark border px-3 py-2 fs-6 shadow-sm"><i class="fa-solid fa-child-reaching me-2 text-success"></i>EYFS Early Learning Framework</span>
+      <span class="badge bg-white text-dark border px-3 py-2 fs-6 shadow-sm"><i class="fa-solid fa-shield-heart me-2 text-danger"></i>Safe Green Junior Campus</span>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+

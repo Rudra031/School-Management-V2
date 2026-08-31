@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Library Hub{% endblock %}
+
+{% block content %}
+
+<div class="page-hero reveal-up" style="background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(79,70,229,0.08));">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <h4 class="fw-bold mb-1" style="font-family:'Geist',sans-serif;background:linear-gradient(135deg,var(--warning),var(--primary));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+        <i class="fa-solid fa-book-bookmark"></i> Library Circulation Hub
+      </h4>
+      <p class="mb-0" style="color:var(--text-muted);font-size:0.875rem;">
+        {{ total_titles }} Titles &nbsp;&bull;&nbsp; {{ total_copies }} Total Copies on Shelf
+      </p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'library:circulation_list' %}" class="btn btn-saas-secondary btn-sm">
+        <i class="fa-solid fa-arrows-rotate"></i> Loan Ledger
+      </a>
+      <a href="{% url 'library:book_issue' %}" class="btn btn-saas-primary btn-sm">
+        <i class="fa-solid fa-plus"></i> Issue Book
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Library Stat Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-6 col-lg-3 reveal-up delay-1">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-primary"><i class="fa-solid fa-book"></i></div>
+      </div>
+      <div class="stat-number" data-target="{{ total_titles }}" data-countup>{{ total_titles }}</div>
+      <div class="mt-1" style="color:var(--text-muted);font-size:0.8rem;font-weight:500;">Book Titles</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3 reveal-up delay-2">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-success"><i class="fa-solid fa-book-bookmark"></i></div>
+      </div>
+      <div class="stat-number" data-target="{{ available_copies }}" data-countup>{{ available_copies }}</div>
+      <div class="mt-1" style="color:var(--text-muted);font-size:0.8rem;font-weight:500;">Available on Shelf</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3 reveal-up delay-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-info"><i class="fa-solid fa-hand-holding"></i></div>
+      </div>
+      <div class="stat-number" data-target="{{ active_loans_count }}" data-countup>{{ active_loans_count }}</div>
+      <div class="mt-1" style="color:var(--text-muted);font-size:0.8rem;font-weight:500;">Active Loans</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3 reveal-up delay-4">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-danger"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      </div>
+      <div class="stat-number" style="background:linear-gradient(135deg,var(--danger),#f97316);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;" data-target="{{ overdue_loans|length }}" data-countup>{{ overdue_loans|length }}</div>
+      <div class="mt-1" style="color:var(--text-muted);font-size:0.8rem;font-weight:500;">Overdue Returns</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Availability Chart -->
+  <div class="col-lg-5 reveal-up delay-1">
+    <div class="card-saas h-100">
+      <div class="card-saas-header">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:28px;height:28px;border-radius:8px;background:var(--warning-light);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-chart-pie" style="color:var(--warning);font-size:0.8rem;"></i>
+          </div>
+          <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Availability Ratio</span>
+        </div>
+      </div>
+      <div class="card-saas-body d-flex align-items-center justify-content-center" style="min-height:240px;">
+        <div style="width:200px;height:200px;">
+          <canvas id="copiesChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overdue Table -->
+  <div class="col-lg-7 reveal-up delay-2">
+    <div class="card-saas h-100">
+      <div class="card-saas-header">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:28px;height:28px;border-radius:8px;background:var(--danger-light);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-triangle-exclamation" style="color:var(--danger);font-size:0.8rem;"></i>
+          </div>
+          <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Overdue Returns</span>
+        </div>
+        {% if overdue_loans %}
+          <span style="background:var(--danger-light);color:var(--danger);padding:2px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;">{{ overdue_loans|length }}</span>
+        {% endif %}
+      </div>
+      <div class="card-saas-body p-0">
+        <div class="table-responsive">
+          <table class="table-saas mb-0" style="font-size:0.83rem;">
+            <thead><tr><th>Book Title</th><th>Borrower</th><th>Due</th><th>Action</th></tr></thead>
+            <tbody>
+              {% for loan in overdue_loans %}
+                <tr>
+                  <td class="fw-semibold" style="color:var(--text-main);">{{ loan.book.title|truncatechars:25 }}</td>
+                  <td style="color:var(--text-muted);">{{ loan.user.email|truncatechars:20 }}</td>
+                  <td class="fw-bold" style="color:var(--danger);">{{ loan.due_date|date:"d M Y" }}</td>
+                  <td>
+                    <form method="post" action="{% url 'library:book_return' loan.pk %}" class="d-inline">
+                      {% csrf_token %}
+                      <button type="submit" class="btn-saas-primary" style="background:var(--success);background-image:none;box-shadow:0 2px 8px rgba(16,185,129,0.3);padding:0.3rem 0.75rem;font-size:0.75rem;">Return</button>
+                    </form>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-center py-5" style="color:var(--success);">
+                  <i class="fa-solid fa-circle-check mb-2 d-block" style="font-size:2rem;opacity:0.7;"></i>
+                  <span class="small fw-semibold">No overdue loans!</span>
+                </td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const ctx = document.getElementById('copiesChart');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Available', 'Borrowed'],
+        datasets: [{ data: {{ chart_copies|safe }}, backgroundColor: ['#10b981','#f59e0b'], borderWidth: 0, hoverOffset: 12 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+    });
+  }
+});
+</script>
+{% endblock %}

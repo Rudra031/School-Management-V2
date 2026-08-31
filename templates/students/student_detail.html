@@ -1,0 +1,815 @@
+{% extends "base.html" %}
+
+{% block title %}{{ student.full_name }} ({{ student.admission_number }}) | Student Dossier{% endblock %}
+{% block page_heading %}Student Profile &amp; 360° Record{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ==========================================================================
+     COMPACT EXECUTIVE STUDENT PROFILE — HIGH DENSITY GLASSMORPHISM
+     ========================================================================== */
+  .student-passport-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    position: sticky;
+    top: 78px;
+  }
+
+  .passport-avatar {
+    width: 68px;
+    height: 68px;
+    border-radius: 16px;
+    object-fit: cover;
+    background: linear-gradient(135deg, var(--primary), var(--violet));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 800;
+    font-family: 'Geist', sans-serif;
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.3);
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .compact-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 1rem 0;
+  }
+
+  .compact-kpi-tile {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 8px 10px;
+    text-align: center;
+  }
+
+  .compact-kpi-tile .kpi-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .compact-kpi-tile .kpi-value {
+    font-size: 0.95rem;
+    font-weight: 800;
+    font-family: 'Geist', sans-serif;
+    line-height: 1.2;
+  }
+
+  .mini-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: 'Geist', sans-serif;
+  }
+
+  /* Compact Pill Navigation */
+  .compact-nav-pills {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 4px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(12px);
+  }
+
+  .compact-nav-pills .nav-link {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border: none;
+    background: transparent;
+    white-space: nowrap;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .compact-nav-pills .nav-link:hover {
+    color: var(--text-main);
+    background: rgba(79, 70, 229, 0.08);
+  }
+
+  .compact-nav-pills .nav-link.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--primary), var(--violet));
+    box-shadow: 0 2px 10px var(--primary-glow);
+  }
+
+  .compact-workspace-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-xs);
+  }
+
+  .data-row-compact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.83rem;
+  }
+
+  .data-row-compact:last-child {
+    border-bottom: none;
+  }
+
+  .data-row-compact .label {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .data-row-compact .value {
+    color: var(--text-main);
+    font-weight: 600;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Top Compact Header & Quick Toolbar -->
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div class="d-flex align-items-center gap-2">
+    <a href="{% url 'students:student_list' %}" class="btn btn-sm btn-saas-secondary" title="Return to Directory">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <div>
+      <h6 class="fw-bold mb-0" style="color:var(--text-main);">{{ student.full_name }}</h6>
+      <span class="text-muted" style="font-size:0.75rem; font-family:'Geist',sans-serif;">
+        {{ student.student_id }} &bull; {{ student.current_class_section }} &bull; Roll #{{ current_enrollment.roll_number|default:"—" }}
+      </span>
+    </div>
+  </div>
+
+    <a href="{% url 'documents:id_card_print_single' 'student' student.pk %}" target="_blank" class="btn btn-sm btn-outline-info" style="font-size:0.78rem; padding:4px 10px;" title="Print Student PVC ID Badge">
+      <i class="fa-solid fa-id-card me-1"></i> ID Badge
+    </a>
+    <a href="{% url 'documents:certificate_studio' %}" class="btn btn-sm btn-outline-warning" style="font-size:0.78rem; padding:4px 10px;" title="Digital Certificate Studio">
+      <i class="fa-solid fa-certificate me-1"></i> Certificates
+    </a>
+    <a href="{% url 'admissions:print_student_admission' student.pk %}" target="_blank" class="btn btn-sm btn-outline-primary" style="font-size:0.78rem; padding:4px 10px;" title="Print Official Admission Certificate">
+      <i class="fa-solid fa-file-invoice me-1"></i> Admission Form
+    </a>
+    <a href="{% url 'students:student_health' student.pk %}" class="btn btn-outline-danger btn-sm" style="font-size:0.78rem; padding:4px 10px;">
+      <i class="fa-solid fa-heart-pulse me-1"></i> Health
+    </a>
+    <a href="{% url 'students:student_edit' student.pk %}" class="btn btn-saas-secondary btn-sm" style="font-size:0.78rem; padding:4px 10px;">
+      <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+    </a>
+    <button onclick="window.print();" class="btn btn-sm btn-outline-secondary" style="font-size:0.78rem; padding:4px 10px;" title="Print Dossier">
+      <i class="fa-solid fa-print"></i>
+    </button>
+  </div>
+</div>
+
+<div class="row g-3">
+
+  <!-- =========================================================================
+       LEFT COLUMN: COMPACT STUDENT PASSPORT (~30% WIDTH)
+       ========================================================================= -->
+  <div class="col-lg-4 col-xl-3">
+    <div class="student-passport-card">
+      <!-- Identity Header -->
+      <div class="d-flex align-items-center gap-3 mb-3">
+        {% if student.photo %}
+          <img src="{{ student.photo.url }}" alt="{{ student.full_name }}" class="passport-avatar">
+        {% else %}
+          <div class="passport-avatar">{{ student.first_name|first }}{{ student.last_name|first }}</div>
+        {% endif %}
+
+        <div class="overflow-hidden">
+          <h6 class="fw-bold mb-1 text-truncate" style="color:var(--text-main);">{{ student.full_name }}</h6>
+          <div class="d-flex align-items-center gap-1 mb-1">
+            <span class="badge bg-success-subtle text-success mini-chip">{{ student.get_status_display }}</span>
+            {% if student.blood_group %}
+              <span class="badge bg-danger-subtle text-danger mini-chip"><i class="fa-solid fa-droplet"></i> {{ student.blood_group }}</span>
+            {% endif %}
+          </div>
+          <div class="text-muted" style="font-size:0.72rem; font-family:'Geist',sans-serif;">Adm: {{ student.admission_number }}</div>
+        </div>
+      </div>
+
+      <!-- Compact 2x2 Metric Grid -->
+      <div class="compact-kpi-grid">
+        <div class="compact-kpi-tile">
+          <span class="kpi-label">Attendance</span>
+          <span class="kpi-value {% if attendance_pct >= 75 %}text-success{% else %}text-danger{% endif %}">
+            {{ attendance_pct }}%
+          </span>
+        </div>
+
+        <div class="compact-kpi-tile">
+          <span class="kpi-label">Exam Avg</span>
+          <span class="kpi-value text-primary">
+            {% if avg_marks_pct %}{{ avg_marks_pct }}%{% else %}N/A{% endif %}
+          </span>
+        </div>
+
+        <div class="compact-kpi-tile">
+          <span class="kpi-label">Fee Balance</span>
+          <span class="kpi-value {% if total_fee_balance > 0 %}text-warning{% else %}text-success{% endif %}">
+            ₹{{ total_fee_balance|floatformat:0 }}
+          </span>
+        </div>
+
+        <div class="compact-kpi-tile">
+          <span class="kpi-label">Placement</span>
+          <span class="kpi-value text-info text-truncate">
+            #{{ current_enrollment.roll_number|default:"—" }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Quick Key-Value List -->
+      <div class="mb-3">
+        <div class="data-row-compact">
+          <span class="label">Class &amp; Section</span>
+          <span class="value text-primary">{{ student.current_class_section }}</span>
+        </div>
+        <div class="data-row-compact">
+          <span class="label">Date of Birth</span>
+          <span class="value">{{ student.date_of_birth|date:"d M Y" }}</span>
+        </div>
+        <div class="data-row-compact">
+          <span class="label">Gender</span>
+          <span class="value">{{ student.get_gender_display }}</span>
+        </div>
+        <div class="data-row-compact">
+          <span class="label">Session</span>
+          <span class="value text-muted">{{ current_enrollment.academic_year.name|default:"2026-27" }}</span>
+        </div>
+        <div class="data-row-compact">
+          <span class="label">Emergency Contact</span>
+          <span class="value text-danger font-monospace" style="font-size:0.78rem;">{{ student.emergency_contact_phone }}</span>
+        </div>
+      </div>
+
+      <!-- Guardian Capsule -->
+      <div class="pt-2 border-top border-secondary border-opacity-10">
+        <span class="text-muted d-block mb-1" style="font-size:0.7rem; text-transform:uppercase; font-weight:700; letter-spacing:0.03em;">Primary Guardian</span>
+        {% if parents %}
+          {% with p=parents.0 %}
+            <div class="d-flex justify-content-between align-items-center small">
+              <span class="fw-semibold text-truncate" style="max-width:140px; color:var(--text-main);">{{ p.parent.full_name }}</span>
+              <span class="badge bg-light text-secondary border" style="font-size:0.65rem;">{{ p.get_relationship_type_display }}</span>
+            </div>
+            <div class="text-muted" style="font-size:0.74rem;">Phone: {{ p.parent.primary_phone }}</div>
+          {% endwith %}
+        {% else %}
+          <span class="text-muted small">No guardian linked</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       RIGHT COLUMN: HIGH-DENSITY TABBED WORKSPACE (~70% WIDTH)
+       ========================================================================= -->
+  <div class="col-lg-8 col-xl-9">
+
+    <!-- Compact Pill Navigation Tabs -->
+    <div class="compact-nav-pills" id="compactStudentTabs" role="tablist">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-overview" type="button">
+        <i class="fa-solid fa-gauge-high"></i> Overview
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-personal" type="button">
+        <i class="fa-regular fa-id-card"></i> Personal
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-parents" type="button">
+        <i class="fa-solid fa-users"></i> Parents ({{ parents.count }})
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-academics" type="button">
+        <i class="fa-solid fa-graduation-cap"></i> Academics
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-attendance" type="button">
+        <i class="fa-solid fa-clipboard-user"></i> Attendance ({{ attendance_pct }}%)
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-timetable" type="button">
+        <i class="fa-solid fa-calendar-days"></i> Timetable
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-homework" type="button">
+        <i class="fa-solid fa-book-open"></i> Homework ({{ assignments.count }})
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-exams" type="button">
+        <i class="fa-solid fa-award"></i> Exams
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-fees" type="button">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Fees
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-library" data-bs-target="#tab-library" type="button">
+        <i class="fa-solid fa-book-bookmark"></i> Library ({{ library_circulations.count }})
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-documents" type="button">
+        <i class="fa-solid fa-folder-open"></i> Docs ({{ documents.count }})
+      </button>
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-audit" type="button">
+        <i class="fa-solid fa-clock-rotate-left"></i> Logs
+      </button>
+    </div>
+
+    <!-- Tab Content Panes -->
+    <div class="tab-content" id="compactStudentTabContent">
+
+      <!-- 1. OVERVIEW -->
+      <div class="tab-pane fade show active" id="tab-overview" role="tabpanel">
+        <div class="row g-3">
+          <!-- Recent Attendance Summary -->
+          <div class="col-md-6">
+            <div class="compact-workspace-card h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold small" style="color:var(--text-main);"><i class="fa-solid fa-clipboard-user text-primary me-1"></i> Attendance Status</span>
+                <span class="badge bg-success-subtle text-success" style="font-size:0.7rem;">{{ attendance_present }}/{{ attendance_total }} Present</span>
+              </div>
+              <div class="progress mb-2" style="height:6px; border-radius:4px;">
+                <div class="progress-bar bg-success" style="width: {{ attendance_pct }}%;"></div>
+              </div>
+              <div class="d-flex justify-content-between text-muted" style="font-size:0.72rem;">
+                <span>Rate: <strong>{{ attendance_pct }}%</strong></span>
+                <span>Absent: <strong>{{ attendance_absent }}</strong></span>
+                <span>Late: <strong>{{ attendance_late }}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fee Account Health -->
+          <div class="col-md-6">
+            <div class="compact-workspace-card h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold small" style="color:var(--text-main);"><i class="fa-solid fa-file-invoice-dollar text-success me-1"></i> Fee Account Health</span>
+                {% if total_fee_balance == 0 %}
+                  <span class="badge bg-success-subtle text-success" style="font-size:0.7rem;"><i class="fa-solid fa-check me-1"></i> Zero Dues</span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning" style="font-size:0.7rem;">Dues: ₹{{ total_fee_balance|floatformat:2 }}</span>
+                {% endif %}
+              </div>
+              <div class="d-flex justify-content-between text-muted small">
+                <span>Total Invoiced: <strong class="text-main">₹{{ total_fee_billed|floatformat:2 }}</strong></span>
+                <span>Total Paid: <strong class="text-success">₹{{ total_fee_paid|floatformat:2 }}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="col-12">
+            <div class="compact-workspace-card">
+              <span class="fw-bold small d-block mb-2" style="color:var(--text-main);"><i class="fa-solid fa-bolt text-warning me-1"></i> Quick Management Operations</span>
+              <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'attendance:mark' %}" class="btn btn-sm btn-saas-secondary" style="font-size:0.78rem;">
+                  <i class="fa-solid fa-clipboard-user text-primary me-1"></i> Mark Attendance
+                </a>
+                <a href="{% url 'examinations:marks_entry' %}" class="btn btn-sm btn-saas-secondary" style="font-size:0.78rem;">
+                  <i class="fa-solid fa-pen-nib text-info me-1"></i> Enter Marks
+                </a>
+                <a href="{% url 'fees:invoice_list' %}" class="btn btn-sm btn-saas-secondary" style="font-size:0.78rem;">
+                  <i class="fa-solid fa-money-bill-wave text-success me-1"></i> Invoices &amp; Fees
+                </a>
+                <a href="{% url 'assignments:create' %}" class="btn btn-sm btn-saas-secondary" style="font-size:0.78rem;">
+                  <i class="fa-solid fa-book-open text-warning me-1"></i> Assign Homework
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. PERSONAL & DEMOGRAPHICS -->
+      <div class="tab-pane fade" id="tab-personal" role="tabpanel">
+        <div class="compact-workspace-card">
+          <h6 class="fw-bold mb-3" style="color:var(--text-main); font-size:0.9rem;"><i class="fa-regular fa-id-card text-primary me-1"></i> Personal Dossier Details</h6>
+          <div class="row g-2">
+            <div class="col-sm-4">
+              <span class="text-muted" style="font-size:0.72rem; text-transform:uppercase;">Full Legal Name</span>
+              <div class="fw-semibold small" style="color:var(--text-main);">{{ student.full_name }}</div>
+            </div>
+            <div class="col-sm-4">
+              <span class="text-muted" style="font-size:0.72rem; text-transform:uppercase;">National ID / Cert</span>
+              <div class="fw-semibold small font-monospace" style="color:var(--text-main);">{{ student.national_id_number|default:"—" }}</div>
+            </div>
+            <div class="col-sm-4">
+              <span class="text-muted" style="font-size:0.72rem; text-transform:uppercase;">Nationality</span>
+              <div class="fw-semibold small" style="color:var(--text-main);">{{ student.nationality }}</div>
+            </div>
+            <div class="col-sm-4">
+              <span class="text-muted" style="font-size:0.72rem; text-transform:uppercase;">Caste / Category</span>
+              <div class="fw-semibold small" style="color:var(--text-main);">{{ student.caste_category }}</div>
+            </div>
+            <div class="col-sm-4">
+              <span class="text-muted" style="font-size:0.72rem; text-transform:uppercase;">Admission Date</span>
+              <div class="fw-semibold small" style="color:var(--text-main);">{{ student.admission_date|date:"M d, Y" }}</div>
+            </div>
+            <div class="col-sm-4">
+              <span class="text-muted" style="font-size:0.72rem; text-transform:uppercase;">Previous School</span>
+              <div class="fw-semibold small" style="color:var(--text-main);">{{ student.previous_school_name|default:"Direct Entry" }}</div>
+            </div>
+            <div class="col-12 pt-2 border-top border-secondary border-opacity-10 mt-2">
+              <span class="text-muted" style="font-size:0.72rem; text-transform:uppercase;">Address</span>
+              <p class="small mb-0" style="color:var(--text-main);">{{ student.residential_address }}, {{ student.city }}, {{ student.state }} - {{ student.postal_code }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. PARENTS & GUARDIANS -->
+      <div class="tab-pane fade" id="tab-parents" role="tabpanel">
+        <div class="compact-workspace-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0" style="color:var(--text-main); font-size:0.9rem;"><i class="fa-solid fa-users text-primary me-1"></i> Linked Parents &amp; Guardians</h6>
+            <a href="{% url 'parents:parent_create' %}" class="btn btn-xs btn-outline-primary">+ Register Parent</a>
+          </div>
+          <div class="row g-2">
+            {% for rel in parents %}
+              <div class="col-md-6">
+                <div class="p-2 border rounded" style="background:rgba(255,255,255,0.02); border-color:var(--card-border)!important;">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-bold small" style="color:var(--text-main);">{{ rel.parent.full_name }}</span>
+                    <span class="badge bg-primary-subtle text-primary" style="font-size:0.68rem;">{{ rel.get_relationship_type_display }}</span>
+                  </div>
+                  <div class="text-muted small" style="font-size:0.75rem;"><i class="fa-solid fa-phone me-1 text-primary"></i> {{ rel.parent.primary_phone }}</div>
+                  <div class="text-muted small" style="font-size:0.75rem;"><i class="fa-solid fa-envelope me-1 text-info"></i> {{ rel.parent.user.email|default:"No email" }}</div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="col-12 text-center py-3 text-muted small">No parents linked to this student record.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. ACADEMIC ENROLLMENTS -->
+      <div class="tab-pane fade" id="tab-academics" role="tabpanel">
+        <div class="compact-workspace-card p-0 overflow-hidden">
+          <table class="table table-hover table-sm mb-0 align-middle" style="font-size:0.82rem;">
+            <thead class="table-light">
+              <tr class="text-muted" style="font-size:0.72rem;">
+                <th>SESSION</th>
+                <th>CLASS &amp; SECTION</th>
+                <th>ROLL #</th>
+                <th>ENROLLMENT DATE</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for enroll in enrollments %}
+                <tr>
+                  <td class="fw-bold">{{ enroll.academic_year.name }}</td>
+                  <td class="text-primary">{{ enroll.section.full_name }}</td>
+                  <td class="font-monospace fw-bold">#{{ enroll.roll_number }}</td>
+                  <td class="text-muted">{{ enroll.enrollment_date|date:"d M Y" }}</td>
+                  <td>
+                    {% if enroll.is_current %}
+                      <span class="badge bg-success-subtle text-success">Active Enrolled</span>
+                    {% else %}
+                      <span class="badge bg-secondary-subtle text-secondary">{{ enroll.get_promotion_status_display }}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5" class="text-center py-3 text-muted">No enrollment history found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 5. ATTENDANCE LOG -->
+      <div class="tab-pane fade" id="tab-attendance" role="tabpanel">
+        <div class="compact-workspace-card p-0 overflow-hidden">
+          <table class="table table-hover table-sm mb-0 align-middle" style="font-size:0.82rem;">
+            <thead class="table-light">
+              <tr class="text-muted" style="font-size:0.72rem;">
+                <th>DATE</th>
+                <th>SESSION</th>
+                <th>CLASS SECTION</th>
+                <th>STATUS</th>
+                <th>REMARKS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for att in attendance_records %}
+                <tr>
+                  <td class="fw-bold">{{ att.sheet.date|date:"D, d M Y" }}</td>
+                  <td class="text-muted">{{ att.sheet.academic_year.name }}</td>
+                  <td>{{ att.sheet.section.full_name }}</td>
+                  <td>
+                    {% if att.status == 'PRESENT' %}
+                      <span class="badge bg-success-subtle text-success">Present</span>
+                    {% elif att.status == 'ABSENT' %}
+                      <span class="badge bg-danger-subtle text-danger">Absent</span>
+                    {% elif att.status == 'LATE' %}
+                      <span class="badge bg-warning-subtle text-warning">Late</span>
+                    {% else %}
+                      <span class="badge bg-secondary-subtle text-secondary">{{ att.get_status_display }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-muted small">{{ att.remarks|default:"—" }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5" class="text-center py-3 text-muted">No attendance logs found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 6. TIMETABLE -->
+      <div class="tab-pane fade" id="tab-timetable" role="tabpanel">
+        <div class="compact-workspace-card p-0 overflow-hidden">
+          <table class="table table-hover table-sm mb-0 align-middle" style="font-size:0.82rem;">
+            <thead class="table-light">
+              <tr class="text-muted" style="font-size:0.72rem;">
+                <th>DAY</th>
+                <th>PERIOD &amp; TIME</th>
+                <th>SUBJECT</th>
+                <th>TEACHER</th>
+                <th>ROOM</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in timetable_entries %}
+                <tr>
+                  <td class="fw-bold">{{ entry.get_day_of_week_display }}</td>
+                  <td>{{ entry.time_slot.name }} ({{ entry.time_slot.start_time|time:"H:i" }} - {{ entry.time_slot.end_time|time:"H:i" }})</td>
+                  <td class="fw-semibold text-primary">{{ entry.subject.name }}</td>
+                  <td>{{ entry.teacher.full_name }}</td>
+                  <td class="font-monospace text-muted">{{ entry.room_number|default:"Classroom" }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5" class="text-center py-3 text-muted">No timetable schedule for this section.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 7. HOMEWORK -->
+      <div class="tab-pane fade" id="tab-homework" role="tabpanel">
+        <div class="compact-workspace-card p-0 overflow-hidden">
+          <table class="table table-hover table-sm mb-0 align-middle" style="font-size:0.82rem;">
+            <thead class="table-light">
+              <tr class="text-muted" style="font-size:0.72rem;">
+                <th>TITLE</th>
+                <th>SUBJECT</th>
+                <th>DUE DATE</th>
+                <th>MAX POINTS</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for hw in assignments %}
+                <tr>
+                  <td class="fw-bold">{{ hw.title }}</td>
+                  <td class="text-primary">{{ hw.subject.name }}</td>
+                  <td class="text-muted">{{ hw.due_date|date:"d M Y, H:i" }}</td>
+                  <td class="fw-semibold">{{ hw.max_points }} pts</td>
+                  <td><span class="badge bg-primary-subtle text-primary">{{ hw.get_status_display }}</span></td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5" class="text-center py-3 text-muted">No homework assignments recorded.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 8. EXAMINATIONS & MARKS -->
+      <div class="tab-pane fade" id="tab-exams" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold small text-muted text-uppercase">Academic Examination Records</span>
+          <div class="d-flex gap-2">
+            <a href="{% url 'examinations:admit_card' %}?student_id={{ student.pk }}" class="btn btn-sm btn-outline-dark" target="_blank">
+              <i class="fa-solid fa-id-badge me-1"></i> Admit Card (Hall Ticket)
+            </a>
+            <a href="{% url 'examinations:report_card' student.pk %}" class="btn btn-sm btn-primary">
+              <i class="fa-solid fa-file-invoice me-1"></i> Official Marksheet
+            </a>
+          </div>
+        </div>
+        <div class="compact-workspace-card p-0 overflow-hidden">
+          <table class="table table-hover table-sm mb-0 align-middle" style="font-size:0.82rem;">
+            <thead class="table-light">
+              <tr class="text-muted" style="font-size:0.72rem;">
+                <th>EXAM TERM</th>
+                <th>SUBJECT</th>
+                <th>MARKS OBTAINED</th>
+                <th>MAX MARKS</th>
+                <th>PCT</th>
+                <th>GRADE</th>
+                <th>RESULT</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for mark in exam_marks %}
+                <tr>
+                  <td class="fw-bold">{{ mark.exam_schedule.exam_term.title }}</td>
+                  <td class="text-primary">{{ mark.exam_schedule.subject.name }}</td>
+                  <td class="fw-bold">{{ mark.total_marks_obtained }}</td>
+                  <td class="text-muted">{{ mark.exam_schedule.max_marks }}</td>
+                  <td class="fw-semibold">{{ mark.percentage }}%</td>
+                  <td><span class="badge bg-warning-subtle text-warning fw-bold">{{ mark.grade.grade_letter|default:"A" }}</span></td>
+                  <td>
+                    {% if mark.is_passed %}
+                      <span class="badge bg-success-subtle text-success">Pass</span>
+                    {% else %}
+                      <span class="badge bg-danger-subtle text-danger">Fail</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="7" class="text-center py-3 text-muted">No examination records logged for this student.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 9. FEES & INVOICES -->
+      <div class="tab-pane fade" id="tab-fees" role="tabpanel">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold small text-muted text-uppercase">Fee Invoices &amp; Ledger</span>
+          <a href="{% url 'fees:pos_counter' %}?student_id={{ student.pk }}" class="btn btn-sm btn-success">
+            <i class="fa-solid fa-cash-register me-1"></i> Collect Fees at POS Counter
+          </a>
+        </div>
+        <div class="compact-workspace-card p-0 overflow-hidden">
+          <table class="table table-hover table-sm mb-0 align-middle" style="font-size:0.82rem;">
+            <thead class="table-light">
+              <tr class="text-muted" style="font-size:0.72rem;">
+                <th>INVOICE #</th>
+                <th>TITLE</th>
+                <th>ISSUE DATE</th>
+                <th>DUE DATE</th>
+                <th>TOTAL (₹)</th>
+                <th>PAID (₹)</th>
+                <th>BALANCE (₹)</th>
+                <th>STATUS</th>
+                <th class="text-center">ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for inv in fee_invoices %}
+                <tr>
+                  <td class="font-monospace fw-bold text-primary">{{ inv.invoice_number }}</td>
+                  <td>{{ inv.title }}</td>
+                  <td class="text-muted">{{ inv.issue_date|date:"d M Y" }}</td>
+                  <td class="text-muted">{{ inv.due_date|date:"d M Y" }}</td>
+                  <td class="fw-semibold">₹{{ inv.net_payable }}</td>
+                  <td class="text-success fw-semibold">₹{{ inv.paid_amount }}</td>
+                  <td class="fw-bold {% if inv.balance_amount > 0 %}text-warning{% else %}text-success{% endif %}">₹{{ inv.balance_amount }}</td>
+                  <td>
+                    {% if inv.status == 'PAID' %}
+                      <span class="badge bg-success-subtle text-success">Paid</span>
+                    {% elif inv.status == 'PARTIAL' %}
+                      <span class="badge bg-warning-subtle text-warning">Partial</span>
+                    {% else %}
+                      <span class="badge bg-danger-subtle text-danger">{{ inv.get_status_display }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    <a href="{% url 'fees:invoice_detail' inv.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2">
+                      <i class="fa-solid fa-eye"></i> View
+                    </a>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="9" class="text-center py-3 text-muted">No fee invoices generated.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 10. LIBRARY -->
+      <div class="tab-pane fade" id="tab-library" role="tabpanel">
+        <div class="compact-workspace-card p-0 overflow-hidden">
+          <table class="table table-hover table-sm mb-0 align-middle" style="font-size:0.82rem;">
+            <thead class="table-light">
+              <tr class="text-muted" style="font-size:0.72rem;">
+                <th>BOOK TITLE</th>
+                <th>AUTHOR</th>
+                <th>BORROW DATE</th>
+                <th>DUE DATE</th>
+                <th>RETURN DATE</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for circ in library_circulations %}
+                <tr>
+                  <td class="fw-bold">{{ circ.book.title }}</td>
+                  <td class="text-muted">{{ circ.book.author }}</td>
+                  <td class="text-muted">{{ circ.borrow_date|date:"d M Y" }}</td>
+                  <td class="text-muted">{{ circ.due_date|date:"d M Y" }}</td>
+                  <td class="text-muted">{{ circ.return_date|date:"d M Y"|default:"—" }}</td>
+                  <td>
+                    {% if circ.status == 'BORROWED' %}
+                      <span class="badge bg-warning-subtle text-warning">Borrowed</span>
+                    {% else %}
+                      <span class="badge bg-success-subtle text-success">Returned</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="6" class="text-center py-3 text-muted">No library circulation records.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 11. DOCUMENTS -->
+      <div class="tab-pane fade" id="tab-documents" role="tabpanel">
+        <div class="compact-workspace-card p-0 overflow-hidden">
+          <table class="table table-hover table-sm mb-0 align-middle" style="font-size:0.82rem;">
+            <thead class="table-light">
+              <tr class="text-muted" style="font-size:0.72rem;">
+                <th>TITLE</th>
+                <th>CATEGORY</th>
+                <th>ACCESS</th>
+                <th>UPLOADED ON</th>
+                <th class="text-end">ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for doc in documents %}
+                <tr>
+                  <td class="fw-bold">{{ doc.title }}</td>
+                  <td><span class="badge bg-primary-subtle text-primary">{{ doc.category.name|default:"General" }}</span></td>
+                  <td class="text-muted">{{ doc.get_access_level_display }}</td>
+                  <td class="text-muted">{{ doc.uploaded_at|date:"d M Y" }}</td>
+                  <td class="text-end">
+                    <a href="{{ doc.document_file.url }}" target="_blank" class="btn btn-xs btn-outline-primary">
+                      <i class="fa-solid fa-eye"></i> View
+                    </a>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5" class="text-center py-3 text-muted">No verified documents on file.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 12. AUDIT LOGS -->
+      <div class="tab-pane fade" id="tab-audit" role="tabpanel">
+        <div class="compact-workspace-card p-0 overflow-hidden">
+          <table class="table table-hover table-sm mb-0 align-middle" style="font-size:0.82rem;">
+            <thead class="table-light">
+              <tr class="text-muted" style="font-size:0.72rem;">
+                <th>TIMESTAMP</th>
+                <th>USER</th>
+                <th>ACTION</th>
+                <th>MODULE</th>
+                <th>IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in audit_logs %}
+                <tr>
+                  <td class="text-muted font-monospace" style="font-size:0.75rem;">{{ log.timestamp|date:"d M Y, H:i" }}</td>
+                  <td class="fw-semibold">{{ log.user.full_name|default:log.user.username }}</td>
+                  <td><span class="badge bg-primary-subtle text-primary">{{ log.get_action_display }}</span></td>
+                  <td>{{ log.module }}</td>
+                  <td class="font-monospace text-muted" style="font-size:0.75rem;">{{ log.ip_address }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5" class="text-center py-3 text-muted">No audit activity logged.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Teacher{% endblock %}
+{% block page_heading %}Assign Subject Teacher{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-chalkboard-user text-primary me-2"></i> Allocation Details</span>
+      </div>
+      <div class="card-saas-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Academic Session</label>
+            {{ form.academic_year }}
+            {% if form.academic_year.errors %}<div class="text-danger small">{{ form.academic_year.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Class Section</label>
+            {{ form.section }}
+            {% if form.section.errors %}<div class="text-danger small">{{ form.section.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Subject</label>
+            {{ form.subject }}
+            {% if form.subject.errors %}<div class="text-danger small">{{ form.subject.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Assigned Teacher</label>
+            {{ form.teacher }}
+            {% if form.teacher.errors %}<div class="text-danger small">{{ form.teacher.errors.0 }}</div>{% endif %}
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'academics:allocation_list' %}" class="btn btn-saas-secondary">Cancel</a>
+            <button type="submit" class="btn btn-saas-primary">Save Allocation</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

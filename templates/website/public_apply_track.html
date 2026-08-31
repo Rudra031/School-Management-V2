@@ -1,0 +1,109 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}Track Application Status | Horizon Premier Public School{% endblock %}
+
+{% block extra_css %}
+<style>
+  .track-card {
+    background: rgba(10, 25, 55, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 2.5rem;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .stage-badge-pill {
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="max-w-800 mx-auto">
+
+    <div class="text-center mb-4">
+      <span class="text-warning fw-bold small text-uppercase" style="letter-spacing:0.08em;">Admissions Portal</span>
+      <h2 class="display-6 fw-bold text-white mt-1">Track Your Application Status</h2>
+      <p class="text-white-50">Enter your official application reference number below to check the real-time review status.</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="track-card mb-4">
+      <form method="GET" action="{% url 'website:public_apply_track' %}">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-7">
+            <label class="form-label text-white-50 small fw-semibold">Application Reference Number *</label>
+            <input type="text" name="app_num" value="{{ app_num|default:'' }}" class="form-control bg-dark text-white border-secondary border-opacity-50" placeholder="e.g. HPS-APP-2026-XXXXX" required style="font-size:1rem; padding:0.75rem 1rem;">
+          </div>
+          <div class="col-md-5">
+            <button type="submit" class="btn btn-warning fw-bold w-100" style="padding:0.75rem 1rem; border-radius:10px;">
+              <i class="fa-solid fa-magnifying-glass me-1"></i> Check Status
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Results Display -->
+    {% if error_msg %}
+      <div class="alert alert-danger bg-danger bg-opacity-25 text-white border-0 p-3 rounded-3 shadow mb-4">
+        <i class="fa-solid fa-circle-xmark me-2 text-danger"></i>{{ error_msg }}
+      </div>
+    {% endif %}
+
+    {% if app %}
+      <div class="track-card">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25 flex-wrap gap-2">
+          <div>
+            <span class="badge bg-warning text-dark fw-bold px-3 py-1 mb-1">{{ app.application_number }}</span>
+            <h4 class="fw-bold text-white mb-0">{{ app.applicant_full_name }}</h4>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-primary text-white fs-6 px-3 py-2">
+              {{ app.get_status_display }}
+            </span>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4 text-white-50 small">
+          <div class="col-sm-6"><strong>Grade Applied:</strong> <span class="text-white">{{ app.applying_for_class.name }}</span></div>
+          <div class="col-sm-6"><strong>Academic Session:</strong> <span class="text-white">{{ app.academic_year.name }}</span></div>
+          <div class="col-sm-6"><strong>Submission Date:</strong> <span class="text-white">{{ app.applied_date|date:"d F Y" }}</span></div>
+          <div class="col-sm-6"><strong>Parent Contact:</strong> <span class="text-white">{{ app.parent_phone }}</span></div>
+        </div>
+
+        <div class="p-3 rounded-3 bg-secondary bg-opacity-25">
+          <h6 class="fw-bold text-warning mb-1"><i class="fa-solid fa-timeline me-1"></i> Next Steps &amp; Status Note:</h6>
+          <p class="text-white-50 small mb-0">
+            {% if app.status == 'SUBMITTED' %}
+              Your application is in queue for initial document verification. Our admissions counselor will reach out via WhatsApp/SMS to schedule the interaction slot.
+            {% elif app.status == 'UNDER_REVIEW' %}
+              Your application dossier is currently undergoing academic review by the Admissions Committee.
+            {% elif app.status == 'ACCEPTED' %}
+              Congratulations! Your admission has been approved. Please visit the school campus to complete formal enrollment and fee clearance.
+            {% else %}
+              {{ app.notes|default:"Application is actively being processed by the school administration." }}
+            {% endif %}
+          </p>
+        </div>
+
+        <div class="mt-4 text-end">
+          <a href="{% url 'website:public_apply_success' app_num=app.application_number %}" class="btn btn-sm btn-outline-light" style="border-radius:20px;">
+            <i class="fa-solid fa-receipt me-1"></i> View &amp; Print Full Application Slip
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

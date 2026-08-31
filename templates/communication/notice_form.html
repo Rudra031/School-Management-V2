@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Post Notice{% endblock %}
+{% block page_heading %}Publish Campus Announcement{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-bullhorn text-primary me-2"></i> Announcement Composer</span>
+      </div>
+      <div class="card-saas-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Announcement Title</label>
+            {{ form.title }}
+            {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Target Audience</label>
+              {{ form.target_audience }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Expiration Date (Optional)</label>
+              {{ form.expires_at }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Detailed Content</label>
+            {{ form.content }}
+            {% if form.content.errors %}<div class="text-danger small">{{ form.content.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">File Attachment (PDF, Circular Image, etc.)</label>
+            {{ form.attachment }}
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <div class="form-check form-switch mt-2">
+                {{ form.is_pinned }}
+                <label class="form-check-label small fw-semibold" for="{{ form.is_pinned.id_for_label }}">Pin to Top of Notice Board</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check form-switch mt-2">
+                {{ form.is_published }}
+                <label class="form-check-label small fw-semibold" for="{{ form.is_published.id_for_label }}">Publish Immediately</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'communication:notice_board' %}" class="btn btn-saas-secondary">Cancel</a>
+            <button type="submit" class="btn btn-saas-primary">Publish Announcement</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

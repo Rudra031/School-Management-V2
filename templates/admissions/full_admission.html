@@ -1,0 +1,869 @@
+{% extends "base.html" %}
+
+{% block title %}Full Student Admission Wizard (10-Step Dossier) | Horizon SMS{% endblock %}
+{% block page_heading %}Full Student Admission Wizard{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ==========================================================================
+     FULL ADMISSION 10-STEP WIZARD STYLING
+     ========================================================================== */
+
+  .wizard-stepper-container {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    margin-bottom: 1.5rem;
+  }
+
+  .step-tab-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 7px 12px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .step-tab-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .step-tab-btn.active {
+    background: linear-gradient(135deg, var(--primary), var(--violet));
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 3px 12px var(--primary-glow);
+  }
+
+  .step-tab-btn.completed {
+    color: var(--success);
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.06);
+  }
+
+  /* Wizard Step Pane */
+  .wizard-pane {
+    display: none;
+    animation: fadeIn 0.25s ease forwards;
+  }
+
+  .wizard-pane.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Document Upload Cards */
+  .doc-upload-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1.5px dashed var(--card-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.2s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .doc-upload-card:hover {
+    border-color: var(--primary);
+    background: rgba(79, 70, 229, 0.04);
+  }
+
+  .doc-upload-card input[type="file"] {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .doc-icon-frame {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(79, 70, 229, 0.1);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin: 0 auto 10px auto;
+  }
+
+  /* Review Summary Rows */
+  .review-matrix-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .review-data-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 0.82rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .review-data-row:last-child {
+    border-bottom: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1" style="font-size:0.78rem;">
+        <li class="breadcrumb-item"><a href="{% url 'admissions:pipeline' %}" class="text-decoration-none">Admissions</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Full Admission Wizard</li>
+      </ol>
+    </nav>
+    <div class="d-flex align-items-center gap-2">
+      <h4 class="fw-bold mb-0" style="color:var(--text-main);">Full Student Admission Wizard</h4>
+      <span class="badge bg-primary-subtle text-primary font-monospace">10-Step Registry Dossier</span>
+    </div>
+    <span class="text-muted small">Comprehensive admission registry: demographics, family, previous school TC, marksheet, character certificate, medical, and documents.</span>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a href="{% url 'admissions:quick_admission' %}" class="btn btn-saas-secondary btn-sm">
+      <i class="fa-solid fa-bolt text-warning me-1"></i> Quick Admission Mode
+    </a>
+  </div>
+</div>
+
+<!-- =========================================================================
+     10-STEP HORIZONTAL STEPPER CONTROLLER
+     ========================================================================= -->
+<div class="wizard-stepper-container">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <span class="fw-bold small" style="color:var(--text-main);">
+      Admission Progress: <span class="text-primary" id="currentStepTitle">Step 1 of 10 &bull; Student Demographics</span>
+    </span>
+    <span class="badge bg-primary font-monospace" id="progressPercentageBadge">10% Completed</span>
+  </div>
+
+  <div class="progress mb-3" style="height: 6px; border-radius: 4px; background:rgba(255,255,255,0.06);">
+    <div class="progress-bar bg-primary" id="wizardProgressBar" role="progressbar" style="width: 10%; transition: width 0.3s ease;"></div>
+  </div>
+
+  <!-- Stepper Tab Links -->
+  <div class="d-flex overflow-auto gap-2 pb-1" id="stepperTabsNav">
+    <button type="button" class="step-tab-btn active" data-step="1"><i class="fa-solid fa-user"></i> 01 Student</button>
+    <button type="button" class="step-tab-btn" data-step="2"><i class="fa-solid fa-users"></i> 02 Family</button>
+    <button type="button" class="step-tab-btn" data-step="3"><i class="fa-solid fa-location-dot"></i> 03 Address</button>
+    <button type="button" class="step-tab-btn" data-step="4"><i class="fa-solid fa-school"></i> 04 Prev School</button>
+    <button type="button" class="step-tab-btn" data-step="5"><i class="fa-solid fa-graduation-cap"></i> 05 Academic</button>
+    <button type="button" class="step-tab-btn" data-step="6"><i class="fa-solid fa-heart-pulse"></i> 06 Medical</button>
+    <button type="button" class="step-tab-btn" data-step="7"><i class="fa-solid fa-file-arrow-up"></i> 07 Documents</button>
+    <button type="button" class="step-tab-btn" data-step="8"><i class="fa-solid fa-star"></i> 08 Additional</button>
+    <button type="button" class="step-tab-btn" data-step="9"><i class="fa-solid fa-clipboard-check"></i> 09 Review</button>
+    <button type="button" class="step-tab-btn" data-step="10"><i class="fa-solid fa-check-double"></i> 10 Submit</button>
+  </div>
+</div>
+
+<!-- =========================================================================
+     WIZARD FORM PANE CONTAINERS (STEPS 01 TO 10)
+     ========================================================================= -->
+{% if existing_app %}
+  <div class="alert alert-primary d-flex align-items-center justify-content-between p-3 mb-4 rounded-3 border-0" style="background:rgba(79,70,229,0.1);color:var(--primary);font-size:0.85rem;">
+    <div class="d-flex align-items-center gap-2">
+      <i class="fa-solid fa-circle-check fs-5"></i>
+      <div>
+        <strong>Continuing Full Admission Profile: {{ existing_app.applicant_full_name }}</strong>
+        <div class="small text-muted">Application No: {{ existing_app.application_number }} &bull; Class: {{ existing_app.applying_for_class.name }} &bull; Status: {{ existing_app.get_status_display }}</div>
+      </div>
+    </div>
+    <span class="badge bg-primary">Quick-Enroll Connected</span>
+  </div>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" id="fullAdmissionForm">
+  {% csrf_token %}
+  {% if existing_app %}
+    <input type="hidden" name="existing_app_id" value="{{ existing_app.id }}">
+  {% endif %}
+
+  <!-- -----------------------------------------------------------------------
+       STEP 01: STUDENT DEMOGRAPHICS
+       ----------------------------------------------------------------------- -->
+  <div class="wizard-pane active" id="step-pane-1">
+    <div class="card-saas p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+        <i class="fa-solid fa-user-graduate text-primary"></i>
+        <h6 class="fw-bold mb-0" style="color:var(--text-main);">Step 01: Student Personal Demographics</h6>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">First Name <span class="text-danger">*</span></label>
+          <input type="text" name="first_name" id="inp_first_name" class="form-control form-control-sm" value="{{ existing_app.first_name|default:'' }}" placeholder="e.g. Aarav" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Last Name <span class="text-danger">*</span></label>
+          <input type="text" name="last_name" id="inp_last_name" class="form-control form-control-sm" value="{{ existing_app.last_name|default:'' }}" placeholder="e.g. Sharma" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Date of Birth <span class="text-danger">*</span></label>
+          <input type="date" name="date_of_birth" id="inp_dob" class="form-control form-control-sm" value="{{ existing_app.date_of_birth|date:'Y-m-d'|default:'2012-05-15' }}" required>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-muted">Gender <span class="text-danger">*</span></label>
+          <select name="gender" id="inp_gender" class="form-select form-select-sm">
+            <option value="MALE" {% if existing_app.gender == 'MALE' or not existing_app %}selected{% endif %}>Male</option>
+            <option value="FEMALE" {% if existing_app.gender == 'FEMALE' %}selected{% endif %}>Female</option>
+            <option value="OTHER" {% if existing_app.gender == 'OTHER' %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-muted">Blood Group</label>
+          <select name="blood_group" id="inp_blood_group" class="form-select form-select-sm">
+            <option value="">-- Select --</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="O+" selected>O+</option>
+            <option value="O-">O-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-muted">Social Category / Quota</label>
+          <select name="category" class="form-select form-select-sm">
+            <option value="GENERAL" selected>General</option>
+            <option value="OBC">OBC (Non-Creamy Layer)</option>
+            <option value="SC">SC (Scheduled Caste)</option>
+            <option value="ST">ST (Scheduled Tribe)</option>
+            <option value="EWS">EWS (Economically Weaker Section)</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-muted">Nationality</label>
+          <input type="text" name="nationality" id="inp_nationality" class="form-control form-control-sm" value="Indian">
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Mother Tongue</label>
+          <input type="text" name="religion" id="inp_religion" class="form-control form-control-sm" placeholder="Hindi / English">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Aadhaar / APAAR / PEN ID</label>
+          <input type="text" name="aadhaar_number" class="form-control form-control-sm font-monospace" placeholder="12-digit Aadhaar / APAAR ID">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Student Passport Photograph</label>
+          <input type="file" name="photo" class="form-control form-control-sm" accept="image/*">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- -----------------------------------------------------------------------
+       STEP 02: FAMILY & GUARDIAN DETAILS
+       ----------------------------------------------------------------------- -->
+  <div class="wizard-pane" id="step-pane-2">
+    <div class="card-saas p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+        <i class="fa-solid fa-users text-primary"></i>
+        <h6 class="fw-bold mb-0" style="color:var(--text-main);">Step 02: Parents &amp; Guardian Information</h6>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Father's Full Name <span class="text-danger">*</span></label>
+          <input type="text" name="father_name" id="inp_father_name" class="form-control form-control-sm" value="{{ existing_app.parent_name|default:'' }}" placeholder="e.g. Rajesh Sharma" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Father's Mobile Phone <span class="text-danger">*</span></label>
+          <input type="text" name="father_phone" id="inp_father_phone" class="form-control form-control-sm" value="{{ existing_app.parent_phone|default:'' }}" placeholder="+91 98765 43210" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Father's Occupation</label>
+          <input type="text" name="father_occupation" class="form-control form-control-sm" placeholder="e.g. Senior Engineer (PSU)">
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Mother's Full Name</label>
+          <input type="text" name="mother_name" id="inp_mother_name" class="form-control form-control-sm" placeholder="e.g. Sunita Sharma">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Mother's Mobile Phone</label>
+          <input type="text" name="mother_phone" id="inp_mother_phone" class="form-control form-control-sm" placeholder="+91 98765 12345">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Mother's Occupation</label>
+          <input type="text" name="mother_occupation" class="form-control form-control-sm" placeholder="e.g. Teacher (Govt. School)">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Official Parent/Guardian Email <span class="text-danger">*</span></label>
+          <input type="email" name="parent_email" id="inp_parent_email" class="form-control form-control-sm" value="{{ existing_app.parent_email|default:'' }}" placeholder="rajesh.sharma@example.in">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Primary Communication Guardian</label>
+          <select name="parent_name" class="form-select form-select-sm">
+            <option value="Father" selected>Father (Primary Contact)</option>
+            <option value="Mother">Mother</option>
+            <option value="Legal Guardian">Legal Guardian</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- -----------------------------------------------------------------------
+       STEP 03: ADDRESS & EMERGENCY CONTACT
+       ----------------------------------------------------------------------- -->
+  <div class="wizard-pane" id="step-pane-3">
+    <div class="card-saas p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+        <i class="fa-solid fa-location-dot text-primary"></i>
+        <h6 class="fw-bold mb-0" style="color:var(--text-main);">Step 03: Address &amp; Emergency Telephony</h6>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label class="form-label small fw-bold text-muted">Current Residential Address <span class="text-danger">*</span></label>
+          <textarea name="residential_address" id="inp_address" class="form-control form-control-sm" rows="2" placeholder="House/Flat No, Street, Landmark, Area" required>{{ existing_app.residential_address|default:"Flat 402, Shanti Kunj Apartments, Sector 14, Rohini, New Delhi - 110085" }}</textarea>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">City / District</label>
+          <input type="text" class="form-control form-control-sm" value="New Delhi">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">State / Union Territory</label>
+          <input type="text" class="form-control form-control-sm" value="Delhi (NCT)">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">PIN Code</label>
+          <input type="text" class="form-control form-control-sm font-monospace" value="110085">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Emergency Contact Person Name <span class="text-danger">*</span></label>
+          <input type="text" name="emergency_contact_name" class="form-control form-control-sm" value="{{ existing_app.parent_name|default:'' }}" placeholder="e.g. Rajesh Sharma">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Emergency Contact Phone Number <span class="text-danger">*</span></label>
+          <input type="text" name="emergency_contact_phone" class="form-control form-control-sm" value="{{ existing_app.parent_phone|default:'' }}" placeholder="+91 98765 43210">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- -----------------------------------------------------------------------
+       STEP 04: PREVIOUS SCHOOL & ACADEMIC HISTORY
+       ----------------------------------------------------------------------- -->
+  <div class="wizard-pane" id="step-pane-4">
+    <div class="card-saas p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+        <i class="fa-solid fa-school text-primary"></i>
+        <h6 class="fw-bold mb-0" style="color:var(--text-main);">Step 04: Previous Educational Institution &amp; Transfer Record</h6>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Previous School Name <span class="text-danger">*</span></label>
+          <input type="text" name="previous_school_name" id="inp_prev_school" class="form-control form-control-sm" value="{{ existing_app.previous_school|default:'St. Xavier International School' }}" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-muted">Affiliated Board <span class="text-danger">*</span></label>
+          <select name="previous_board" class="form-select form-select-sm">
+            <option value="CBSE" selected>CBSE Board</option>
+            <option value="ICSE">ICSE Board</option>
+            <option value="IB">IB World School</option>
+            <option value="STATE">State Board</option>
+            <option value="CAMBRIDGE">Cambridge IGCSE</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-muted">Last Grade Attended <span class="text-danger">*</span></label>
+          <input type="text" name="last_grade" class="form-control form-control-sm" value="Grade 8 - Section A">
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Transfer Certificate (TC) Number <span class="text-danger">*</span></label>
+          <input type="text" name="tc_number" class="form-control form-control-sm font-monospace" value="TC/2026/0891">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">TC Issue Date</label>
+          <input type="date" name="tc_date" class="form-control form-control-sm" value="2026-03-28">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Reason for Leaving</label>
+          <input type="text" name="reason_for_leaving" class="form-control form-control-sm" value="Relocation &amp; Higher Grade Promotion">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- -----------------------------------------------------------------------
+       STEP 05: ACADEMIC ALLOCATION (CLASS & SECTION)
+       ----------------------------------------------------------------------- -->
+  <div class="wizard-pane" id="step-pane-5">
+    <div class="card-saas p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+        <i class="fa-solid fa-graduation-cap text-primary"></i>
+        <h6 class="fw-bold mb-0" style="color:var(--text-main);">Step 05: Academic Session &amp; Class Placement</h6>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Academic Session <span class="text-danger">*</span></label>
+          <select name="academic_year" class="form-select form-select-sm">
+            {% for ay in academic_years %}
+              <option value="{{ ay.id }}" {% if existing_app.academic_year_id == ay.id or ay.is_current %}selected{% endif %}>{{ ay.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Class / Grade Applying For <span class="text-danger">*</span></label>
+          <select name="applying_for_class" id="inp_class_apply" class="form-select form-select-sm">
+            {% for cl in class_levels %}
+              <option value="{{ cl.id }}" {% if existing_app.applying_for_class_id == cl.id %}selected{% endif %}>{{ cl.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-muted">Assigned Section</label>
+          <select name="section" class="form-select form-select-sm">
+            {% for sec in sections %}
+              <option value="{{ sec.id }}">{{ sec.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Curriculum Stream / Program</label>
+          <select class="form-select form-select-sm">
+            <option value="GENERAL" selected>General Standard Curriculum</option>
+            <option value="STEM">STEM &amp; Computer Science Track</option>
+            <option value="ARTS">Liberal Arts &amp; Humanities</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Second Language Option</label>
+          <select class="form-select form-select-sm">
+            <option value="FRENCH" selected>French</option>
+            <option value="SPANISH">Spanish</option>
+            <option value="GERMAN">German</option>
+            <option value="MANDARIN">Mandarin</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- -----------------------------------------------------------------------
+       STEP 06: MEDICAL & HEALTH DOSSIER
+       ----------------------------------------------------------------------- -->
+  <div class="wizard-pane" id="step-pane-6">
+    <div class="card-saas p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+        <i class="fa-solid fa-heart-pulse text-danger"></i>
+        <h6 class="fw-bold mb-0" style="color:var(--text-main);">Step 06: Medical &amp; Clinical Records</h6>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Known Allergies (Food / Medicine)</label>
+          <input type="text" name="allergies" class="form-control form-control-sm" placeholder="e.g. Peanut allergy, Penicillin (Leave blank if none)">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Chronic Conditions or Medications</label>
+          <input type="text" name="chronic_conditions" class="form-control form-control-sm" placeholder="e.g. Mild Asthma (Inhaler required)">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Family Physician / Pediatrician Contact</label>
+          <input type="text" name="doctor_contact" class="form-control form-control-sm" placeholder="Dr. Smith, Springfield Clinic &bull; +1 (555) 901-2345">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Dietary Preferences / Restrictions</label>
+          <input type="text" name="dietary" class="form-control form-control-sm" placeholder="e.g. Vegetarian, Halal, Lactose-Free">
+        </div>
+
+        <div class="col-12">
+          <label class="form-label small fw-bold text-muted">Special Emergency Medical Notes for School Nurse</label>
+          <textarea name="medical_notes" class="form-control form-control-sm" rows="2" placeholder="Any specific medical protocols or instructions"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- -----------------------------------------------------------------------
+       STEP 07: DOCUMENT UPLOAD CENTER (TC, MARKSHEET, CHARACTER, ID)
+       ----------------------------------------------------------------------- -->
+  <div class="wizard-pane" id="step-pane-7">
+    <div class="card-saas p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+        <i class="fa-solid fa-file-arrow-up text-primary"></i>
+        <h6 class="fw-bold mb-0" style="color:var(--text-main);">Step 07: Document Upload Center (Previous School &amp; Statutory Proofs)</h6>
+      </div>
+
+      <div class="row g-3">
+        <!-- 1. Transfer Certificate (TC) -->
+        <div class="col-md-6 col-lg-3">
+          <div class="doc-upload-card" id="card_tc">
+            <input type="file" name="transfer_certificate" id="inp_file_tc" onchange="handleFileSelected(this, 'badge_tc')">
+            <div>
+              <div class="doc-icon-frame"><i class="fa-solid fa-file-lines"></i></div>
+              <strong class="d-block text-main small mb-1">Transfer Certificate</strong>
+              <span class="text-muted d-block" style="font-size:0.7rem;">Official TC from previous school</span>
+            </div>
+            <div class="mt-2">
+              <span class="badge bg-secondary-subtle text-secondary" id="badge_tc" style="font-size:0.7rem;">Click to Upload PDF/JPG</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Marksheet / Report Card -->
+        <div class="col-md-6 col-lg-3">
+          <div class="doc-upload-card" id="card_marksheet">
+            <input type="file" name="marksheet" id="inp_file_marksheet" onchange="handleFileSelected(this, 'badge_marksheet')">
+            <div>
+              <div class="doc-icon-frame"><i class="fa-solid fa-file-invoice"></i></div>
+              <strong class="d-block text-main small mb-1">Academic Marksheet</strong>
+              <span class="text-muted d-block" style="font-size:0.7rem;">Final term grade transcript</span>
+            </div>
+            <div class="mt-2">
+              <span class="badge bg-secondary-subtle text-secondary" id="badge_marksheet" style="font-size:0.7rem;">Click to Upload PDF/JPG</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Character Certificate -->
+        <div class="col-md-6 col-lg-3">
+          <div class="doc-upload-card" id="card_character">
+            <input type="file" name="character_certificate" id="inp_file_character" onchange="handleFileSelected(this, 'badge_character')">
+            <div>
+              <div class="doc-icon-frame"><i class="fa-solid fa-award"></i></div>
+              <strong class="d-block text-main small mb-1">Character Certificate</strong>
+              <span class="text-muted d-block" style="font-size:0.7rem;">Conduct &amp; testimonial slip</span>
+            </div>
+            <div class="mt-2">
+              <span class="badge bg-secondary-subtle text-secondary" id="badge_character" style="font-size:0.7rem;">Click to Upload PDF/JPG</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Birth Certificate / National ID -->
+        <div class="col-md-6 col-lg-3">
+          <div class="doc-upload-card" id="card_birth">
+            <input type="file" name="birth_certificate" id="inp_file_birth" onchange="handleFileSelected(this, 'badge_birth')">
+            <div>
+              <div class="doc-icon-frame"><i class="fa-solid fa-id-card"></i></div>
+              <strong class="d-block text-main small mb-1">Birth Cert / National ID</strong>
+              <span class="text-muted d-block" style="font-size:0.7rem;">Age verification proof</span>
+            </div>
+            <div class="mt-2">
+              <span class="badge bg-secondary-subtle text-secondary" id="badge_birth" style="font-size:0.7rem;">Click to Upload PDF/JPG</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- -----------------------------------------------------------------------
+       STEP 08: ADDITIONAL & TRANSPORTATION
+       ----------------------------------------------------------------------- -->
+  <div class="wizard-pane" id="step-pane-8">
+    <div class="card-saas p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+        <i class="fa-solid fa-star text-warning"></i>
+        <h6 class="fw-bold mb-0" style="color:var(--text-main);">Step 08: Extracurricular &amp; Special Provisions</h6>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Extracurricular Activities &amp; Clubs</label>
+          <input type="text" name="extracurricular" class="form-control form-control-sm" placeholder="e.g. Debate Club, Soccer, Robotics, Chess, Violin">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Special Educational Needs (SEN)</label>
+          <input type="text" name="sen_notes" class="form-control form-control-sm" placeholder="e.g. Extra time in exams, remedial tutoring (None if N/A)">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Authorized Campus Pickup Contact</label>
+          <input type="text" name="authorized_pickup" class="form-control form-control-sm" placeholder="Name of guardian authorized to pick up student">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-bold text-muted">Sibling Studying in Same Academy?</label>
+          <input type="text" name="sibling_info" class="form-control form-control-sm" placeholder="Sibling Student ID or Name (Leave blank if none)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- -----------------------------------------------------------------------
+       STEP 09: LIVE COMPREHENSIVE DOSSIER REVIEW
+       ----------------------------------------------------------------------- -->
+  <div class="wizard-pane" id="step-pane-9">
+    <div class="card-saas p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+        <i class="fa-solid fa-clipboard-check text-success"></i>
+        <h6 class="fw-bold mb-0" style="color:var(--text-main);">Step 09: Comprehensive Dossier Verification Review</h6>
+      </div>
+
+      <div class="row g-3">
+        <!-- Review Card 1: Student Demographics -->
+        <div class="col-md-6">
+          <div class="review-matrix-card">
+            <strong class="d-block text-primary small mb-2"><i class="fa-solid fa-user me-1"></i> Student Information</strong>
+            <div class="review-data-row"><span class="text-muted">Full Name:</span><strong id="rev_name">Aarav Sharma</strong></div>
+            <div class="review-data-row"><span class="text-muted">Date of Birth:</span><span id="rev_dob">15 May 2012</span></div>
+            <div class="review-data-row"><span class="text-muted">Gender:</span><span id="rev_gender">Male</span></div>
+            <div class="review-data-row"><span class="text-muted">Blood Group:</span><span id="rev_blood">O+</span></div>
+          </div>
+        </div>
+
+        <!-- Review Card 2: Family & Contact -->
+        <div class="col-md-6">
+          <div class="review-matrix-card">
+            <strong class="d-block text-primary small mb-2"><i class="fa-solid fa-users me-1"></i> Family &amp; Contact</strong>
+            <div class="review-data-row"><span class="text-muted">Father's Name:</span><span id="rev_father">Rajesh Sharma</span></div>
+            <div class="review-data-row"><span class="text-muted">Emergency Phone:</span><span id="rev_phone">+91 98765 43210</span></div>
+            <div class="review-data-row"><span class="text-muted">Parent Email:</span><span id="rev_email">rajesh.sharma@example.in</span></div>
+            <div class="review-data-row"><span class="text-muted">Residential City:</span><span>New Delhi, India</span></div>
+          </div>
+        </div>
+
+        <!-- Review Card 3: Previous School -->
+        <div class="col-md-6">
+          <div class="review-matrix-card">
+            <strong class="d-block text-primary small mb-2"><i class="fa-solid fa-school me-1"></i> Previous Educational Background</strong>
+            <div class="review-data-row"><span class="text-muted">Previous School:</span><span id="rev_prev_school">St. Xavier International School</span></div>
+            <div class="review-data-row"><span class="text-muted">TC Number:</span><span class="font-monospace">TC/2026/0891</span></div>
+            <div class="review-data-row"><span class="text-muted">Verification Status:</span><span class="badge bg-success-subtle text-success">Compliant &bull; Ready</span></div>
+          </div>
+        </div>
+
+        <!-- Review Card 4: Documents Attached -->
+        <div class="col-md-6">
+          <div class="review-matrix-card">
+            <strong class="d-block text-primary small mb-2"><i class="fa-solid fa-file-shield me-1"></i> Attached Verification Documents</strong>
+            <div class="review-data-row"><span class="text-muted">Transfer Certificate:</span><span id="rev_doc_tc" class="text-muted">File Selected</span></div>
+            <div class="review-data-row"><span class="text-muted">Academic Marksheet:</span><span id="rev_doc_marksheet" class="text-muted">File Selected</span></div>
+            <div class="review-data-row"><span class="text-muted">Character Certificate:</span><span id="rev_doc_character" class="text-muted">File Selected</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- -----------------------------------------------------------------------
+       STEP 10: DECLARATION & FINAL ENROLLMENT SUBMIT
+       ----------------------------------------------------------------------- -->
+  <div class="wizard-pane" id="step-pane-10">
+    <div class="card-saas p-4 mb-4">
+      <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+        <i class="fa-solid fa-check-double text-success"></i>
+        <h6 class="fw-bold mb-0" style="color:var(--text-main);">Step 10: Statutory Verification &amp; Final Admission Confirmation</h6>
+      </div>
+
+      <div class="alert alert-warning d-flex align-items-center gap-2 p-3 mb-4 rounded-3" style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25);">
+        <input class="form-check-input mt-0" type="checkbox" id="declarationCheck" checked required>
+        <label class="form-check-label text-main small" for="declarationCheck">
+          <strong>Statutory Verification Confirmation:</strong> I confirm that the student's previous school transfer certificate, character testimonial, academic marksheets, and birth identity records have been authenticated and comply with institutional admission statutes.
+        </label>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label small fw-bold text-muted">Admissions Registrar Remarks / Approval Notes</label>
+        <textarea name="notes" class="form-control form-control-sm" rows="2" placeholder="Enter any administrative notes or fee concession codes (Optional)">Full 10-step student dossier authenticated and approved for immediate academic enrollment.</textarea>
+      </div>
+
+      <div class="p-3 rounded text-center" style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2);">
+        <i class="fa-solid fa-circle-check text-success fs-3 mb-2"></i>
+        <h6 class="fw-bold mb-1" style="color:var(--text-main);">Ready for Instant SIS Enrollment</h6>
+        <p class="text-muted small mb-0">Upon submission, permanent Student ID, Roll Number, Attendance Sheet slot, and Term 1 Fee Invoice will be generated automatically.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       STICKY BOTTOM WIZARD CONTROLLER BAR
+       ========================================================================= -->
+  <div class="position-sticky bottom-0 bg-surface p-3 border-top d-flex justify-content-between align-items-center shadow-sm" style="margin: 0 -1.5rem -1.5rem -1.5rem; background: var(--bg-surface); border-color: var(--card-border) !important; z-index: 100;">
+    <div>
+      <button type="button" class="btn btn-saas-secondary btn-sm" id="prevStepBtn" onclick="navigateStep(-1)" style="display:none;">
+        <i class="fa-solid fa-arrow-left me-1"></i> Previous Step
+      </button>
+      <a href="{% url 'admissions:pipeline' %}" class="btn btn-outline-secondary btn-sm" id="cancelWizardBtn">
+        <i class="fa-solid fa-xmark me-1"></i> Cancel
+      </a>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-saas-primary btn-sm px-4" id="nextStepBtn" onclick="navigateStep(1)">
+        Next Step <i class="fa-solid fa-arrow-right ms-1"></i>
+      </button>
+      <button type="submit" class="btn btn-success btn-sm px-4" id="submitWizardBtn" style="display:none;">
+        <i class="fa-solid fa-check-double me-1"></i> Finalize &amp; Enroll Student
+      </button>
+    </div>
+  </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentStep = 1;
+const totalSteps = 10;
+
+const stepTitles = [
+  "Step 1 of 10 • Student Demographics",
+  "Step 2 of 10 • Parents & Guardian Information",
+  "Step 3 of 10 • Address & Emergency Contact",
+  "Step 4 of 10 • Previous School & Transfer Record",
+  "Step 5 of 10 • Academic Session & Placement",
+  "Step 6 of 10 • Medical & Health Dossier",
+  "Step 7 of 10 • Document Upload Center (TC, Marksheet, Character)",
+  "Step 8 of 10 • Additional & Extracurricular Data",
+  "Step 9 of 10 • Live Dossier Verification Review",
+  "Step 10 of 10 • Statutory Verification & Submission"
+];
+
+function goToStep(step) {
+  if (step < 1 || step > totalSteps) return;
+  currentStep = step;
+
+  // 1. Hide all panes & show current
+  for (let i = 1; i <= totalSteps; i++) {
+    const pane = document.getElementById(`step-pane-${i}`);
+    if (pane) {
+      if (i === currentStep) pane.classList.add('active');
+      else pane.classList.remove('active');
+    }
+  }
+
+  // 2. Update step tabs
+  document.querySelectorAll('#stepperTabsNav .step-tab-btn').forEach((btn, idx) => {
+    const btnStep = idx + 1;
+    btn.classList.remove('active');
+    if (btnStep === currentStep) {
+      btn.classList.add('active');
+    } else if (btnStep < currentStep) {
+      btn.classList.add('completed');
+    }
+  });
+
+  // 3. Update title & progress bar
+  document.getElementById('currentStepTitle').textContent = stepTitles[currentStep - 1];
+  const pct = Math.round((currentStep / totalSteps) * 100);
+  document.getElementById('wizardProgressBar').style.width = `${pct}%`;
+  document.getElementById('progressPercentageBadge').textContent = `${pct}% Completed`;
+
+  // 4. Update Navigation Buttons
+  const prevBtn = document.getElementById('prevStepBtn');
+  const nextBtn = document.getElementById('nextStepBtn');
+  const submitBtn = document.getElementById('submitWizardBtn');
+  const cancelBtn = document.getElementById('cancelWizardBtn');
+
+  if (currentStep === 1) {
+    prevBtn.style.display = 'none';
+    cancelBtn.style.display = 'inline-flex';
+  } else {
+    prevBtn.style.display = 'inline-flex';
+    cancelBtn.style.display = 'none';
+  }
+
+  if (currentStep === totalSteps) {
+    nextBtn.style.display = 'none';
+    submitBtn.style.display = 'inline-flex';
+  } else {
+    nextBtn.style.display = 'inline-flex';
+    submitBtn.style.display = 'none';
+  }
+
+  // 5. Update review pane values when navigating to review (Step 9)
+  if (currentStep === 9) {
+    updateReviewData();
+  }
+
+  // Smooth scroll to top of wizard container
+  window.scrollTo({ top: 150, behavior: 'smooth' });
+}
+
+function navigateStep(direction) {
+  goToStep(currentStep + direction);
+}
+
+function handleFileSelected(input, badgeId) {
+  const badge = document.getElementById(badgeId);
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const sizeKB = Math.round(file.size / 1024);
+    badge.className = 'badge bg-success text-white';
+    badge.innerHTML = `<i class="fa-solid fa-check me-1"></i> ${file.name.substring(0, 16)} (${sizeKB} KB)`;
+  }
+}
+
+function updateReviewData() {
+  const fn = document.getElementById('inp_first_name')?.value || 'Aarav';
+  const ln = document.getElementById('inp_last_name')?.value || 'Sharma';
+  document.getElementById('rev_name').textContent = `${fn} ${ln}`;
+  document.getElementById('rev_dob').textContent = document.getElementById('inp_dob')?.value || '2012-05-15';
+  document.getElementById('rev_gender').textContent = document.getElementById('inp_gender')?.value || 'Male';
+  document.getElementById('rev_blood').textContent = document.getElementById('inp_blood_group')?.value || 'O+';
+  document.getElementById('rev_father').textContent = document.getElementById('inp_father_name')?.value || 'Rajesh Sharma';
+  document.getElementById('rev_phone').textContent = document.getElementById('inp_father_phone')?.value || '+91 98765 43210';
+  document.getElementById('rev_email').textContent = document.getElementById('inp_parent_email')?.value || 'rajesh.sharma@example.in';
+  document.getElementById('rev_prev_school').textContent = document.getElementById('inp_prev_school')?.value || 'St. Xavier Senior Secondary School, Delhi';
+
+  // Check files
+  const tcFile = document.getElementById('inp_file_tc')?.files[0];
+  if (tcFile) document.getElementById('rev_doc_tc').innerHTML = `<span class="text-success font-monospace">${tcFile.name}</span>`;
+
+  const msFile = document.getElementById('inp_file_marksheet')?.files[0];
+  if (msFile) document.getElementById('rev_doc_marksheet').innerHTML = `<span class="text-success font-monospace">${msFile.name}</span>`;
+
+  const ccFile = document.getElementById('inp_file_character')?.files[0];
+  if (ccFile) document.getElementById('rev_doc_character').innerHTML = `<span class="text-success font-monospace">${ccFile.name}</span>`;
+}
+
+// Attach Tab Click Listeners to all 10 Stepper Buttons
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('#stepperTabsNav .step-tab-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const step = parseInt(this.getAttribute('data-step'));
+      goToStep(step);
+    });
+  });
+});
+</script>
+{% endblock %}

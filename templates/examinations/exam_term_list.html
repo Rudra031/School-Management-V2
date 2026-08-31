@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Exam Terms{% endblock %}
+{% block page_heading %}Examination Cycles & Terms{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Examination Terms</h5>
+    <p class="text-muted small mb-0">Create exam cycles, terms, and publish report cards.</p>
+  </div>
+  <div>
+    <a href="{% url 'examinations:term_create' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Add Exam Term</a>
+  </div>
+</div>
+
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Term Title</th>
+            <th>Academic Session</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Report Cards Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for term in terms %}
+            <tr>
+              <td class="fw-bold text-primary">{{ term.title }}</td>
+              <td>{{ term.academic_year.name }}</td>
+              <td class="small">{{ term.start_date|date:"d M Y" }}</td>
+              <td class="small">{{ term.end_date|date:"d M Y" }}</td>
+              <td>
+                {% if term.is_published %}
+                  <span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i> Published to Parents/Students</span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary">Draft / Unpublished</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4 small">No examination terms created yet.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

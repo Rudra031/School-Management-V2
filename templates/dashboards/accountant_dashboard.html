@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Finance Hub{% endblock %}
+
+{% block content %}
+
+<div class="page-hero reveal-up" style="background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(79,70,229,0.08));">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <h4 class="fw-bold mb-1" style="font-family:'Geist',sans-serif;background:linear-gradient(135deg,var(--success),var(--primary));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+        <i class="fa-solid fa-coins"></i> Financial & Accounts Hub
+      </h4>
+      <p class="mb-0" style="color:var(--text-muted);font-size:0.875rem;">
+        Fiscal Accounting &amp; Expenditure Control
+      </p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% url 'fees:pos_counter' %}" class="btn btn-success btn-sm fw-bold">
+        <i class="fa-solid fa-cash-register me-1"></i> POS Counter
+      </a>
+      <a href="{% url 'fees:defaulters_list' %}" class="btn btn-outline-danger btn-sm">
+        <i class="fa-solid fa-triangle-exclamation me-1"></i> Dues Defaulters
+      </a>
+      <a href="{% url 'fees:concession_list' %}" class="btn btn-outline-primary btn-sm">
+        <i class="fa-solid fa-tags me-1"></i> Concessions
+      </a>
+      <a href="{% url 'fees:invoice_batch_generate' %}" class="btn btn-saas-secondary btn-sm">
+        <i class="fa-solid fa-file-invoice-dollar me-1"></i> Generate Invoices
+      </a>
+      <a href="{% url 'expenses:create' %}" class="btn btn-saas-primary btn-sm">
+        <i class="fa-solid fa-plus me-1"></i> Record Expense
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Financial Stat Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-6 col-lg-3 reveal-up delay-1">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-primary"><i class="fa-solid fa-file-invoice"></i></div>
+      </div>
+      <div class="stat-number" data-target="{{ total_billed|floatformat:0 }}" data-prefix="₹" data-countup>₹{{ total_billed|floatformat:2 }}</div>
+      <div class="mt-1" style="color:var(--text-muted);font-size:0.8rem;font-weight:500;">Total Billed</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3 reveal-up delay-2">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-success"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+      </div>
+      <div class="stat-number" data-target="{{ total_collected|floatformat:0 }}" data-prefix="₹" data-countup>₹{{ total_collected|floatformat:2 }}</div>
+      <div class="mt-1" style="color:var(--text-muted);font-size:0.8rem;font-weight:500;">Total Collected</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3 reveal-up delay-3">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-danger"><i class="fa-solid fa-scale-unbalanced"></i></div>
+      </div>
+      <div class="stat-number" style="background:linear-gradient(135deg,var(--danger),#f97316);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;" data-target="{{ total_outstanding|floatformat:0 }}" data-prefix="₹" data-countup>₹{{ total_outstanding|floatformat:2 }}</div>
+      <div class="mt-1" style="color:var(--text-muted);font-size:0.8rem;font-weight:500;">Outstanding Arrears</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3 reveal-up delay-4">
+    <div class="stat-card">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-icon-wrapper stat-icon-warning"><i class="fa-solid fa-money-bill-transfer"></i></div>
+      </div>
+      <div class="stat-number" data-target="{{ total_expenses|floatformat:0 }}" data-prefix="₹" data-countup>₹{{ total_expenses|floatformat:2 }}</div>
+      <div class="mt-1" style="color:var(--text-muted);font-size:0.8rem;font-weight:500;">Total Expenses</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Chart -->
+  <div class="col-lg-6 reveal-up delay-1">
+    <div class="card-saas h-100">
+      <div class="card-saas-header">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:28px;height:28px;border-radius:8px;background:var(--success-light);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-chart-column" style="color:var(--success);font-size:0.8rem;"></i>
+          </div>
+          <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Inflow vs Outflow (₹)</span>
+        </div>
+      </div>
+      <div class="card-saas-body">
+        <canvas id="financeChart" height="160"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Invoices -->
+  <div class="col-lg-6 reveal-up delay-2">
+    <div class="card-saas h-100">
+      <div class="card-saas-header">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:28px;height:28px;border-radius:8px;background:var(--danger-light);display:flex;align-items:center;justify-content:center;">
+            <i class="fa-solid fa-clock-rotate-left" style="color:var(--danger);font-size:0.8rem;"></i>
+          </div>
+          <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Pending Invoices</span>
+        </div>
+        <a href="{% url 'fees:invoice_list' %}" style="font-size:0.8rem;color:var(--primary);font-weight:500;">All Invoices →</a>
+      </div>
+      <div class="card-saas-body p-0">
+        <div class="table-responsive">
+          <table class="table-saas mb-0" style="font-size:0.83rem;">
+            <thead><tr><th>Student</th><th>Class</th><th>Due</th><th>Balance</th><th></th></tr></thead>
+            <tbody>
+              {% for inv in unpaid_invoices %}
+                <tr>
+                  <td class="fw-semibold" style="color:var(--text-main);">{{ inv.student_enrollment.student.full_name }}</td>
+                  <td style="color:var(--text-muted);">{{ inv.student_enrollment.section.full_name }}</td>
+                  <td style="color:var(--text-muted);">{{ inv.due_date|date:"d M" }}</td>
+                  <td class="fw-bold" style="color:var(--danger);">₹{{ inv.balance_amount }}</td>
+                  <td><a href="{% url 'fees:invoice_detail' inv.pk %}" class="btn-saas-primary" style="padding:0.3rem 0.75rem;font-size:0.75rem;">Collect</a></td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5" class="text-center py-5" style="color:var(--success);">
+                  <i class="fa-solid fa-circle-check mb-2 d-block" style="font-size:2rem;opacity:0.7;"></i>
+                  <span class="small fw-semibold">All fees collected!</span>
+                </td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const ctx = document.getElementById('financeChart');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Fee Collections', 'Operating Expenses'],
+        datasets: [{
+          data: {{ chart_finance|safe }},
+          backgroundColor: ['rgba(16,185,129,0.85)', 'rgba(239,68,68,0.85)'],
+          borderRadius: 10,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Class-Wise Fee Structures | Horizon School ERP{% endblock %}
+{% block page_heading %}Class-Wise Fee Structures &amp; Schedules{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold text-dark mb-1">Class-Wise Fee Structures</h4>
+    <p class="text-muted small mb-0">
+      Configure tuition, laboratory, developmental, and admission rates by class. 
+      <span class="badge bg-success-subtle text-success ms-2"><i class="fa-solid fa-cloud-arrow-up me-1"></i> Live Synced to Public Website</span>
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'fees:structure_create' %}" class="btn btn-primary btn-sm fw-semibold rounded-3">
+      <i class="fa-solid fa-plus me-1"></i> Add Fee Head
+    </a>
+    <a href="/admissions/#sec-admissions-tuition" target="_blank" class="btn btn-outline-info btn-sm fw-semibold rounded-3">
+      <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> View on Public Portal
+    </a>
+  </div>
+</div>
+
+<!-- Class x Fee Category Interactive Matrix Grid -->
+<div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4 bg-white">
+  <div class="card-header bg-light py-3 px-4 d-flex justify-content-between align-items-center border-bottom border-light">
+    <div class="d-flex align-items-center gap-2">
+      <i class="fa-solid fa-table-cells text-primary fs-5"></i>
+      <h6 class="fw-bold text-dark mb-0">Class-Wise Rate Matrix Grid ({{ academic_year.name|default:"Active Session" }})</h6>
+    </div>
+    <span class="badge bg-primary-subtle text-primary small">{{ matrix|length }} Class Levels Configured</span>
+  </div>
+
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr style="font-size:0.82rem;">
+            <th class="ps-4" style="min-width:180px;">Class Level</th>
+            {% for cat in categories %}
+              <th class="text-center" style="min-width:140px;">
+                <div>{{ cat.name }}</div>
+                <small class="text-muted fw-normal" style="font-size:0.72rem;">{{ cat.get_category_type_display }}</small>
+              </th>
+            {% endfor %}
+            <th class="text-end pe-4 fw-bold text-dark" style="min-width:150px;">Total Combined / Yr</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in matrix %}
+            <tr>
+              <td class="ps-4">
+                <div class="fw-bold text-dark">{{ row.class_level.name }}</div>
+                <span class="badge bg-light text-secondary border" style="font-size:0.7rem;">{{ row.class_level.department.name|default:"General" }}</span>
+              </td>
+              {% for item in row.items %}
+                <td class="text-center">
+                  {% if item.structure %}
+                    <div class="fw-bold text-primary">₹{{ item.amount|floatformat:0 }}</div>
+                    <div class="d-flex align-items-center justify-content-center gap-1 mt-1">
+                      <span class="badge bg-secondary-subtle text-secondary" style="font-size:0.65rem;">{{ item.structure.get_frequency_display }}</span>
+                      <a href="{% url 'fees:structure_edit' item.structure.id %}" class="text-muted small hover-primary" title="Edit Rate">
+                        <i class="fa-solid fa-pen-to-square" style="font-size:0.75rem;"></i>
+                      </a>
+                    </div>
+                  {% else %}
+                    <a href="{% url 'fees:structure_create' %}?class_level={{ row.class_level.id }}&fee_category={{ item.category.id }}" class="btn btn-sm btn-light py-0 px-2 text-muted border border-dashed rounded-pill" style="font-size:0.72rem;">
+                      <i class="fa-solid fa-plus"></i> Set
+                    </a>
+                  {% endif %}
+                </td>
+              {% endfor %}
+              <td class="text-end pe-4 fw-bold text-success fs-6">
+                ₹{{ row.total|floatformat:0 }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="{{ categories|length|add:2 }}" class="text-center text-muted py-5">
+                <i class="fa-solid fa-receipt fs-1 text-muted d-block mb-2"></i>
+                No fee structures configured yet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Detailed Fee Rules Itemized List -->
+<div class="card shadow-sm border-0 rounded-4 overflow-hidden bg-white">
+  <div class="card-header bg-light py-3 px-4 d-flex justify-content-between align-items-center">
+    <h6 class="fw-bold text-dark mb-0">Itemized Fee Structure Rules</h6>
+    <span class="badge bg-secondary-subtle text-secondary">{{ structures|length }} Rules</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4">Academic Year</th>
+            <th>Class Level</th>
+            <th>Fee Head Category</th>
+            <th>Amount (₹)</th>
+            <th>Billing Schedule</th>
+            <th>Due Date</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for struct in structures %}
+            <tr>
+              <td class="ps-4 small text-muted">{{ struct.academic_year.name }}</td>
+              <td class="fw-bold text-dark">{{ struct.class_level.name }}</td>
+              <td><span class="badge bg-primary-subtle text-primary">{{ struct.fee_category.name }}</span></td>
+              <td class="fw-bold text-success fs-6">₹{{ struct.amount }}</td>
+              <td><span class="badge bg-light text-secondary border">{{ struct.get_frequency_display }}</span></td>
+              <td class="small text-muted">{{ struct.due_date|date:"d M Y"|default:"Periodic" }}</td>
+              <td class="text-end pe-4">
+                <div class="btn-group btn-group-sm">
+                  <a href="{% url 'fees:structure_edit' struct.id %}" class="btn btn-outline-secondary btn-sm" title="Edit Fee Rate">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </a>
+                  <a href="{% url 'fees:structure_delete' struct.id %}" class="btn btn-outline-danger btn-sm" title="Delete Fee Head">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">No detailed rules recorded.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Student{% else %}Enroll New Student{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Floating Label */
+  .float-field { position: relative; margin-bottom: 1.5rem; }
+  .float-field input, .float-field select, .float-field textarea {
+    background: var(--input-bg) !important;
+    border: 1.5px solid var(--input-border) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--text-main) !important;
+    padding: 1.1rem 0.9rem 0.5rem 0.9rem !important;
+    font-size: 0.9rem !important;
+    width: 100%;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+    outline: none !important;
+  }
+  .float-field input:focus, .float-field select:focus, .float-field textarea:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.12) !important;
+  }
+  .float-label {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.9rem;
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    font-weight: 500;
+  }
+  .float-field input:focus ~ .float-label,
+  .float-field input:not(:placeholder-shown) ~ .float-label,
+  .float-field select:focus ~ .float-label,
+  .float-field select:not([value=""]) ~ .float-label,
+  .float-field textarea:focus ~ .float-label,
+  .float-field textarea:not(:placeholder-shown) ~ .float-label {
+    top: 0.25rem;
+    font-size: 0.7rem;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* Profile Preview Card */
+  .profile-preview {
+    position: sticky;
+    top: calc(var(--topbar-height) + 1rem);
+  }
+  .preview-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--violet));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: #fff;
+    font-weight: 800;
+    margin: 0 auto 1rem;
+    box-shadow: 0 8px 32px var(--primary-glow);
+    transition: all 0.3s var(--ease-spring);
+    font-family: 'Geist', sans-serif;
+  }
+
+  /* Section Tabs */
+  .section-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.1rem;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.25s var(--ease-smooth);
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.875rem;
+  }
+  .section-tab:hover { background: var(--primary-light); color: var(--primary); }
+  .section-tab.active { background: linear-gradient(135deg, var(--primary), var(--violet)); color: #fff; box-shadow: 0 4px 16px var(--primary-glow); }
+  .section-tab .tab-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+  }
+  .section-tab:not(.active) .tab-icon { background: var(--bg-main); color: var(--text-muted); }
+
+  /* Form Sections */
+  .form-section { display: none; }
+  .form-section.active { display: block; animation: slideUp 0.4s var(--ease-spring) both; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Hero -->
+<div class="page-hero reveal-up mb-4">
+  <div class="d-flex align-items-center gap-3">
+    <div style="width:42px;height:42px;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--primary),var(--violet));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;box-shadow:0 4px 16px var(--primary-glow);">
+      <i class="fa-solid fa-user-graduate"></i>
+    </div>
+    <div>
+      <h4 class="fw-bold mb-0" style="font-family:'Geist',sans-serif;">
+        {% if form.instance.pk %}Edit Student Profile{% else %}Enroll New Student{% endif %}
+      </h4>
+      <p class="mb-0 small" style="color:var(--text-muted);">
+        {% if form.instance.pk %}Update student academic & personal details{% else %}Complete all sections to register a new student{% endif %}
+      </p>
+    </div>
+  </div>
+</div>
+
+<form method="post" enctype="multipart/form-data" novalidate id="studentForm">
+  {% csrf_token %}
+  <div class="row g-4">
+
+    <!-- Left: Nav + Sections -->
+    <div class="col-lg-8">
+
+      <!-- Section Navigation Tabs -->
+      <div class="card-saas mb-4 reveal-up delay-1">
+        <div class="card-saas-body" style="padding:0.75rem;">
+          <div class="d-flex gap-2 flex-wrap">
+            <div class="section-tab active" onclick="switchTab(0)" id="tab0">
+              <div class="tab-icon"><i class="fa-solid fa-user"></i></div>
+              Personal Info
+            </div>
+            <div class="section-tab" onclick="switchTab(1)" id="tab1">
+              <div class="tab-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+              Academic Details
+            </div>
+            <div class="section-tab" onclick="switchTab(2)" id="tab2">
+              <div class="tab-icon"><i class="fa-solid fa-lock"></i></div>
+              Account Setup
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 0: Personal Info -->
+      <div class="card-saas reveal-up delay-2">
+        <div class="card-saas-body">
+          <div id="section0" class="form-section active">
+            <h6 class="fw-bold mb-3" style="color:var(--text-main);font-size:0.95rem;">
+              <i class="fa-solid fa-user me-2" style="color:var(--primary);"></i>Personal Information
+            </h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.first_name }}
+                  <label class="float-label">First Name *</label>
+                  {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.last_name }}
+                  <label class="float-label">Last Name *</label>
+                  {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.date_of_birth }}
+                  <label class="float-label">Date of Birth *</label>
+                  {% if form.date_of_birth.errors %}<div class="text-danger small mt-1">{{ form.date_of_birth.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.gender }}
+                  <label class="float-label">Gender *</label>
+                  {% if form.gender.errors %}<div class="text-danger small mt-1">{{ form.gender.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.nationality }}
+                  <label class="float-label">Nationality</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.blood_group }}
+                  <label class="float-label">Blood Group</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="float-field">
+                  {{ form.address }}
+                  <label class="float-label">Residential Address</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.emergency_contact_name }}
+                  <label class="float-label">Emergency Contact Name</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.emergency_contact_phone }}
+                  <label class="float-label">Emergency Contact Phone</label>
+                </div>
+              </div>
+            </div>
+            <div class="text-end mt-3">
+              <button type="button" class="btn btn-saas-primary" onclick="switchTab(1)">
+                Next: Academic Details <i class="fa-solid fa-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 1: Academic Details -->
+          <div id="section1" class="form-section">
+            <h6 class="fw-bold mb-3" style="color:var(--text-main);font-size:0.95rem;">
+              <i class="fa-solid fa-graduation-cap me-2" style="color:var(--primary);"></i>Academic Enrollment Details
+            </h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.academic_year }}
+                  <label class="float-label">Academic Year *</label>
+                  {% if form.academic_year.errors %}<div class="text-danger small mt-1">{{ form.academic_year.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.section }}
+                  <label class="float-label">Class & Section *</label>
+                  {% if form.section.errors %}<div class="text-danger small mt-1">{{ form.section.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.roll_number }}
+                  <label class="float-label">Roll Number</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.admission_number }}
+                  <label class="float-label">Admission Number</label>
+                  {% if form.admission_number.errors %}<div class="text-danger small mt-1">{{ form.admission_number.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.admission_date }}
+                  <label class="float-label">Admission Date *</label>
+                  {% if form.admission_date.errors %}<div class="text-danger small mt-1">{{ form.admission_date.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.student_status }}
+                  <label class="float-label">Enrollment Status</label>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between mt-3">
+              <button type="button" class="btn btn-saas-secondary" onclick="switchTab(0)">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back
+              </button>
+              <button type="button" class="btn btn-saas-primary" onclick="switchTab(2)">
+                Next: Account Setup <i class="fa-solid fa-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 2: Account Setup -->
+          <div id="section2" class="form-section">
+            <h6 class="fw-bold mb-3" style="color:var(--text-main);font-size:0.95rem;">
+              <i class="fa-solid fa-lock me-2" style="color:var(--primary);"></i>Portal Account Credentials
+            </h6>
+            <div class="row g-3">
+              <div class="col-12">
+                <div class="float-field">
+                  {{ form.email }}
+                  <label class="float-label">Email Address *</label>
+                  {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              {% if not form.instance.pk %}
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.password1 }}
+                  <label class="float-label">Password *</label>
+                  {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.password2 }}
+                  <label class="float-label">Confirm Password *</label>
+                  {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+              {% endif %}
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-saas-secondary" onclick="switchTab(1)">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back
+              </button>
+              <button type="submit" class="btn btn-saas-primary" id="submitBtn">
+                <i class="fa-solid fa-check me-1"></i>
+                {% if form.instance.pk %}Save Changes{% else %}Register Student{% endif %}
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Live Profile Preview -->
+    <div class="col-lg-4">
+      <div class="profile-preview reveal-up delay-3">
+        <div class="card-saas">
+          <div class="card-saas-header">
+            <span class="fw-bold small" style="color:var(--text-main);">Live Preview</span>
+            <span style="background:var(--success-light);color:var(--success);padding:2px 8px;border-radius:6px;font-size:0.72rem;font-weight:600;">
+              <span style="width:6px;height:6px;background:var(--success);border-radius:50%;display:inline-block;margin-right:4px;"></span>Live
+            </span>
+          </div>
+          <div class="card-saas-body text-center">
+            <div class="preview-avatar" id="previewAvatar">S</div>
+            <h6 class="fw-bold mb-1" id="previewName" style="color:var(--text-main);font-family:'Geist',sans-serif;">New Student</h6>
+            <p class="small mb-3" id="previewSection" style="color:var(--text-muted);">Class & Section</p>
+
+            <div style="background:var(--bg-main);border-radius:var(--radius-md);padding:0.75rem;text-align:left;">
+              <div class="d-flex justify-content-between py-1" style="border-bottom:1px solid var(--card-border);">
+                <span class="small" style="color:var(--text-muted);">Status</span>
+                <span class="small fw-semibold" style="color:var(--success);">● Active</span>
+              </div>
+              <div class="d-flex justify-content-between py-1" style="border-bottom:1px solid var(--card-border);">
+                <span class="small" style="color:var(--text-muted);">Gender</span>
+                <span class="small fw-semibold" id="previewGender" style="color:var(--text-main);">—</span>
+              </div>
+              <div class="d-flex justify-content-between py-1">
+                <span class="small" style="color:var(--text-muted);">Blood Group</span>
+                <span class="small fw-semibold" id="previewBlood" style="color:var(--text-main);">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form errors summary -->
+        {% if form.errors %}
+          <div class="card-saas mt-3" style="border-color:rgba(239,68,68,0.3);">
+            <div class="card-saas-body py-2">
+              <p class="small fw-bold mb-2" style="color:var(--danger);">
+                <i class="fa-solid fa-circle-exclamation me-1"></i>Please fix these errors:
+              </p>
+              {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                  <div class="small mb-1" style="color:var(--danger);">• {{ field }}: {{ error }}</div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function switchTab(idx) {
+    for (let i = 0; i < 3; i++) {
+      document.getElementById('section' + i).classList.toggle('active', i === idx);
+      document.getElementById('tab' + i).classList.toggle('active', i === idx);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Live preview sync
+  function syncPreview() {
+    const fn = document.getElementById('id_first_name')?.value.trim() || '';
+    const ln = document.getElementById('id_last_name')?.value.trim() || '';
+    const name = (fn + ' ' + ln).trim() || 'New Student';
+    const initials = (fn[0] || 'S') + (ln[0] || '');
+
+    document.getElementById('previewName').textContent = name;
+    document.getElementById('previewAvatar').textContent = initials.toUpperCase();
+
+    const genderEl = document.getElementById('id_gender');
+    if (genderEl) {
+      const gText = genderEl.options[genderEl.selectedIndex]?.text || '—';
+      document.getElementById('previewGender').textContent = gText !== '---------' ? gText : '—';
+    }
+    const bloodEl = document.getElementById('id_blood_group');
+    if (bloodEl) {
+      const bText = bloodEl.options[bloodEl.selectedIndex]?.text || '—';
+      document.getElementById('previewBlood').textContent = bText !== '---------' ? bText : '—';
+    }
+    const sectionEl = document.getElementById('id_section');
+    if (sectionEl) {
+      const sText = sectionEl.options[sectionEl.selectedIndex]?.text || 'Class & Section';
+      document.getElementById('previewSection').textContent = sText !== '---------' ? sText : 'Class & Section';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    ['id_first_name','id_last_name','id_gender','id_blood_group','id_section'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', syncPreview);
+      if (el) el.addEventListener('change', syncPreview);
+    });
+    syncPreview();
+
+    // Add placeholders so float labels work correctly
+    document.querySelectorAll('.float-field input, .float-field select, .float-field textarea').forEach(el => {
+      if (!el.getAttribute('placeholder')) el.setAttribute('placeholder', ' ');
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Asset Allocations{% endblock %}
+{% block page_heading %}Asset Custody & Allocations{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Asset Custody Ledger</h5>
+    <p class="text-muted small mb-0">Total {{ paginator.count }} custody records.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'inventory:dashboard' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Dashboard</a>
+    <a href="{% url 'inventory:allocation_create' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> New Allocation</a>
+  </div>
+</div>
+
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Asset Item</th>
+            <th>Custodian (User / Department)</th>
+            <th>Quantity</th>
+            <th>Allocation Date</th>
+            <th>Return Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for alloc in allocations %}
+            <tr>
+              <td>
+                <div class="fw-semibold text-dark">{{ alloc.item.name }}</div>
+                <small class="text-muted">{{ alloc.item.item_code }}</small>
+              </td>
+              <td>
+                {% if alloc.allocated_to_user %}
+                  <div class="fw-semibold text-dark">{{ alloc.allocated_to_user.get_full_name|default:alloc.allocated_to_user.email }}</div>
+                  <small class="text-muted">Staff Custodian</small>
+                {% elif alloc.department %}
+                  <div class="fw-semibold text-dark">{{ alloc.department.name }}</div>
+                  <small class="text-muted">Department Lab</small>
+                {% else %}
+                  <span class="text-muted">Unassigned</span>
+                {% endif %}
+              </td>
+              <td class="fw-bold text-primary">{{ alloc.quantity }}</td>
+              <td class="small">{{ alloc.allocated_date|date:"d M Y" }}</td>
+              <td class="small text-muted">{{ alloc.return_date|date:"d M Y"|default:"-" }}</td>
+              <td>
+                {% if alloc.status == 'ACTIVE' %}
+                  <span class="badge bg-primary-subtle text-primary">In Custody</span>
+                {% elif alloc.status == 'RETURNED' %}
+                  <span class="badge bg-success-subtle text-success">Returned</span>
+                {% else %}
+                  <span class="badge bg-danger-subtle text-danger">Damaged</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if alloc.status == 'ACTIVE' %}
+                  <form method="post" action="{% url 'inventory:allocation_return' alloc.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-success py-0" data-confirm="Return allocated asset back to inventory?">
+                      <i class="fa-solid fa-arrow-turn-down-left me-1"></i> Return Asset
+                    </button>
+                  </form>
+                {% else %}
+                  <small class="text-muted">Closed</small>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4 small">No asset custody records found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

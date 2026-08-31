@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}Salary Slip: {{ slip.slip_number }} | Horizon SMS{% endblock %}
+{% block page_heading %}Employee Pay Stub / Salary Slip{% endblock %}
+
+{% block extra_css %}
+<style>
+  .slip-container {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(16px);
+  }
+
+  .slip-header-brand {
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .slip-table-col {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .slip-item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.88rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  }
+
+  .slip-item-row:last-child {
+    border-bottom: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-lg-10">
+
+    <!-- Top Action Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <a href="{% url 'staff:payroll_period_detail' slip.payroll_period.pk %}" class="btn btn-sm btn-saas-secondary">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Payroll Period
+      </a>
+
+      <div class="d-flex gap-2">
+        <a href="{% url 'staff:salary_slip_print' slip.pk %}" target="_blank" class="btn btn-sm btn-primary">
+          <i class="fa-solid fa-print me-1"></i> Print Official Pay Slip
+        </a>
+      </div>
+    </div>
+
+    <!-- Official Pay Stub Card -->
+    <div class="slip-container">
+      <!-- School Header -->
+      <div class="slip-header-brand d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--violet));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.6rem;">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold mb-0" style="color:var(--text-main);">Horizon Public School</h4>
+            <span class="text-muted small">Sector 14, Rohini, New Delhi - 110085 (Affiliated to CBSE) &bull; Official Salary Slip</span>
+          </div>
+        </div>
+
+        <div class="text-end">
+          <span class="badge bg-primary-subtle text-primary font-monospace fs-6 px-3 py-2">{{ slip.slip_number }}</span>
+          <div class="text-muted small mt-1">Disbursed on: {{ slip.payment_date|date:"d M Y" }}</div>
+        </div>
+      </div>
+
+      <!-- Employee Details Grid -->
+      <div class="row g-3 mb-4 p-3 rounded-3" style="background:rgba(255,255,255,0.02); border:1px solid var(--card-border);">
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small text-uppercase d-block" style="font-size:0.7rem;">Employee Name</span>
+          <strong style="color:var(--text-main);">{{ slip.staff_member.full_name }}</strong>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small text-uppercase d-block" style="font-size:0.7rem;">Employee ID</span>
+          <strong class="font-monospace text-primary">{{ slip.staff_member.employee_id }}</strong>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small text-uppercase d-block" style="font-size:0.7rem;">Designation</span>
+          <strong style="color:var(--text-main);">{{ slip.staff_member.designation.title }}</strong>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small text-uppercase d-block" style="font-size:0.7rem;">Department</span>
+          <strong style="color:var(--text-main);">{{ slip.staff_member.department.name|default:"Faculty" }}</strong>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small text-uppercase d-block" style="font-size:0.7rem;">Pay Period</span>
+          <strong class="text-info">{{ slip.payroll_period.get_month_display }} {{ slip.payroll_period.year }}</strong>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small text-uppercase d-block" style="font-size:0.7rem;">Payment Method</span>
+          <strong style="color:var(--text-main);">{{ slip.get_payment_method_display }}</strong>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small text-uppercase d-block" style="font-size:0.7rem;">NEFT / UTR Reference</span>
+          <strong class="font-monospace small text-muted">{{ slip.transaction_reference|default:"NEFT-DIRECT-CREDIT" }}</strong>
+        </div>
+        <div class="col-sm-6 col-md-3">
+          <span class="text-muted small text-uppercase d-block" style="font-size:0.7rem;">Payment Status</span>
+          <span class="badge bg-success-subtle text-success">{{ slip.get_payment_status_display }}</span>
+        </div>
+      </div>
+
+      <!-- Itemized Earnings vs Deductions -->
+      <div class="row g-4 mb-4">
+        <!-- Earnings Column -->
+        <div class="col-md-6">
+          <div class="slip-table-col h-100">
+            <h6 class="fw-bold text-success mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+              <i class="fa-solid fa-plus-circle me-1"></i> Gross Earnings &amp; Allowances (₹)
+            </h6>
+
+            <div class="slip-item-row">
+              <span>Basic Salary</span>
+              <strong>₹{{ slip.basic_salary|floatformat:2 }}</strong>
+            </div>
+            <div class="slip-item-row">
+              <span>House Rent Allowance (HRA)</span>
+              <strong>+₹{{ slip.allowance_hra|floatformat:2 }}</strong>
+            </div>
+            <div class="slip-item-row">
+              <span>Dearness / Transport Allowance (DA/TA)</span>
+              <strong>+₹{{ slip.allowance_transport|floatformat:2 }}</strong>
+            </div>
+            <div class="slip-item-row">
+              <span>Medical Allowance</span>
+              <strong>+₹{{ slip.allowance_medical|floatformat:2 }}</strong>
+            </div>
+            <div class="slip-item-row">
+              <span>Special Academic Allowance</span>
+              <strong>+₹{{ slip.allowance_special|floatformat:2 }}</strong>
+            </div>
+            {% if slip.incentives_bonus > 0 %}
+              <div class="slip-item-row">
+                <span>Incentives &amp; Bonus</span>
+                <strong class="text-success">+₹{{ slip.incentives_bonus|floatformat:2 }}</strong>
+              </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between pt-3 mt-2 border-top border-success border-opacity-25 fs-6 fw-bold text-success">
+              <span>Total Gross Earnings:</span>
+              <span>₹{{ slip.gross_salary|floatformat:2 }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deductions Column -->
+        <div class="col-md-6">
+          <div class="slip-table-col h-100">
+            <h6 class="fw-bold text-danger mb-3 pb-2 border-bottom border-secondary border-opacity-10">
+              <i class="fa-solid fa-minus-circle me-1"></i> Statutory &amp; Institutional Deductions (₹)
+            </h6>
+
+            <div class="slip-item-row">
+              <span>Income Tax / TDS (Sec 192)</span>
+              <strong>-₹{{ slip.deduction_tax|floatformat:2 }}</strong>
+            </div>
+            <div class="slip-item-row">
+              <span>Employee Provident Fund (EPF @ 12%)</span>
+              <strong>-₹{{ slip.deduction_pf|floatformat:2 }}</strong>
+            </div>
+            <div class="slip-item-row">
+              <span>ESI / Group Health Insurance</span>
+              <strong>-₹{{ slip.deduction_insurance|floatformat:2 }}</strong>
+            </div>
+            {% if slip.deduction_leave_penalty > 0 %}
+              <div class="slip-item-row">
+                <span>Loss of Pay (LWP)</span>
+                <strong>-₹{{ slip.deduction_leave_penalty|floatformat:2 }}</strong>
+              </div>
+            {% endif %}
+            {% if slip.deduction_other > 0 %}
+              <div class="slip-item-row">
+                <span>Professional Tax / Other</span>
+                <strong>-₹{{ slip.deduction_other|floatformat:2 }}</strong>
+              </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between pt-3 mt-2 border-top border-danger border-opacity-25 fs-6 fw-bold text-danger">
+              <span>Total Deductions:</span>
+              <span>-₹{{ slip.total_deductions|floatformat:2 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Net Payout Banner -->
+      <div class="p-4 rounded-3 text-center mb-4" style="background:linear-gradient(135deg, rgba(79,70,229,0.12), rgba(16,185,129,0.15)); border:1px solid rgba(16,185,129,0.3);">
+        <span class="text-muted text-uppercase small fw-bold">Net Salary Payable (Take Home)</span>
+        <h2 class="fw-bold text-success mb-0 my-1">₹{{ slip.net_salary|floatformat:2 }}</h2>
+        <span class="text-muted small font-monospace">Basic + Allowances - Deductions</span>
+      </div>
+
+      <!-- Signature & Institutional Seal Section -->
+      <div class="row pt-4 mt-4 border-top border-secondary border-opacity-10 text-center">
+        <div class="col-4">
+          <div style="height:40px;"></div>
+          <div class="border-top pt-2 small fw-bold text-muted">Employee Signature</div>
+        </div>
+        <div class="col-4">
+          <div style="height:40px;"></div>
+          <div class="border-top pt-2 small fw-bold text-muted">Accounts Department</div>
+        </div>
+        <div class="col-4">
+          <div style="height:40px;"></div>
+          <div class="border-top pt-2 small fw-bold text-muted">Principal / Authorized Signatory</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

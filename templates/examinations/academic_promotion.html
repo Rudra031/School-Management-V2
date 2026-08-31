@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Academic Class Promotion Engine - Horizon Public School{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+          <li class="breadcrumb-item"><a href="{% url 'examinations:schedule_list' %}" class="text-decoration-none text-muted">Exams Studio</a></li>
+          <li class="breadcrumb-item active text-success fw-semibold" aria-current="page">Class Promotion</li>
+        </ol>
+      </nav>
+      <h4 class="fw-bold mb-0 text-gradient-primary">
+        <i class="fa-solid fa-graduation-cap text-success me-2"></i> Academic Progression &amp; Annual Promotion
+      </h4>
+      <p class="text-muted small mb-0">Evaluate annual final results and advance passing students to the next higher grade level for session <strong>{{ to_year.name|default:"Next Academic Session" }}</strong>.</p>
+    </div>
+  </div>
+
+  <!-- Filter & Class Selector -->
+  <div class="card-saas p-3 mb-4">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-6">
+        <label class="form-label small fw-bold">Select Current Section to Promote</label>
+        <select name="section" class="form-select form-select-sm" onchange="this.form.submit()">
+          {% for sec in sections %}
+            <option value="{{ sec.id }}" {% if selected_section.id == sec.id %}selected{% endif %}>{{ sec.full_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6 text-end">
+        <span class="text-muted small d-block">Current Session: <strong>{{ from_year.name }}</strong> &rarr; Target: <strong>{{ to_year.name|default:"2027-28" }}</strong></span>
+      </div>
+    </form>
+  </div>
+
+  <!-- Promotion Table -->
+  <div class="card-saas p-0 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" style="font-size:0.85rem;">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3">Roll &amp; Student Name</th>
+            <th>Admission #</th>
+            <th>Annual Aggregate %</th>
+            <th>Promotion Assessment</th>
+            <th class="pe-3 text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sp in students_promotion_data %}
+            <tr>
+              <td class="ps-3">
+                <span class="fw-bold font-monospace text-primary me-2">#{{ sp.enrollment.roll_number|default:"—" }}</span>
+                <strong>{{ sp.student.full_name }}</strong>
+              </td>
+              <td class="font-monospace text-muted">{{ sp.student.admission_number }}</td>
+              <td class="fw-bold fs-6 font-monospace">{{ sp.percentage }}%</td>
+              <td>
+                <span class="badge {{ sp.badge_class }} p-2">{{ sp.recommendation }}</span>
+              </td>
+              <td class="pe-3 text-end">
+                <button class="btn btn-sm btn-outline-success" onclick="alert('Student {{ sp.student.full_name }} assigned to next grade level!')">
+                  <i class="fa-solid fa-arrow-up me-1"></i> Approve Promotion
+                </button>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center py-4 text-muted">No student enrollment records in this section.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

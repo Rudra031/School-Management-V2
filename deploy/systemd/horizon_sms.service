@@ -1,0 +1,14 @@
+[Unit]
+Description=Horizon School Management System Gunicorn Service
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/school_management
+ExecStart=/var/www/school_management/venv/bin/gunicorn --config deploy/gunicorn/gunicorn.conf.py config.wsgi:application
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

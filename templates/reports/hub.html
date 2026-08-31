@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Executive Reports Hub{% endblock %}
+{% block page_heading %}Institutional Intelligence & Reports Hub{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Executive Analytics & Consolidated Reports</h5>
+    <p class="text-muted small mb-0">{{ academic_year.name|default:"Active Academic Session" }} | Institutional Governance Portal</p>
+  </div>
+</div>
+
+<!-- Report Navigation Cards -->
+<div class="row g-4">
+  <div class="col-md-6 col-lg-4">
+    <div class="card-saas h-100 p-4 d-flex flex-column">
+      <div class="stat-icon-wrapper stat-icon-primary mb-3"><i class="fa-solid fa-users-line"></i></div>
+      <h5 class="fw-bold text-dark mb-1">Student Demographics</h5>
+      <p class="text-muted small mb-4">Enrollment distribution by grade level, gender diversity ratios, and cohort status analytics.</p>
+      <a href="{% url 'reports:demographics' %}" class="btn btn-outline-primary btn-sm mt-auto w-100">
+        <i class="fa-solid fa-chart-simple me-1"></i> View Demographics Report
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card-saas h-100 p-4 d-flex flex-column">
+      <div class="stat-icon-wrapper stat-icon-success mb-3"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+      <h5 class="fw-bold text-dark mb-1">Financial Statement (P&L)</h5>
+      <p class="text-muted small mb-4">Comprehensive institutional Profit & Loss statement, fee collections vs operational expenditures.</p>
+      <a href="{% url 'reports:financial' %}" class="btn btn-outline-success btn-sm mt-auto w-100">
+        <i class="fa-solid fa-scale-balanced me-1"></i> View Financial P&L
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card-saas h-100 p-4 d-flex flex-column">
+      <div class="stat-icon-wrapper stat-icon-info mb-3"><i class="fa-solid fa-user-check"></i></div>
+      <h5 class="fw-bold text-dark mb-1">Attendance Matrix</h5>
+      <p class="text-muted small mb-4">Campus attendance percentages, chronic absenteeism thresholds (<75%), and class registers.</p>
+      <a href="{% url 'attendance:report' %}" class="btn btn-outline-info btn-sm mt-auto w-100">
+        <i class="fa-solid fa-calendar-check me-1"></i> View Attendance Analytics
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card-saas h-100 p-4 d-flex flex-column">
+      <div class="stat-icon-wrapper stat-icon-warning mb-3"><i class="fa-solid fa-boxes-stacked"></i></div>
+      <h5 class="fw-bold text-dark mb-1">Inventory & Valuation</h5>
+      <p class="text-muted small mb-4">Institutional fixed asset valuation, stock exhaustion warnings, and departmental allocations.</p>
+      <a href="{% url 'inventory:dashboard' %}" class="btn btn-outline-warning btn-sm mt-auto w-100">
+        <i class="fa-solid fa-boxes-stacked me-1"></i> View Inventory Valuation
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card-saas h-100 p-4 d-flex flex-column">
+      <div class="stat-icon-wrapper stat-icon-primary mb-3"><i class="fa-solid fa-graduation-cap"></i></div>
+      <h5 class="fw-bold text-dark mb-1">Admissions Pipeline</h5>
+      <p class="text-muted small mb-4">Prospective recruitment conversion rates, enquiry bottlenecks, and enrollment status tracking.</p>
+      <a href="{% url 'admissions:pipeline' %}" class="btn btn-outline-primary btn-sm mt-auto w-100">
+        <i class="fa-solid fa-timeline me-1"></i> View Admissions Funnel
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card-saas h-100 p-4 d-flex flex-column">
+      <div class="stat-icon-wrapper stat-icon-danger mb-3"><i class="fa-solid fa-clipboard-user"></i></div>
+      <h5 class="fw-bold text-dark mb-1">Staff Directory & Roster</h5>
+      <p class="text-muted small mb-4">Complete faculty roster, departmental designations, and qualification directories with CSV export.</p>
+      <a href="{% url 'staff:staff_list' %}" class="btn btn-outline-danger btn-sm mt-auto w-100">
+        <i class="fa-solid fa-address-book me-1"></i> View Staff Roster
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

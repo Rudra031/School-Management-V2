@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load core_tags %}
+{% block title %}Class Tabulation Sheet & Result Master - Horizon Public School{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1 small">
+          <li class="breadcrumb-item"><a href="{% url 'examinations:schedule_list' %}" class="text-decoration-none text-muted">Exams Studio</a></li>
+          <li class="breadcrumb-item active text-primary fw-semibold" aria-current="page">Class Tabulation Master</li>
+        </ol>
+      </nav>
+      <h4 class="fw-bold mb-0 text-gradient-primary">
+        <i class="fa-solid fa-table-cells text-warning me-2"></i> Class Results Tabulation Sheet
+      </h4>
+      <p class="text-muted small mb-0">Class-wide consolidated mark matrix with GPA, percentage, pass/fail status, and section rankings.</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <a href="{% url 'examinations:academic_promotion' %}" class="btn btn-sm btn-outline-success">
+        <i class="fa-solid fa-graduation-cap me-1"></i> Class Promotion Engine
+      </a>
+      <button onclick="window.print()" class="btn btn-sm btn-outline-secondary">
+        <i class="fa-solid fa-print me-1"></i> Print Tabulation Sheet
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter Selector -->
+  <div class="card-saas p-3 mb-4 no-print">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-5">
+        <label class="form-label small fw-bold">Select Examination Term</label>
+        <select name="term" class="form-select form-select-sm" onchange="this.form.submit()">
+          {% for t in terms %}
+            <option value="{{ t.id }}" {% if selected_term.id == t.id %}selected{% endif %}>{{ t.title }} ({{ t.academic_year.name }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-5">
+        <label class="form-label small fw-bold">Select Class &amp; Section</label>
+        <select name="section" class="form-select form-select-sm" onchange="this.form.submit()">
+          {% for sec in sections %}
+            <option value="{{ sec.id }}" {% if selected_section.id == sec.id %}selected{% endif %}>{{ sec.full_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2 text-end">
+        <button type="submit" class="btn btn-sm btn-primary w-100"><i class="fa-solid fa-filter me-1"></i> Load Matrix</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Class Summary Metrics Strip -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+      <div class="card-saas p-3 text-center">
+        <span class="text-muted small text-uppercase fw-bold">Total Students</span>
+        <h3 class="fw-bold text-primary mb-0 mt-1">{{ total_students }}</h3>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card-saas p-3 text-center">
+        <span class="text-muted small text-uppercase fw-bold">Pass Rate</span>
+        <h3 class="fw-bold text-success mb-0 mt-1">{{ pass_rate }}%</h3>
+        <span class="text-muted" style="font-size:0.7rem;">{{ passed_count }} Passed</span>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card-saas p-3 text-center">
+        <span class="text-muted small text-uppercase fw-bold">Class Average</span>
+        <h3 class="fw-bold text-dark mb-0 mt-1">{{ class_average }}%</h3>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card-saas p-3 text-center">
+        <span class="text-muted small text-uppercase fw-bold">Highest Score</span>
+        <h3 class="fw-bold text-warning mb-0 mt-1">{{ highest_pct }}%</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabulation Table -->
+  <div class="card-saas p-0 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover align-middle mb-0 text-center" style="font-size:0.8rem;">
+        <thead class="table-dark">
+          <tr>
+            <th style="width:50px;">Roll</th>
+            <th class="text-start" style="min-width:180px;">Student Name</th>
+            <th style="width:100px;">Adm #</th>
+            {% for sch in schedules %}
+              <th>
+                <div class="text-truncate" style="max-width:90px;" title="{{ sch.subject.name }}">{{ sch.subject.name }}</div>
+                <div class="text-muted" style="font-size:0.65rem;">Max: {{ sch.max_marks|floatformat:0 }}</div>
+              </th>
+            {% endfor %}
+            <th class="bg-primary text-white" style="width:90px;">Total</th>
+            <th class="bg-primary text-white" style="width:70px;">%</th>
+            <th class="bg-primary text-white" style="width:60px;">Grade</th>
+            <th style="width:60px;">Rank</th>
+            <th style="width:90px;">Result</th>
+            <th class="no-print" style="width:80px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for srow in student_rows %}
+            <tr class="{% if not srow.is_pass %}table-danger bg-opacity-25{% endif %}">
+              <td class="fw-bold font-monospace">#{{ srow.enrollment.roll_number|default:"—" }}</td>
+              <td class="text-start fw-semibold">
+                {{ srow.student.full_name }}
+              </td>
+              <td class="font-monospace text-muted">{{ srow.student.admission_number }}</td>
+              
+              <!-- Subject Marks Columns -->
+              {% for sch in schedules %}
+                {% with mark=srow.subject_marks|get_item:sch.id %}
+                  <td>
+                    {% if mark.is_absent %}
+                      <span class="badge bg-secondary">AB</span>
+                    {% elif mark.is_medical %}
+                      <span class="badge bg-warning text-dark">MED</span>
+                    {% else %}
+                      <span class="{% if not mark.passed %}text-danger fw-bold{% else %}text-dark{% endif %}">
+                        {{ mark.obtained|floatformat:0 }}
+                      </span>
+                    {% endif %}
+                  </td>
+                {% endwith %}
+              {% endfor %}
+
+              <td class="fw-bold bg-light font-monospace">{{ srow.total_obtained|floatformat:0 }}</td>
+              <td class="fw-bold text-primary font-monospace">{{ srow.percentage }}%</td>
+              <td><span class="badge bg-primary-subtle text-primary">{{ srow.grade }}</span></td>
+              <td>
+                <span class="badge bg-warning text-dark fw-bold font-monospace">#{{ srow.rank }}</span>
+              </td>
+              <td>
+                {% if srow.is_pass %}
+                  <span class="badge bg-success text-white">PASSED</span>
+                {% else %}
+                  <span class="badge bg-danger text-white">COMPART</span>
+                {% endif %}
+              </td>
+              <td class="no-print">
+                <a href="{% url 'examinations:report_card' srow.student.id %}?term={{ selected_term.id }}" class="btn btn-sm btn-outline-primary py-0 px-2" title="View Report Card">
+                  <i class="fa-solid fa-file-invoice"></i>
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="{{ schedules|length|add:'8' }}" class="text-center py-5 text-muted">
+                No marks entered yet for this section. Use the Marks Entry Grid to publish scores.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

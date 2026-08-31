@@ -1,0 +1,527 @@
+{% extends "base.html" %}
+
+{% block title %}Student Directory | Horizon SMS{% endblock %}
+{% block page_heading %}Student Management Directory{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ==========================================================================
+     STUDENT DIRECTORY — LUXURY GRID & SEARCH SYSTEM
+     ========================================================================== */
+  
+  /* Floating Glass Search & Command Bar */
+  .student-search-capsule {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-input-wrapper i {
+    position: absolute;
+    left: 14px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    pointer-events: none;
+  }
+
+  .student-search-input {
+    width: 100%;
+    padding: 9px 14px 9px 40px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .student-search-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow-sm);
+  }
+
+  .filter-select-custom {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text-main);
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    height: 40px;
+  }
+
+  .filter-select-custom:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow-sm);
+  }
+
+  /* View Mode Toggle Pill */
+  .view-mode-toggle {
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 3px;
+  }
+
+  .view-mode-btn {
+    padding: 5px 10px;
+    border-radius: 7px;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+  }
+
+  .view-mode-btn:hover {
+    color: var(--text-main);
+  }
+
+  .view-mode-btn.active {
+    background: linear-gradient(135deg, var(--primary), var(--violet));
+    color: #ffffff;
+    box-shadow: 0 2px 8px var(--primary-glow);
+  }
+
+  /* Luxury Student Grid Card */
+  .student-grid-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-xs);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: transform 0.25s var(--ease-spring), box-shadow 0.25s ease, border-color 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .student-grid-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(129, 140, 248, 0.4);
+  }
+
+  .student-grid-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--violet));
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .student-grid-card:hover::before {
+    opacity: 1;
+  }
+
+  .student-card-avatar-frame {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+  }
+
+  .student-card-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    object-fit: cover;
+    background: linear-gradient(135deg, var(--primary), var(--violet));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    font-weight: 800;
+    font-family: 'Geist', sans-serif;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+  }
+
+  .student-card-beacon {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    border: 2px solid var(--card-bg);
+  }
+
+  .student-card-beacon.active {
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+  }
+
+  .student-card-beacon.graduated {
+    background: var(--primary);
+    box-shadow: 0 0 8px var(--primary);
+  }
+
+  .student-card-beacon.transferred {
+    background: var(--warning);
+    box-shadow: 0 0 8px var(--warning);
+  }
+
+  .chip-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: 'Geist', sans-serif;
+  }
+
+  .info-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+
+  .info-tag-row i {
+    width: 14px;
+    text-align: center;
+    color: var(--primary);
+    font-size: 0.75rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header & Top Management Toolbar -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="d-flex align-items-center gap-2">
+      <h5 class="fw-bold mb-0" style="color:var(--text-main);"><i class="fa-solid fa-user-graduate text-primary me-2"></i> Student Directory</h5>
+      <span class="badge bg-primary-subtle text-primary font-monospace">{{ paginator.count }} Total</span>
+    </div>
+    <span class="text-muted small">Centralized directory of all active enrolled students and alumni records</span>
+  </div>
+
+  <div class="d-flex gap-2 flex-wrap">
+    <div class="btn-group">
+      <a href="{% url 'students:student_export' %}?format=excel" class="btn btn-saas-secondary btn-sm" title="Export Excel">
+        <i class="fa-solid fa-file-excel text-success me-1"></i> Excel
+      </a>
+      <a href="{% url 'students:student_export' %}?format=csv" class="btn btn-saas-secondary btn-sm" title="Export CSV">
+        <i class="fa-solid fa-file-csv text-primary me-1"></i> CSV
+      </a>
+    </div>
+    <a href="{% url 'students:student_promote' %}" class="btn btn-saas-secondary btn-sm">
+      <i class="fa-solid fa-arrow-up-right-dots me-1"></i> Batch Promotion
+    </a>
+    <a href="{% url 'students:student_register' %}" class="btn btn-saas-primary btn-sm">
+      <i class="fa-solid fa-user-plus me-1"></i> Enroll Student
+    </a>
+  </div>
+</div>
+
+<!-- =========================================================================
+     1. ULTRA-SLEEK FLOATING SEARCH & FILTER CAPSULE
+     ========================================================================= -->
+<div class="student-search-capsule">
+  <form method="get" class="row g-2 align-items-center">
+    <!-- Keep view mode parameter -->
+    <input type="hidden" name="view" value="{{ view_mode }}">
+
+    <!-- Search Input -->
+    <div class="col-lg-5 col-md-12">
+      <div class="search-input-wrapper">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" 
+               name="search" 
+               class="student-search-input" 
+               placeholder="Search by student name, admission #, or ID..." 
+               value="{{ search_query }}"
+               autocomplete="off">
+      </div>
+    </div>
+
+    <!-- Class Level Filter -->
+    <div class="col-lg-2 col-sm-4">
+      <select name="class_level" class="form-select filter-select-custom">
+        <option value="">All Classes</option>
+        {% for cl in classes %}
+          <option value="{{ cl.id }}" {% if selected_class == cl.id|stringformat:"s" %}selected{% endif %}>{{ cl.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="col-lg-2 col-sm-4">
+      <select name="status" class="form-select filter-select-custom">
+        <option value="">All Statuses</option>
+        <option value="ACTIVE" {% if selected_status == "ACTIVE" %}selected{% endif %}>Active Enrolled</option>
+        <option value="GRADUATED" {% if selected_status == "GRADUATED" %}selected{% endif %}>Graduated</option>
+        <option value="TRANSFERRED" {% if selected_status == "TRANSFERRED" %}selected{% endif %}>Transferred</option>
+      </select>
+    </div>
+
+    <!-- Filter Buttons & Mode Switcher -->
+    <div class="col-lg-3 col-sm-4 d-flex align-items-center justify-content-between gap-2">
+      <div class="d-flex gap-1 flex-grow-1">
+        <button type="submit" class="btn btn-saas-primary btn-sm flex-grow-1" style="height:40px;">
+          <i class="fa-solid fa-filter me-1"></i> Filter
+        </button>
+        {% if search_query or selected_class or selected_status or selected_gender %}
+          <a href="{% url 'students:student_list' %}?view={{ view_mode }}" class="btn btn-saas-secondary btn-sm d-flex align-items-center justify-content-center" style="height:40px;" title="Clear Filters">
+            <i class="fa-solid fa-rotate-left"></i>
+          </a>
+        {% endif %}
+      </div>
+
+      <!-- View Switcher (Grid vs List) -->
+      <div class="view-mode-toggle">
+        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_class %}class_level={{ selected_class }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}view=grid" 
+           class="view-mode-btn {% if view_mode == 'grid' %}active{% endif %}" 
+           title="Grid View">
+          <i class="fa-solid fa-grip"></i>
+        </a>
+        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_class %}class_level={{ selected_class }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}view=table" 
+           class="view-mode-btn {% if view_mode == 'table' %}active{% endif %}" 
+           title="Table View">
+          <i class="fa-solid fa-list"></i>
+        </a>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- =========================================================================
+     2. GRID STYLE VIEW (DEFAULT)
+     ========================================================================= -->
+{% if view_mode == 'grid' %}
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-4">
+    {% for student in students %}
+      <div class="col">
+        <div class="student-grid-card">
+          <!-- Top Header Strip: Class & Roll Number -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="chip-pill bg-primary-subtle text-primary fw-semibold">
+              <i class="fa-solid fa-school me-1"></i> {{ student.current_class_section }}
+            </span>
+            <span class="chip-pill bg-secondary-subtle text-secondary font-monospace fw-bold">
+              Roll #{{ student.current_enrollment.roll_number|default:"—" }}
+            </span>
+          </div>
+
+          <!-- Identity: Avatar & Names -->
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="student-card-avatar-frame">
+              {% if student.photo %}
+                <img src="{{ student.photo.url }}" alt="{{ student.full_name }}" class="student-card-avatar">
+              {% else %}
+                <div class="student-card-avatar">
+                  {{ student.first_name|first }}{{ student.last_name|first }}
+                </div>
+              {% endif %}
+              <span class="student-card-beacon {% if student.status == 'ACTIVE' %}active{% elif student.status == 'GRADUATED' %}graduated{% else %}transferred{% endif %}" 
+                    title="Status: {{ student.get_status_display }}"></span>
+            </div>
+
+            <div class="overflow-hidden flex-grow-1">
+              <h6 class="fw-bold mb-0 text-truncate" style="color:var(--text-main);">
+                <a href="{% url 'students:student_detail' student.pk %}" class="text-decoration-none" style="color:var(--text-main);">
+                  {{ student.full_name }}
+                </a>
+              </h6>
+              <span class="text-muted font-monospace d-block" style="font-size:0.72rem;">{{ student.admission_number }}</span>
+              <div class="d-flex align-items-center gap-1 mt-1">
+                {% if student.status == 'ACTIVE' %}
+                  <span class="badge bg-success-subtle text-success" style="font-size:0.65rem;">Active</span>
+                {% elif student.status == 'GRADUATED' %}
+                  <span class="badge bg-primary-subtle text-primary" style="font-size:0.65rem;">Graduated</span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning" style="font-size:0.65rem;">{{ student.get_status_display }}</span>
+                {% endif %}
+                {% if student.blood_group %}
+                  <span class="badge bg-danger-subtle text-danger" style="font-size:0.65rem;"><i class="fa-solid fa-droplet"></i> {{ student.blood_group }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Micro Info Matrix -->
+          <div class="mb-3 pt-2 border-top border-secondary border-opacity-10 flex-grow-1">
+            <div class="info-tag-row">
+              <i class="fa-regular fa-calendar text-info"></i>
+              <span>DOB: <strong style="color:var(--text-main);">{{ student.date_of_birth|date:"M d, Y" }}</strong></span>
+            </div>
+            <div class="info-tag-row">
+              <i class="fa-solid fa-venus-mars text-primary"></i>
+              <span>Gender: <strong style="color:var(--text-main);">{{ student.get_gender_display }}</strong></span>
+            </div>
+            <div class="info-tag-row">
+              <i class="fa-solid fa-phone text-success"></i>
+              <span>Emergency: <strong class="font-monospace" style="color:var(--text-main); font-size:0.75rem;">{{ student.emergency_contact_phone|default:"Unrecorded" }}</strong></span>
+            </div>
+          </div>
+
+          <!-- Card Footer Actions -->
+          <div class="pt-2 border-top border-secondary border-opacity-10 d-flex justify-content-between align-items-center gap-2">
+            <a href="{% url 'students:student_detail' student.pk %}" class="btn btn-saas-secondary btn-sm flex-grow-1 py-1" style="font-size:0.78rem;">
+              <i class="fa-solid fa-id-badge me-1 text-primary"></i> Profile <i class="fa-solid fa-arrow-right ms-1 small"></i>
+            </a>
+            <a href="{% url 'students:student_health' student.pk %}" class="btn btn-outline-danger btn-sm py-1 px-2" style="font-size:0.78rem;" title="Medical Dossier">
+              <i class="fa-solid fa-heart-pulse"></i>
+            </a>
+            <a href="{% url 'students:student_edit' student.pk %}" class="btn btn-outline-secondary btn-sm py-1 px-2" style="font-size:0.78rem;" title="Edit Student">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center py-5">
+        <div class="p-4 rounded-4" style="background:var(--card-bg); border:1px solid var(--card-border); max-width:450px; margin:0 auto;">
+          <i class="fa-solid fa-user-xmark fs-1 text-muted mb-3 opacity-50"></i>
+          <h6 class="fw-bold mb-1" style="color:var(--text-main);">No Students Found</h6>
+          <p class="text-muted small mb-3">No student records match your current search query or filter criteria.</p>
+          <a href="{% url 'students:student_list' %}?view=grid" class="btn btn-saas-primary btn-sm">
+            <i class="fa-solid fa-rotate-left me-1"></i> Clear Filters
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+<!-- =========================================================================
+     3. TABLE STYLE VIEW (FALLBACK)
+     ========================================================================= -->
+{% else %}
+  <div class="card-saas p-0 overflow-hidden mb-4">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead class="table-light">
+          <tr class="small text-muted">
+            <th>ADMISSION #</th>
+            <th>STUDENT NAME</th>
+            <th>CLASS &amp; SECTION</th>
+            <th>ROLL #</th>
+            <th>GENDER</th>
+            <th>STATUS</th>
+            <th>EMERGENCY PHONE</th>
+            <th class="text-end">ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+            <tr>
+              <td class="fw-bold font-monospace text-primary small">{{ student.admission_number }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold" style="width:34px; height:34px; font-size:0.8rem;">
+                    {{ student.first_name|first }}{{ student.last_name|first }}
+                  </div>
+                  <div>
+                    <a href="{% url 'students:student_detail' student.pk %}" class="fw-semibold text-decoration-none" style="color:var(--text-main);">
+                      {{ student.full_name }}
+                    </a>
+                    <div class="text-muted" style="font-size:0.72rem;">DOB: {{ student.date_of_birth|date:"M d, Y" }}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge bg-light text-dark border">{{ student.current_class_section }}</span></td>
+              <td class="font-monospace fw-bold small text-info">#{{ student.current_enrollment.roll_number|default:"—" }}</td>
+              <td class="small">{{ student.get_gender_display }}</td>
+              <td>
+                {% if student.status == 'ACTIVE' %}
+                  <span class="badge bg-success-subtle text-success">Active</span>
+                {% elif student.status == 'GRADUATED' %}
+                  <span class="badge bg-primary-subtle text-primary">Graduated</span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary">{{ student.get_status_display }}</span>
+                {% endif %}
+              </td>
+              <td class="small text-muted font-monospace">{{ student.emergency_contact_phone }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a href="{% url 'students:student_detail' student.pk %}" class="btn btn-xs btn-outline-primary">Profile</a>
+                  <a href="{% url 'students:student_health' student.pk %}" class="btn btn-xs btn-outline-danger" title="Health Dossier"><i class="fa-solid fa-heart-pulse"></i></a>
+                  <a href="{% url 'students:student_edit' student.pk %}" class="btn btn-xs btn-outline-secondary" title="Edit Student"><i class="fa-solid fa-pen-to-square"></i></a>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted small">No students found matching current filters.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
+
+<!-- =========================================================================
+     4. MODERN PAGINATION CONTROLS
+     ========================================================================= -->
+{% if is_paginated %}
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+    <span class="text-muted small">
+      Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} ({{ page_obj.paginator.count }} total students)
+    </span>
+    <nav>
+      <ul class="pagination pagination-sm mb-0">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_class %}class_level={{ selected_class }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}view={{ view_mode }}&page={{ page_obj.previous_page_number }}">
+              <i class="fa-solid fa-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for p in page_obj.paginator.page_range %}
+          {% if p == page_obj.number %}
+            <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+          {% elif p > page_obj.number|add:"-3" and p < page_obj.number|add:"3" %}
+            <li class="page-item">
+              <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_class %}class_level={{ selected_class }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}view={{ view_mode }}&page={{ p }}">{{ p }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_class %}class_level={{ selected_class }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}view={{ view_mode }}&page={{ page_obj.next_page_number }}">
+              <i class="fa-solid fa-chevron-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+{% endif %}
+
+{% endblock %}

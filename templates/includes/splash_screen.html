@@ -1,0 +1,619 @@
+{% load static %}
+{% if show_login_splash or request.GET.preview_splash %}
+<!-- ==========================================================================
+     HORIZON SMS — INTELLIGENT LOGIN SPLASH SCREEN
+     ========================================================================== -->
+<div id="horizonSplashScreen" class="horizon-splash-overlay" role="dialog" aria-modal="true" aria-label="Loading Dashboard">
+  <!-- Ambient Atmospheric Glow Layers -->
+  <div class="splash-ambient-orb splash-orb-1"></div>
+  <div class="splash-ambient-orb splash-orb-2"></div>
+  <div class="splash-ambient-orb splash-orb-3"></div>
+
+  <!-- Splash Glass Card -->
+  <div class="splash-glass-card" id="splashGlassCard">
+    <!-- Top School Brand Crest -->
+    <div class="splash-crest-wrapper">
+      <div class="splash-orbit-ring ring-1"></div>
+      <div class="splash-orbit-ring ring-2"></div>
+      <div class="splash-crest-glow"></div>
+      <div class="splash-crest-icon">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+    </div>
+
+    <div class="splash-school-name">
+      {{ school.name|default:"Horizon International Academy" }}
+    </div>
+
+    <!-- User Persona Showcase -->
+    <div class="splash-user-container">
+      <div class="splash-avatar-frame">
+        {% if request.user.avatar %}
+          <img src="{{ request.user.avatar.url }}" alt="{{ request.user.full_name }}" class="splash-avatar-img">
+        {% else %}
+          <div class="splash-avatar-fallback">
+            {{ request.user.first_name|default:request.user.email|slice:":1"|upper }}
+          </div>
+        {% endif %}
+        <span class="splash-status-dot" title="Authenticated"></span>
+      </div>
+
+      <!-- Personalized Greeting -->
+      <div class="splash-greeting-line">
+        <span id="splashTimeGreeting">Welcome back</span>, 
+        <strong class="splash-user-name">{{ request.user.full_name|default:request.user.email }}</strong>
+      </div>
+
+      <!-- Role Badge Pill -->
+      <div class="splash-role-pill">
+        {% if request.user.is_superadmin %}
+          <i class="fa-solid fa-crown text-warning"></i>
+          <span>Super Administrator</span>
+        {% elif request.user.is_principal %}
+          <i class="fa-solid fa-shield-halved text-primary"></i>
+          <span>Principal / Executive</span>
+        {% elif request.user.is_school_admin %}
+          <i class="fa-solid fa-user-shield text-info"></i>
+          <span>School Administrator</span>
+        {% elif request.user.is_teacher %}
+          <i class="fa-solid fa-chalkboard-user text-success"></i>
+          <span>Faculty Member / Teacher</span>
+        {% elif request.user.is_accountant %}
+          <i class="fa-solid fa-calculator text-warning"></i>
+          <span>Finance & Accounts Officer</span>
+        {% elif request.user.is_librarian %}
+          <i class="fa-solid fa-book-bookmark text-info"></i>
+          <span>Chief Librarian</span>
+        {% elif request.user.is_student %}
+          <i class="fa-solid fa-user-graduate text-primary"></i>
+          <span>Student Portal</span>
+        {% elif request.user.is_parent %}
+          <i class="fa-solid fa-users-rectangle text-teal"></i>
+          <span>Parent / Guardian</span>
+        {% elif request.user.is_support_staff %}
+          <i class="fa-solid fa-id-badge text-secondary"></i>
+          <span>Support Staff</span>
+        {% else %}
+          <i class="fa-solid fa-user-check text-primary"></i>
+          <span>{{ request.user.get_user_type_display|default:"Authorized User" }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Dynamic Status & Progress Bar -->
+    <div class="splash-progress-wrapper">
+      <div class="splash-status-text" id="splashStatusTicker">Authenticating credentials...</div>
+      
+      <div class="splash-progress-track">
+        <div class="splash-progress-fill" id="splashProgressBar">
+          <div class="splash-progress-shimmer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Dismiss / Skip Prompt -->
+    <div class="splash-skip-hint">
+      <span class="splash-kbd-pill">ESC</span> or click anywhere to skip
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ==========================================================================
+     SPLASH SCREEN STYLES
+     ========================================================================== */
+  .horizon-splash-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    overflow: hidden;
+    user-select: none;
+    cursor: pointer;
+    transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Theme-aware backgrounds */
+  [data-theme="dark"] .horizon-splash-overlay {
+    background: radial-gradient(circle at 50% 30%, rgba(15, 23, 42, 0.96) 0%, rgba(5, 10, 24, 0.99) 100%);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+  }
+
+  [data-theme="light"] .horizon-splash-overlay {
+    background: radial-gradient(circle at 50% 30%, rgba(248, 250, 252, 0.95) 0%, rgba(226, 232, 240, 0.98) 100%);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+  }
+
+  /* Ambient Glow Orbs */
+  .splash-ambient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.45;
+    pointer-events: none;
+    animation: splashFloat 6s ease-in-out infinite alternate;
+  }
+
+  .splash-orb-1 {
+    width: 380px;
+    height: 380px;
+    top: 15%;
+    left: 20%;
+    background: radial-gradient(circle, rgba(79, 70, 229, 0.55), rgba(99, 102, 241, 0));
+  }
+
+  .splash-orb-2 {
+    width: 420px;
+    height: 420px;
+    bottom: 15%;
+    right: 20%;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.45), rgba(14, 165, 233, 0));
+    animation-delay: -3s;
+  }
+
+  .splash-orb-3 {
+    width: 300px;
+    height: 300px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.25), rgba(245, 158, 11, 0));
+    animation-delay: -1.5s;
+  }
+
+  @keyframes splashFloat {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-25px) scale(1.08); }
+  }
+
+  /* Central Glass Card */
+  .splash-glass-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 490px;
+    padding: 2.25rem 2rem 1.75rem;
+    border-radius: 28px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: splashCardIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    cursor: default;
+  }
+
+  [data-theme="dark"] .splash-glass-card {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.6),
+                0 0 50px rgba(99, 102, 241, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  [data-theme="light"] .splash-glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.12),
+                0 0 40px rgba(79, 70, 229, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  @keyframes splashCardIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.9) translateY(18px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Crest and Orbitals */
+  .splash-crest-wrapper {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .splash-orbit-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px dashed rgba(99, 102, 241, 0.5);
+    pointer-events: none;
+  }
+
+  .ring-1 {
+    width: 86px;
+    height: 86px;
+    animation: splashSpin 8s linear infinite;
+  }
+
+  .ring-2 {
+    width: 100px;
+    height: 100px;
+    border-style: dotted;
+    border-color: rgba(6, 182, 212, 0.4);
+    animation: splashSpin 12s linear infinite reverse;
+  }
+
+  @keyframes splashSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .splash-crest-glow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(79, 70, 229, 0.5), transparent 70%);
+    filter: blur(8px);
+    animation: splashPulse 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes splashPulse {
+    0% { transform: scale(0.9); opacity: 0.5; }
+    100% { transform: scale(1.2); opacity: 0.9; }
+  }
+
+  .splash-crest-icon {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #ffffff;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.45);
+  }
+
+  .splash-school-name {
+    font-family: 'Geist', 'Inter', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1.4rem;
+    background: linear-gradient(135deg, #818cf8, #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  [data-theme="light"] .splash-school-name {
+    background: linear-gradient(135deg, #4338ca, #0284c7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* User Avatar & Info */
+  .splash-user-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .splash-avatar-frame {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    margin-bottom: 0.9rem;
+  }
+
+  .splash-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2.5px solid #6366f1;
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+  }
+
+  .splash-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+    border: 2.5px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .splash-status-dot {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #10b981;
+    border: 2.5px solid #0f172a;
+    box-shadow: 0 0 10px #10b981;
+  }
+
+  [data-theme="light"] .splash-status-dot {
+    border-color: #ffffff;
+  }
+
+  .splash-greeting-line {
+    font-size: 1.15rem;
+    font-weight: 400;
+    margin-bottom: 0.45rem;
+  }
+
+  [data-theme="dark"] .splash-greeting-line {
+    color: #cbd5e1;
+  }
+
+  [data-theme="light"] .splash-greeting-line {
+    color: #475569;
+  }
+
+  .splash-user-name {
+    font-weight: 700;
+  }
+
+  [data-theme="dark"] .splash-user-name {
+    color: #ffffff;
+  }
+
+  [data-theme="light"] .splash-user-name {
+    color: #0f172a;
+  }
+
+  /* Role Badge */
+  .splash-role-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0.35rem 0.95rem;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  [data-theme="dark"] .splash-role-pill {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+  }
+
+  [data-theme="light"] .splash-role-pill {
+    background: rgba(15, 23, 42, 0.06);
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    color: #334155;
+  }
+
+  /* Progress & Status Bar */
+  .splash-progress-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .splash-status-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    min-height: 1.2rem;
+    transition: opacity 0.2s ease;
+  }
+
+  [data-theme="dark"] .splash-status-text {
+    color: #94a3b8;
+  }
+
+  [data-theme="light"] .splash-status-text {
+    color: #64748b;
+  }
+
+  .splash-progress-track {
+    width: 100%;
+    height: 7px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  [data-theme="dark"] .splash-progress-track {
+    background: rgba(255, 255, 255, 0.09);
+  }
+
+  [data-theme="light"] .splash-progress-track {
+    background: rgba(15, 23, 42, 0.09);
+  }
+
+  .splash-progress-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #4f46e5, #06b6d4, #10b981);
+    position: relative;
+    transition: width 1.3s cubic-bezier(0.12, 0.8, 0.32, 1);
+    box-shadow: 0 0 14px rgba(6, 182, 212, 0.65);
+  }
+
+  .splash-progress-shimmer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: splashShimmer 1s infinite linear;
+  }
+
+  @keyframes splashShimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* Skip Hint */
+  .splash-skip-hint {
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+  }
+
+  .splash-skip-hint:hover {
+    opacity: 1;
+  }
+
+  [data-theme="dark"] .splash-skip-hint {
+    color: #64748b;
+  }
+
+  [data-theme="light"] .splash-skip-hint {
+    color: #94a3b8;
+  }
+
+  .splash-kbd-pill {
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 0.65rem;
+    font-family: monospace;
+    font-weight: 700;
+  }
+
+  [data-theme="dark"] .splash-kbd-pill {
+    background: rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  [data-theme="light"] .splash-kbd-pill {
+    background: rgba(15, 23, 42, 0.08);
+    color: #475569;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+  }
+
+  /* Dismiss Out Animation */
+  .horizon-splash-overlay.splash-dismissing {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  .horizon-splash-overlay.splash-dismissing .splash-glass-card {
+    transform: scale(1.05) translateY(-10px) !important;
+    opacity: 0 !important;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease !important;
+  }
+</style>
+
+<script>
+  (function() {
+    const splash = document.getElementById('horizonSplashScreen');
+    if (!splash) return;
+
+    // 1. Time-aware Dynamic Greeting
+    const greetingEl = document.getElementById('splashTimeGreeting');
+    if (greetingEl) {
+      const hour = new Date().getHours();
+      let greeting = "Welcome back";
+      if (hour >= 4 && hour < 12) {
+        greeting = "Good morning";
+      } else if (hour >= 12 && hour < 17) {
+        greeting = "Good afternoon";
+      } else if (hour >= 17 && hour <= 23) {
+        greeting = "Good evening";
+      }
+      greetingEl.textContent = greeting;
+    }
+
+    // 2. Dynamic Progress & Micro-step Status Ticker
+    const progressBar = document.getElementById('splashProgressBar');
+    const statusTicker = document.getElementById('splashStatusTicker');
+
+    // Trigger progress animation on next paint
+    requestAnimationFrame(() => {
+      if (progressBar) {
+        progressBar.style.width = '100%';
+      }
+    });
+
+    const statusSteps = [
+      { time: 0, text: "Authenticating credentials..." },
+      { time: 420, text: "Synchronizing academic workspace..." },
+      { time: 880, text: "Loading bell schedule & modules..." },
+      { time: 1250, text: "Ready! Welcome aboard." }
+    ];
+
+    statusSteps.forEach(step => {
+      setTimeout(() => {
+        if (statusTicker && splash && !splash.classList.contains('splash-dismissing')) {
+          statusTicker.style.opacity = '0';
+          setTimeout(() => {
+            statusTicker.textContent = step.text;
+            statusTicker.style.opacity = '1';
+          }, 120);
+        }
+      }, step.time);
+    });
+
+    // 3. Smooth Dismissal
+    let dismissed = false;
+    function dismissSplash() {
+      if (dismissed) return;
+      dismissed = true;
+      splash.classList.add('splash-dismissing');
+      setTimeout(() => {
+        if (splash.parentNode) {
+          splash.parentNode.removeChild(splash);
+        }
+      }, 450);
+    }
+
+    // Auto dismiss after 1.45s
+    const autoDismissTimer = setTimeout(dismissSplash, 1450);
+
+    // Fast-dismiss on Escape key or Click
+    function handleKeydown(e) {
+      if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+        clearTimeout(autoDismissTimer);
+        dismissSplash();
+        document.removeEventListener('keydown', handleKeydown);
+      }
+    }
+    document.addEventListener('keydown', handleKeydown);
+
+    splash.addEventListener('click', function(e) {
+      clearTimeout(autoDismissTimer);
+      dismissSplash();
+    });
+
+    // Global helper for developer/user preview
+    window.previewSplashScreen = function() {
+      window.location.href = window.location.pathname + '?preview_splash=1';
+    };
+  })();
+</script>
+{% endif %}

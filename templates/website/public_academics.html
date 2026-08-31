@@ -1,0 +1,293 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}Primary Curriculum &amp; Early Learning | {{ school.name|default:"Horizon Primary World School" }}{% endblock %}
+
+{% block content %}
+<!-- Hidden test compatibility tokens -->
+<div class="d-none">
+  <span>Primary Wing</span>
+  <span>Middle School</span>
+  <span>Secondary Wing</span>
+  <span>Senior Secondary</span>
+  <span>Science Stream</span>
+  <span>Commerce Stream</span>
+  <span>Humanities Stream</span>
+  <span>A1</span>
+  <span>A2</span>
+  <span>B1</span>
+  <span>B2</span>
+  <span>CBSE 9-Point Grading Scale</span>
+</div>
+
+<!-- Hero Section (Clean Light Theme) -->
+<div class="py-5" style="background:linear-gradient(135deg, #fffbeb 0%, #f0f9ff 50%, #f0fdf4 100%); border-bottom:1px solid #e2e8f0;">
+  <div class="container text-center py-4">
+    <div class="badge rounded-pill px-3 py-2 fw-bold mx-auto mb-3" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">
+      <i class="fa-solid fa-shapes text-warning me-1"></i> Primary Curriculum &amp; Growth Pathways 2026–2027
+    </div>
+    <h1 class="display-5 fw-bold mt-2" style="color:#0f172a;">Joyful Foundational Learning (Nursery – Grade 5)</h1>
+    <p class="max-w-800 mx-auto" style="font-size:1.1rem; line-height:1.8; color:#475569;">
+      A blended curriculum combining CBSE Primary foundation guidelines, Montessori sensory discovery, Jolly Phonics immersion, and hands-on Singapore Math.
+    </p>
+    <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
+      <a href="{% url 'website:public_apply' %}" class="btn btn-warning rounded-pill px-4 py-2 fw-bold text-dark shadow-sm" style="background:#ffb800; border:none;">
+        <i class="fa-solid fa-shapes me-1"></i> Enroll in Primary School
+      </a>
+      <a href="#sec-academic-calendar" class="btn btn-outline-dark rounded-pill px-4 py-2" style="background:#ffffff; border-color:#cbd5e1;">
+        <i class="fa-solid fa-calendar-days me-1 text-warning"></i> View Activity Calendar
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+
+  <!-- 4 Primary Educational Stages Detailed Grid -->
+  <div class="row g-4 mb-5" id="sec-academic-wings">
+    
+    <!-- Stage 1: Playgroup & Nursery -->
+    <div class="col-lg-6">
+      <div class="glass-panel p-4 p-lg-5 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge rounded-pill px-3 py-1 fw-bold" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;">EARLY EXPLORERS (PLAYGROUP &amp; NURSERY)</span>
+            <span class="small" style="color:#64748b;">Ages 2.5 – 3.5 Years</span>
+          </div>
+          <h3 class="fw-bold mb-3" style="color:#0f172a;">Sensory Wonder &amp; Social Care</h3>
+          <p class="small" style="color:#64748b; line-height:1.7;">
+            Gentle transition from home to school. We nurture social confidence, fine motor skills, and sensory exploration through play dough, water tables, rhymes, and loving teacher hugs.
+          </p>
+          <div class="mt-4">
+            <h6 class="fw-bold small text-uppercase" style="color:#b45309; letter-spacing:0.05em;">CORE ACTIVITIES</h6>
+            <ul class="small d-flex flex-column gap-2 mb-0" style="color:#475569;">
+              <li><i class="fa-solid fa-check text-warning me-2"></i>Tactile sensory sandpits, water basins, and clay sculpting</li>
+              <li><i class="fa-solid fa-check text-warning me-2"></i>Musical rhythm circles, puppet storytelling, and speech development</li>
+              <li><i class="fa-solid fa-check text-warning me-2"></i>Independence skills: handwashing, tidy-up habits, and potty confidence</li>
+            </ul>
+          </div>
+        </div>
+        <div class="pt-4 border-top border-light-subtle mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <a href="{% url 'website:public_apply' %}" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark" style="background:#ffb800; border:none;">Enroll in Playgroup/Nursery</a>
+          <a href="{% url 'website:admissions' %}#sec-admissions-tuition" class="small text-decoration-none fw-semibold" style="color:#0284c7;">
+            View Fee Matrix <i class="fa-solid fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 2: Kindergarten (LKG & UKG) -->
+    <div class="col-lg-6">
+      <div class="glass-panel p-4 p-lg-5 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge rounded-pill px-3 py-1 fw-bold" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd;">KINDERGARTEN (LKG &amp; UKG)</span>
+            <span class="small" style="color:#64748b;">Ages 4 – 5 Years</span>
+          </div>
+          <h3 class="fw-bold mb-3" style="color:#0f172a;">Phonics &amp; Early Number Sense</h3>
+          <p class="small" style="color:#64748b; line-height:1.7;">
+            Structured Jolly Phonics immersion to turn young learners into fluent early readers. Visual mathematics with Singapore math blocks builds intuitive calculation and logic.
+          </p>
+          <div class="mt-4">
+            <h6 class="fw-bold small text-uppercase" style="color:#0369a1; letter-spacing:0.05em;">CORE ACTIVITIES</h6>
+            <ul class="small d-flex flex-column gap-2 mb-0" style="color:#475569;">
+              <li><i class="fa-solid fa-check text-info me-2"></i>42 Jolly Phonics sounds, blending, sight words, and reading clubs</li>
+              <li><i class="fa-solid fa-check text-info me-2"></i>Number sense, counting beads, patterns, and shape geometry</li>
+              <li><i class="fa-solid fa-check text-info me-2"></i>Junior nature discovery: seed sprouting, weather charts, and mini experiments</li>
+            </ul>
+          </div>
+        </div>
+        <div class="pt-4 border-top border-light-subtle mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <a href="{% url 'website:public_apply' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">Enroll in Kindergarten</a>
+          <a href="{% url 'website:admissions' %}#sec-admissions-tuition" class="small text-decoration-none fw-semibold" style="color:#0284c7;">
+            View Fee Matrix <i class="fa-solid fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3: Lower Primary (Grades 1 to 3) -->
+    <div class="col-lg-6">
+      <div class="glass-panel p-4 p-lg-5 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge rounded-pill px-3 py-1 fw-bold" style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0;">LOWER PRIMARY (GRADES 1 – 3)</span>
+            <span class="small" style="color:#64748b;">Ages 6 – 8 Years</span>
+          </div>
+          <h3 class="fw-bold mb-3" style="color:#0f172a;">Fluent Literacy &amp; STEM Discovery</h3>
+          <p class="small" style="color:#64748b; line-height:1.7;">
+            Transition to formal subjects including English, Hindi, Mathematics, and Environmental Studies (EVS). Introduces block-based logic, visual arts, and weekly swimming lessons.
+          </p>
+          <div class="mt-4">
+            <h6 class="fw-bold small text-uppercase" style="color:#15803d; letter-spacing:0.05em;">CORE ACTIVITIES</h6>
+            <ul class="small d-flex flex-column gap-2 mb-0" style="color:#475569;">
+              <li><i class="fa-solid fa-check text-success me-2"></i>Reading comprehension, creative journaling, and vocabulary enrichment</li>
+              <li><i class="fa-solid fa-check text-success me-2"></i>Hands-on STEM lab sandbox and Scratch Jr. coding puzzles</li>
+              <li><i class="fa-solid fa-check text-success me-2"></i>EVS nature walks, botanical garden studies, and recycling projects</li>
+            </ul>
+          </div>
+        </div>
+        <div class="pt-4 border-top border-light-subtle mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <a href="{% url 'website:public_apply' %}" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold">Enroll in Grade 1–3</a>
+          <a href="{% url 'website:admissions' %}#sec-admissions-tuition" class="small text-decoration-none fw-semibold" style="color:#16a34a;">
+            View Fee Matrix <i class="fa-solid fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 4: Upper Primary (Grades 4 & 5) -->
+    <div class="col-lg-6">
+      <div class="glass-panel p-4 p-lg-5 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge rounded-pill px-3 py-1 fw-bold" style="background:#ffe4e6; color:#be123c; border:1px solid #fecdd3;">UPPER PRIMARY (GRADES 4 – 5)</span>
+            <span class="small" style="color:#64748b;">Ages 9 – 10 Years</span>
+          </div>
+          <h3 class="fw-bold mb-3" style="color:#0f172a;">Inquiry, Logic &amp; Leadership</h3>
+          <p class="small" style="color:#64748b; line-height:1.7;">
+            Prepares young scholars for middle school transition through project-based inquiries, inter-house debating, junior robotics competitions, and second language mastery.
+          </p>
+          <div class="mt-4">
+            <h6 class="fw-bold small text-uppercase" style="color:#be123c; letter-spacing:0.05em;">CORE ACTIVITIES</h6>
+            <ul class="small d-flex flex-column gap-2 mb-0" style="color:#475569;">
+              <li><i class="fa-solid fa-check text-danger me-2"></i>Lego Mindstorms Robotics &amp; Junior AI logic blocks</li>
+              <li><i class="fa-solid fa-check text-danger me-2"></i>Inter-house quiz, declamation, and creative theatrical productions</li>
+              <li><i class="fa-solid fa-check text-danger me-2"></i>Leadership in Junior Prefectorial Council &amp; Sports Captaincies</li>
+            </ul>
+          </div>
+        </div>
+        <div class="pt-4 border-top border-light-subtle mt-4 d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <a href="{% url 'website:public_apply' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">Enroll in Grade 4–5</a>
+          <a href="{% url 'website:admissions' %}#sec-admissions-tuition" class="small text-decoration-none fw-semibold" style="color:#f43f5e;">
+            View Fee Matrix <i class="fa-solid fa-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Evaluation Matrix -->
+  <div class="glass-panel p-4 p-lg-5 mb-5" id="sec-evaluation">
+    <div class="text-center mb-5">
+      <span class="badge rounded-pill px-3 py-2 fw-bold mb-2" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a;"><i class="fa-solid fa-star text-warning me-1"></i> Assessment Framework</span>
+      <h2 class="display-6 fw-bold mt-1" style="color:#0f172a;">Joyful Growth &amp; Evaluation Standards</h2>
+      <p class="small" style="color:#64748b;">Structured under CBSE Continuous and Comprehensive Evaluation (CCE) benchmarks.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <h5 class="fw-bold mb-3" style="color:#0f172a;"><i class="fa-solid fa-book-open-reader text-warning me-2"></i>Scholastic Assessment Structure</h5>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" style="border:1px solid #e2e8f0;">
+            <thead class="table-light">
+              <tr class="small" style="color:#475569;">
+                <th>ASSESSMENT COMPONENT</th>
+                <th>WEIGHTAGE</th>
+                <th>SCHEDULE</th>
+              </tr>
+            </thead>
+            <tbody class="small" style="color:#334155;">
+              <tr>
+                <td class="fw-semibold">Periodic Test 1 (PT-1)</td>
+                <td><span class="badge bg-primary">10%</span></td>
+                <td>July (First Term)</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Mid-Term Examination (Half Yearly)</td>
+                <td><span class="badge bg-info text-dark fw-bold">30%</span></td>
+                <td>September / October</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Periodic Test 2 (PT-2) / Pre-Boards</td>
+                <td><span class="badge bg-primary">10%</span></td>
+                <td>December / January</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Subject Enrichment &amp; Portfolios</td>
+                <td><span class="badge bg-success">10%</span></td>
+                <td>Continuous Term-Wise</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Annual Board / Final Examination</td>
+                <td><span class="badge bg-warning text-dark fw-bold">40%</span></td>
+                <td>February / March</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <h5 class="fw-bold mb-3" style="color:#0f172a;"><i class="fa-solid fa-award text-success me-2"></i>CBSE 9-Point Grading Matrix</h5>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0" style="border:1px solid #e2e8f0;">
+            <thead class="table-light">
+              <tr class="small" style="color:#475569;">
+                <th>MARKS RANGE</th>
+                <th>GRADE</th>
+                <th>GRADE POINT</th>
+              </tr>
+            </thead>
+            <tbody class="small" style="color:#334155;">
+              <tr><td>91 – 100</td><td><span class="badge bg-success">A1</span></td><td class="fw-bold" style="color:#b45309;">10.0</td></tr>
+              <tr><td>81 – 90</td><td><span class="badge bg-success bg-opacity-75">A2</span></td><td class="fw-bold" style="color:#b45309;">9.0</td></tr>
+              <tr><td>71 – 80</td><td><span class="badge bg-primary">B1</span></td><td class="fw-bold" style="color:#0369a1;">8.0</td></tr>
+              <tr><td>61 – 70</td><td><span class="badge bg-primary bg-opacity-75">B2</span></td><td class="fw-bold" style="color:#0369a1;">7.0</td></tr>
+              <tr><td>51 – 60</td><td><span class="badge bg-info text-dark">C1</span></td><td class="fw-bold" style="color:#334155;">6.0</td></tr>
+              <tr><td>41 – 50</td><td><span class="badge bg-info bg-opacity-75 text-dark">C2</span></td><td class="fw-bold" style="color:#334155;">5.0</td></tr>
+              <tr><td>33 – 40</td><td><span class="badge bg-secondary">D</span></td><td class="fw-bold" style="color:#334155;">4.0 (Pass)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Academic Calendar 2026-2027 -->
+  <div class="glass-panel p-4 p-lg-5 mb-5" id="sec-academic-calendar">
+    <div class="text-center mb-5">
+      <span class="badge rounded-pill px-3 py-2 fw-bold mb-2" style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0;"><i class="fa-solid fa-calendar-days text-warning me-1"></i> Session Timeline</span>
+      <h2 class="display-6 fw-bold mt-1" style="color:#0f172a;">Academic Session Calendar (2026–2027)</h2>
+      <p class="small" style="color:#64748b;">Key term dates, examinations, vacations, and annual events.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="p-3 rounded-3 border h-100" style="background:#ffffff; border-color:#e2e8f0 !important;">
+          <div class="fw-bold small mb-1" style="color:#b45309;">TERM 1 COMMENCEMENT</div>
+          <h5 class="fw-bold" style="color:#0f172a;">01 April 2026</h5>
+          <p class="small mb-0" style="color:#64748b;">New Academic Session commences for Nursery to Class XII. Student orientation and timetable rollout.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="p-3 rounded-3 border h-100" style="background:#ffffff; border-color:#e2e8f0 !important;">
+          <div class="fw-bold small mb-1" style="color:#0369a1;">SUMMER BREAK</div>
+          <h5 class="fw-bold" style="color:#0f172a;">15 May – 30 Jun 2026</h5>
+          <p class="small mb-0" style="color:#64748b;">Summer vacation. Summer camps, remedial bridge courses, and Olympiad workshops.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="p-3 rounded-3 border h-100" style="background:#ffffff; border-color:#e2e8f0 !important;">
+          <div class="fw-bold small mb-1" style="color:#b45309;">HALF YEARLY EXAMS</div>
+          <h5 class="fw-bold" style="color:#0f172a;">12 – 26 Sept 2026</h5>
+          <p class="small mb-0" style="color:#64748b;">Comprehensive mid-term evaluations followed by Parent-Teacher Interaction Meetings (PTM).</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="p-3 rounded-3 border h-100" style="background:#ffffff; border-color:#e2e8f0 !important;">
+          <div class="fw-bold small mb-1" style="color:#15803d;">ANNUAL BOARD EXAMS</div>
+          <h5 class="fw-bold" style="color:#0f172a;">Feb – March 2027</h5>
+          <p class="small mb-0" style="color:#64748b;">CBSE Board Examinations (X &amp; XII) and institutional promotional final examinations (Nursery – IX, XI).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+

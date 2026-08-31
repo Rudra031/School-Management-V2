@@ -1,0 +1,211 @@
+{% extends "website/public_base.html" %}
+{% load static %}
+
+{% block title %}Official Certificate &amp; TC Authentication Portal | Horizon Premier Public School{% endblock %}
+
+{% block extra_css %}
+<style>
+  .verify-hero {
+    background: radial-gradient(circle at 50% 20%, rgba(5, 150, 105, 0.2) 0%, rgba(0, 32, 91, 0.95) 70%, #001230 100%);
+    padding: 3.5rem 0 2.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .verify-card {
+    background: rgba(10, 25, 55, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 2.5rem;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .watermark-seal {
+    position: absolute;
+    right: -30px;
+    bottom: -30px;
+    font-size: 16rem;
+    color: rgba(255, 255, 255, 0.02);
+    pointer-events: none;
+  }
+
+  .data-row-pill {
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Banner -->
+<section class="verify-hero text-center">
+  <div class="container">
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-3" style="background:rgba(5, 150, 105, 0.2); border:1px solid rgba(5, 150, 105, 0.4); color:#6ee7b7; font-size:0.8rem; font-weight:600;">
+      <i class="fa-solid fa-shield-check"></i> Official CBSE Document Authentication Directorate
+    </div>
+    <h1 class="display-6 fw-bold text-white mb-2">Transfer &amp; Character Certificate Authenticator</h1>
+    <p class="text-white-50 max-w-700 mx-auto" style="font-size:1.05rem;">
+      Verify the cryptographic authenticity and official registry status of Transfer Certificates (TC), Character Certificates (CC), and Bonafide documents issued by the Registrar.
+    </p>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="max-w-800 mx-auto">
+    
+    <!-- Lookup Form -->
+    <div class="verify-card mb-4">
+      <form method="GET" action="{% url 'documents:certificate_verify_search' %}">
+        <label class="form-label text-white-50 small fw-semibold mb-2">Enter Certificate Number or Student Admission Number *</label>
+        <div class="input-group">
+          <input type="text" name="cert_no" value="{{ search_query|default:'' }}" class="form-control" placeholder="e.g. TC/2026/001, CC/2026/001, or ADM-2026-0419" required style="background:#001742; border-color:rgba(255,255,255,0.2); color:#fff; font-size:1rem; padding:0.75rem 1rem;">
+          <button type="submit" class="btn btn-warning fw-bold px-4" style="border-radius:0 10px 10px 0;">
+            <i class="fa-solid fa-magnifying-glass me-1"></i> Authenticate
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Results Display -->
+    {% if cert %}
+      {% if is_verified %}
+        <!-- AUTHENTIC & ACTIVE CERTIFICATE -->
+        <div class="verify-card" style="border-color:rgba(34, 197, 94, 0.4); background:rgba(10, 25, 55, 0.95);">
+          <div class="watermark-seal">
+            <i class="fa-solid fa-stamp"></i>
+          </div>
+
+          <!-- Header -->
+          <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-50 flex-wrap gap-2 position-relative" style="z-index:1;">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-success text-white fw-bold px-3 py-2 fs-6">
+                <i class="fa-solid fa-circle-check me-1"></i> OFFICIALLY VERIFIED &amp; AUTHENTIC
+              </span>
+              <span class="badge bg-secondary bg-opacity-50 text-white-50">{{ cert.get_certificate_type_display }}</span>
+            </div>
+            <div class="text-end">
+              <span class="badge bg-warning text-dark fw-bold px-3 py-1">{{ cert.certificate_number }}</span>
+              <div class="text-white-50 small mt-1" style="font-size:0.72rem;">Registry Sequence No.</div>
+            </div>
+          </div>
+
+          <!-- Certificate Record Details Grid -->
+          <div class="row g-3 mb-4 position-relative" style="z-index:1;">
+            <div class="col-sm-6">
+              <div class="data-row-pill">
+                <span class="text-white-50 small d-block">Student Full Name</span>
+                <h5 class="fw-bold text-white mb-0">{{ cert.student.full_name }}</h5>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="data-row-pill">
+                <span class="text-white-50 small d-block">Admission / Enrollment Number</span>
+                <h5 class="fw-bold text-warning mb-0">{{ cert.student.admission_number }}</h5>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="data-row-pill">
+                <span class="text-white-50 small d-block">Father / Guardian Name</span>
+                <div class="text-white fw-semibold">{{ cert.student.emergency_contact_name|default:"Parent/Guardian" }}</div>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="data-row-pill">
+                <span class="text-white-50 small d-block">Date of Birth (As per School Register)</span>
+                <div class="text-white fw-semibold">{{ cert.student.date_of_birth|date:"d F Y"|default:"N/A" }}</div>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="data-row-pill">
+                <span class="text-white-50 small d-block">Class Last Studied / Passed</span>
+                <div class="text-info fw-semibold">{{ cert.student_enrollment.section.full_name|default:cert.last_class_passed|default:"Class 10" }}</div>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="data-row-pill">
+                <span class="text-white-50 small d-block">Date of Certificate Issue</span>
+                <div class="text-white fw-semibold">{{ cert.issue_date|date:"d F Y" }}</div>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="data-row-pill">
+                <span class="text-white-50 small d-block">Reason for Leaving School</span>
+                <div class="text-white fw-semibold">{{ cert.reason_for_leaving|default:"Completed Academic Course" }}</div>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="data-row-pill">
+                <span class="text-white-50 small d-block">General Conduct &amp; Dues Status</span>
+                <div class="text-success fw-semibold">
+                  Conduct: {{ cert.general_conduct }} &bull; Dues: {% if cert.dues_cleared %}Fully Cleared{% else %}<span class="text-danger">Pending</span>{% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="data-row-pill">
+                <span class="text-white-50 small d-block">Cryptographic Token ID</span>
+                <code class="text-info small" style="letter-spacing:0.04em;">{{ cert.verification_token }}</code>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Notice & Institution Details -->
+          <div class="p-3 rounded-3 bg-secondary bg-opacity-25 text-white-50 small d-flex justify-content-between align-items-center flex-wrap gap-2 position-relative" style="z-index:1;">
+            <div>
+              <i class="fa-solid fa-graduation-cap text-warning me-1"></i> <strong>Horizon Premier Public School</strong> (CBSE Affiliation No. 2430089)
+            </div>
+            <div class="text-end">
+              <span class="text-success fw-semibold"><i class="fa-solid fa-lock me-1"></i> Digitally Signed &amp; Sealed</span>
+            </div>
+          </div>
+
+        </div>
+
+      {% elif is_revoked %}
+        <!-- REVOKED CERTIFICATE -->
+        <div class="verify-card" style="border-color:rgba(239, 68, 68, 0.5); background:rgba(239, 68, 68, 0.08);">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="badge bg-danger text-white fs-6 px-3 py-2">
+              <i class="fa-solid fa-ban me-1"></i> CERTIFICATE REVOKED / CANCELLED
+            </span>
+          </div>
+          <h4 class="fw-bold text-danger mb-2">This Document Has Been Officially Cancelled</h4>
+          <p class="text-white-50 small mb-2"><strong>Reason for Revocation:</strong> {{ cert.revocation_reason|default:"Revoked by School Administration Office." }}</p>
+          <p class="text-white-50 small mb-0">Please contact the Registrar's Office at <strong>admissions@horizon.edu.in</strong> or helpline <strong>+91 (033) 2443-0451</strong> for further information.</p>
+        </div>
+
+      {% endif %}
+
+    {% elif search_query or token %}
+      <!-- NO RECORD FOUND -->
+      <div class="verify-card text-center" style="border-color:rgba(245, 158, 11, 0.3);">
+        <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width:60px; height:60px; border-radius:50%; background:rgba(245, 158, 11, 0.15); color:#f59e0b; font-size:1.8rem;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h4 class="fw-bold text-white mb-2">No Matching Certificate Record Found</h4>
+        <p class="text-white-50 small mb-3">
+          The reference number <strong>"{{ search_query|default:token }}"</strong> does not match any authenticated Transfer Certificate or Character Certificate issued in our official school registry.
+        </p>
+        <p class="text-white-50 small mb-0">
+          Please check the certificate sequence (e.g. <code>TC/2026/001</code>) or the student's admission number.
+        </p>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

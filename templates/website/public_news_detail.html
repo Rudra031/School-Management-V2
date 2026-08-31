@@ -1,0 +1,82 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}{{ article.title }} | {{ school.name|default:"Horizon Premier Public School" }}{% endblock %}
+
+{% block content %}
+<div class="py-5">
+  <div class="container max-w-900 mx-auto">
+    
+    <div class="mb-4">
+      <a href="{% url 'website:news_events' %}" class="btn-site-glass btn-sm">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Newsroom &amp; Circulars
+      </a>
+    </div>
+
+    <div class="glass-panel p-4 p-lg-5 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <span class="badge bg-primary bg-opacity-25 text-info px-3 py-1 fs-6">{{ article.get_category_display }}</span>
+        <span class="text-white-50 small"><i class="fa-solid fa-eye me-1 text-warning"></i>{{ article.views_count }} Reads</span>
+      </div>
+
+      <h1 class="display-6 fw-bold text-white mb-3" style="line-height:1.2;">{{ article.title }}</h1>
+      
+      <div class="d-flex align-items-center gap-4 text-white-50 small pb-4 mb-4 border-bottom border-secondary border-opacity-25 flex-wrap">
+        <span><i class="fa-solid fa-feather-pointed text-warning me-1"></i>{{ article.author_name }}</span>
+        <span><i class="fa-solid fa-calendar me-1 text-info"></i>{{ article.published_at|date:"d F Y" }}</span>
+        <span><i class="fa-solid fa-shield-halved text-success me-1"></i>Verified Institutional Dispatch</span>
+      </div>
+
+      <p class="fs-5 text-info fw-medium mb-4 p-3 rounded-3" style="background:rgba(56, 189, 248, 0.08); border-left:4px solid #38bdf8; line-height:1.7;">
+        {{ article.excerpt }}
+      </p>
+
+      <div class="text-white-50" style="line-height:1.9; font-size:1.05rem;">
+        {{ article.content|linebreaks }}
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center pt-4 mt-5 border-top border-secondary border-opacity-25 flex-wrap gap-3">
+        <span class="text-white-50 small">Published by the Directorate of Communications &amp; Student Affairs</span>
+        <div class="d-flex gap-2">
+          <button onclick="window.print()" class="btn-site-glass btn-sm">
+            <i class="fa-solid fa-print me-1"></i> Print Circular
+          </button>
+          <a href="{% url 'website:public_apply' %}" class="btn-site-gold btn-sm">
+            <i class="fa-solid fa-file-pen me-1"></i> Apply for 2026–27
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Dispatches -->
+    {% if recent_news %}
+      <div class="mt-5">
+        <h5 class="fw-bold text-white mb-3"><i class="fa-solid fa-newspaper text-warning me-2"></i>Other Recent Circulars</h5>
+        <div class="row g-3">
+          {% for r in recent_news %}
+            <div class="col-md-4">
+              <div class="glass-card p-3 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <span class="badge bg-secondary bg-opacity-25 text-info mb-1" style="font-size:0.68rem;">{{ r.get_category_display }}</span>
+                  <h6 class="fw-bold text-white mb-2" style="font-size:0.88rem;">
+                    <a href="{% url 'website:news_detail' slug=r.slug %}" class="text-white text-decoration-none hover-primary">
+                      {{ r.title|truncatewords:10 }}
+                    </a>
+                  </h6>
+                </div>
+                <div class="pt-2 border-top border-secondary border-opacity-25">
+                  <a href="{% url 'website:news_detail' slug=r.slug %}" class="text-info small fw-semibold text-decoration-none" style="font-size:0.75rem;">
+                    Read More <i class="fa-solid fa-arrow-right ms-1"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Student & Staff ID Card Designer & Studio | Horizon SMS{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 3D Flip Card Container */
+.id-card-preview-wrapper {
+  perspective: 1000px;
+  width: 280px;
+  height: 440px;
+  margin: 0 auto;
+}
+.id-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.id-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+.id-card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+}
+.id-card-back {
+  transform: rotateY(180deg);
+}
+
+/* Orientation Modifiers */
+.id-card-preview-wrapper.landscape {
+  width: 440px;
+  height: 280px;
+}
+
+/* Color Themes */
+.theme-NAVY_GOLD .card-header-band { background: linear-gradient(135deg, #1e1b4b, #312e81); color: #fff; }
+.theme-NAVY_GOLD .card-accent-strip { background: #d4af37; }
+.theme-EMERALD .card-header-band { background: linear-gradient(135deg, #064e3b, #047857); color: #fff; }
+.theme-EMERALD .card-accent-strip { background: #10b981; }
+.theme-MAROON .card-header-band { background: linear-gradient(135deg, #7f1d1d, #991b1b); color: #fff; }
+.theme-MAROON .card-accent-strip { background: #f59e0b; }
+.theme-INDIGO_VIOLET .card-header-band { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; }
+.theme-INDIGO_VIOLET .card-accent-strip { background: #8b5cf6; }
+
+.kpi-card-badge {
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+.kpi-card-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+  <!-- Page Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-indigo bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-semibold" style="color: #4f46e5;">
+          <i class="bi bi-person-badge-fill me-1"></i> PVC Card Studio 2026
+        </span>
+        <span class="badge bg-success bg-opacity-10 text-success px-2 py-1 rounded-pill">CR80 High-Res Batch Print</span>
+      </div>
+      <h2 class="h3 fw-bold text-dark mt-2 mb-0">Student &amp; Staff ID Card Designer &amp; Bulk Generator</h2>
+      <p class="text-muted small mb-0">Customize institutional ID badges, preview dual-sided cards in 3D, and generate 8-per-A4 batch print sheets.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'documents:certificate_studio' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-award me-1"></i> Certificate Studio
+      </a>
+      <a href="{% url 'documents:id_card_bulk_print' %}?mode={{ mode }}&class_id={{ selected_class_id|default:'' }}&section_id={{ selected_section_id|default:'' }}&department={{ selected_department|default:'' }}" target="_blank" class="btn btn-primary fw-semibold">
+        <i class="bi bi-printer-fill me-1"></i> Print Batch (8-per-A4)
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Strip -->
+  <div class="row g-3 mb-4">
+    <div class="col-xl-4 col-sm-6">
+      <div class="card kpi-card-badge bg-white p-3 shadow-sm border-start border-4 border-primary">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="text-muted small fw-semibold text-uppercase">Total Active Identity Badges</div>
+            <h3 class="fw-bold mb-0 text-dark">{{ kpi_total_cards }}</h3>
+          </div>
+          <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+            <i class="bi bi-person-badge fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-sm-6">
+      <div class="card kpi-card-badge bg-white p-3 shadow-sm border-start border-4 border-success">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="text-muted small fw-semibold text-uppercase">Student Badges (Active)</div>
+            <h3 class="fw-bold mb-0 text-dark">{{ kpi_total_students }}</h3>
+          </div>
+          <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
+            <i class="bi bi-people-fill fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4 col-sm-6">
+      <div class="card kpi-card-badge bg-white p-3 shadow-sm border-start border-4 border-info">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="text-muted small fw-semibold text-uppercase">Faculty &amp; Staff Badges</div>
+            <h3 class="fw-bold mb-0 text-dark">{{ kpi_total_staff }}</h3>
+          </div>
+          <div class="bg-info bg-opacity-10 p-3 rounded-circle text-info">
+            <i class="bi bi-person-workspace fs-4"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Split Pane: Customizer Controls & 3D Live Card Canvas -->
+  <div class="row g-4 mb-4">
+    <!-- Left Pane: Mode & Configuration Controls -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm border-0 rounded-3 h-100">
+        <div class="card-header bg-white border-bottom p-3">
+          <!-- Mode Switcher -->
+          <div class="btn-group w-100" role="group">
+            <a href="?mode=STUDENT" class="btn {% if mode == 'STUDENT' %}btn-primary fw-bold{% else %}btn-outline-secondary{% endif %}">
+              <i class="bi bi-mortarboard-fill me-1"></i> Student ID Cards
+            </a>
+            <a href="?mode=STAFF" class="btn {% if mode == 'STAFF' %}btn-primary fw-bold{% else %}btn-outline-secondary{% endif %}">
+              <i class="bi bi-person-vcard-fill me-1"></i> Staff &amp; Faculty Badges
+            </a>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <h6 class="fw-bold text-dark mb-3"><i class="bi bi-palette-fill me-1 text-primary"></i> Live Theme &amp; Layout Controls</h6>
+          
+          <div class="row g-3 mb-4">
+            <div class="col-6">
+              <label class="form-label small fw-bold">Orientation</label>
+              <select id="orientationSelect" class="form-select form-select-sm" onchange="updateCardLayout()">
+                <option value="PORTRAIT" selected>Portrait (54x86mm)</option>
+                <option value="LANDSCAPE">Landscape (86x54mm)</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold">Theme Preset</label>
+              <select id="themeSelect" class="form-select form-select-sm" onchange="updateCardTheme()">
+                <option value="NAVY_GOLD" selected>Academic Navy &amp; Gold</option>
+                <option value="EMERALD">Prestige Emerald</option>
+                <option value="MAROON">Royal Maroon</option>
+                <option value="INDIGO_VIOLET">Modern Indigo</option>
+              </select>
+            </div>
+          </div>
+
+          <hr class="text-muted">
+
+          <!-- Filter Entity Registry Form -->
+          <h6 class="fw-bold text-dark mb-3"><i class="bi bi-funnel-fill me-1 text-primary"></i> Batch Selection Filter</h6>
+          <form method="get" class="row g-3">
+            <input type="hidden" name="mode" value="{{ mode }}">
+            
+            {% if mode == 'STUDENT' %}
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Class Level</label>
+              <select name="class_id" class="form-select form-select-sm">
+                <option value="">All Classes</option>
+                {% for cl in class_levels %}
+                <option value="{{ cl.id }}" {% if selected_class_id == cl.id|stringformat:"s" %}selected{% endif %}>{{ cl.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Section</label>
+              <select name="section_id" class="form-select form-select-sm">
+                <option value="">All Sections</option>
+                {% for sec in sections %}
+                <option value="{{ sec.id }}" {% if selected_section_id == sec.id|stringformat:"s" %}selected{% endif %}>{{ sec.full_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            {% else %}
+            <div class="col-md-12">
+              <label class="form-label small fw-bold">Staff Department</label>
+              <select name="department" class="form-select form-select-sm">
+                <option value="">All Departments</option>
+                {% for dept in departments %}
+                <option value="{{ dept.id }}" {% if selected_department == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            {% endif %}
+
+            <div class="col-12">
+              <label class="form-label small fw-bold">Search Name or ID</label>
+              <div class="input-group input-group-sm">
+                <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search by name, roll #, employee ID...">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+              </div>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Pane: Interactive 3D Card Preview Canvas -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm border-0 rounded-3 h-100">
+        <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+          <span class="fw-bold text-dark"><i class="bi bi-badge-ad-fill me-1 text-primary"></i> 3D Live Badge Canvas</span>
+          <div class="d-flex gap-2 align-items-center">
+            <span class="text-muted small">Click Card to Flip</span>
+            <button type="button" class="btn btn-sm btn-outline-primary fw-semibold" onclick="flipIDCard()">
+              <i class="bi bi-arrow-repeat me-1"></i> Flip (Front / Back)
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-4 bg-light d-flex justify-content-center align-items-center">
+          
+          <!-- Interactive Flip Card Container -->
+          <div id="cardPreviewContainer" class="id-card-preview-wrapper theme-NAVY_GOLD" onclick="flipIDCard()" style="cursor: pointer;">
+            <div id="idCardInner" class="id-card-inner">
+              
+              <!-- FRONT FACE -->
+              <div class="id-card-face id-card-front">
+                <!-- Header Band -->
+                <div class="card-header-band p-2 text-center position-relative">
+                  <div class="fw-bold" style="font-size: 0.85rem; letter-spacing: 0.05em;">APEX INTERNATIONAL ACADEMY</div>
+                  <div style="font-size: 0.65rem; opacity: 0.85;">Affiliated to CBSE, New Delhi</div>
+                </div>
+                <div class="card-accent-strip" style="height: 3px;"></div>
+
+                <!-- Photo & Basic Info -->
+                <div class="p-3 text-center flex-grow-1 d-flex flex-column justify-content-between">
+                  <div>
+                    <!-- Photo Box -->
+                    <div class="d-inline-block p-1 bg-white border rounded shadow-sm my-1">
+                      {% if sample_holder.photo %}
+                      <img src="{{ sample_holder.photo.url }}" class="rounded" style="width: 75px; height: 85px; object-fit: cover;" alt="Photo">
+                      {% else %}
+                      <div class="bg-light rounded d-flex align-items-center justify-content-center text-secondary" style="width: 75px; height: 85px;">
+                        <i class="bi bi-person fs-1"></i>
+                      </div>
+                      {% endif %}
+                    </div>
+                    
+                    <h6 class="fw-bold text-dark mb-0 mt-1" style="font-size: 0.95rem;">
+                      {{ sample_holder.full_name|default:"Aarav Sharma" }}
+                    </h6>
+                    <div class="badge bg-primary bg-opacity-10 text-primary fw-bold" style="font-size: 0.7rem;">
+                      {% if mode == 'STUDENT' %}STUDENT BADGE{% else %}FACULTY &amp; STAFF{% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Metadata Grid -->
+                  <div class="text-start px-2 py-1 bg-light rounded border" style="font-size: 0.72rem;">
+                    <div class="d-flex justify-content-between py-1 border-bottom border-white">
+                      <span class="text-muted">ID / Adm No:</span>
+                      <strong class="text-dark">{% if mode == 'STUDENT' %}{{ sample_holder.admission_number|default:"ADM-2026-042" }}{% else %}{{ sample_holder.employee_id|default:"STF-102" }}{% endif %}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between py-1 border-bottom border-white">
+                      <span class="text-muted">{% if mode == 'STUDENT' %}Class &amp; Sec:{% else %}Designation:{% endif %}</span>
+                      <strong class="text-dark">{% if mode == 'STUDENT' %}Class 10-A{% else %}{{ sample_holder.designation|default:"Senior Faculty" }}{% endif %}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between py-1">
+                      <span class="text-muted">Blood Group:</span>
+                      <strong class="text-danger">{{ sample_holder.blood_group|default:"O+" }}</strong>
+                    </div>
+                  </div>
+
+                  <!-- QR / Barcode Strip -->
+                  <div class="pt-2">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=45x45&data=APEX-ID-{{ sample_holder.id }}" width="45" height="45" alt="QR">
+                    <div class="text-muted mt-1" style="font-size: 0.6rem; font-family: monospace;">VALID THRU: 03/2027</div>
+                  </div>
+                </div>
+
+                <!-- Footer Strip -->
+                <div class="card-accent-strip" style="height: 2px;"></div>
+                <div class="bg-dark text-white p-1 text-center" style="font-size: 0.6rem;">
+                  Dwarka Sector 12, New Delhi - 110075
+                </div>
+              </div>
+
+              <!-- BACK FACE -->
+              <div class="id-card-face id-card-back">
+                <div class="card-header-band p-2 text-center">
+                  <div class="fw-bold" style="font-size: 0.8rem;">EMERGENCY &amp; RESIDENCE</div>
+                </div>
+                <div class="card-accent-strip" style="height: 3px;"></div>
+
+                <div class="p-3 text-start flex-grow-1 d-flex flex-column justify-content-between" style="font-size: 0.72rem;">
+                  <div>
+                    <div class="mb-2">
+                      <span class="text-muted d-block" style="font-size: 0.65rem;">Emergency Helpline:</span>
+                      <strong class="text-dark"><i class="bi bi-telephone-fill text-primary me-1"></i> {{ sample_holder.emergency_contact_phone|default:"+91 98765 43210" }}</strong>
+                    </div>
+                    <div class="mb-2">
+                      <span class="text-muted d-block" style="font-size: 0.65rem;">Residential Address:</span>
+                      <span class="text-dark">{{ sample_holder.residential_address|default:"Flat 402, Sector 12, Dwarka, New Delhi - 110075" }}</span>
+                    </div>
+                    <div class="mb-2">
+                      <span class="text-muted d-block" style="font-size: 0.65rem;">School Bus Route:</span>
+                      <span class="badge bg-secondary">Route #12 (Dwarka Expressway)</span>
+                    </div>
+                  </div>
+
+                  <!-- Return Policy Disclaimer -->
+                  <div class="p-2 bg-light border rounded text-center" style="font-size: 0.62rem; color: #475569;">
+                    This card is non-transferable and remains the property of Apex International Academy. If found, please return to the School Administration Office. Ph: +91 11 2659 8000.
+                  </div>
+
+                  <!-- Principal Signature -->
+                  <div class="text-end pt-2">
+                    <div class="fw-bold text-dark" style="font-size: 0.7rem;">Principal</div>
+                    <div class="text-muted" style="font-size: 0.58rem;">Authorized Signatory</div>
+                  </div>
+                </div>
+
+                <div class="card-accent-strip" style="height: 2px;"></div>
+                <div class="bg-dark text-white p-1 text-center" style="font-size: 0.6rem;">
+                  www.apexacademy.edu.in
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Entity Registry -->
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+      <h5 class="fw-bold mb-0 text-dark">Identity Badge Registry ({{ mode }})</h5>
+      <span class="text-muted small">Showing active records matching current selection.</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-3">Photo</th>
+            <th>Name</th>
+            <th>ID / Code</th>
+            <th>{% if mode == 'STUDENT' %}Class &amp; Section{% else %}Department / Role{% endif %}</th>
+            <th>Blood Group</th>
+            <th>Contact Phone</th>
+            <th class="text-end pe-3">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in records %}
+          <tr>
+            <td class="ps-3">
+              {% if r.photo %}
+              <img src="{{ r.photo.url }}" class="rounded-circle" style="width: 36px; height: 36px; object-fit: cover;" alt="Avatar">
+              {% else %}
+              <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.8rem;">
+                {{ r.full_name|slice:":2"|upper }}
+              </div>
+              {% endif %}
+            </td>
+            <td>
+              <div class="fw-bold text-dark">{{ r.full_name }}</div>
+            </td>
+            <td>
+              <code class="fw-semibold">{% if mode == 'STUDENT' %}{{ r.admission_number }}{% else %}{{ r.employee_id }}{% endif %}</code>
+            </td>
+            <td>
+              {% if mode == 'STUDENT' %}
+              {{ r.enrollments.first.section.full_name|default:"Enrolled" }}
+              {% else %}
+              <span class="badge bg-secondary">{{ r.designation }}</span>
+              {% endif %}
+            </td>
+            <td><span class="badge bg-danger bg-opacity-10 text-danger">{{ r.blood_group|default:"O+" }}</span></td>
+            <td>{{ r.emergency_contact_phone|default:"-" }}</td>
+            <td class="text-end pe-3">
+              <a href="{% url 'documents:id_card_print_single' mode|lower r.pk %}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-printer me-1"></i> Print PVC Card
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center py-4 text-muted">
+              <i class="bi bi-person-x fs-2 d-block mb-1"></i> No records found for current filters.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function flipIDCard() {
+  const inner = document.getElementById('idCardInner');
+  inner.classList.toggle('flipped');
+}
+
+function updateCardTheme() {
+  const theme = document.getElementById('themeSelect').value;
+  const container = document.getElementById('cardPreviewContainer');
+  container.className = 'id-card-preview-wrapper theme-' + theme;
+  if (document.getElementById('orientationSelect').value === 'LANDSCAPE') {
+    container.classList.add('landscape');
+  }
+}
+
+function updateCardLayout() {
+  const orientation = document.getElementById('orientationSelect').value;
+  const container = document.getElementById('cardPreviewContainer');
+  if (orientation === 'LANDSCAPE') {
+    container.classList.add('landscape');
+  } else {
+    container.classList.remove('landscape');
+  }
+}
+</script>
+{% endblock %}

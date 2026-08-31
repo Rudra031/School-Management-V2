@@ -1,0 +1,175 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}Application Submitted | {{ app.application_number }} — Horizon Premier Public School{% endblock %}
+
+{% block extra_css %}
+<style>
+  .slip-container {
+    background: rgba(10, 25, 55, 0.9);
+    border: 2px solid rgba(245, 158, 11, 0.4);
+    border-radius: 20px;
+    padding: 3rem;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .watermark-crest {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22rem;
+    color: rgba(255, 255, 255, 0.02);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    .printable-slip, .printable-slip * {
+      visibility: visible;
+    }
+    .printable-slip {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      background: #ffffff !important;
+      color: #000000 !important;
+      border: 1px solid #000 !important;
+      padding: 20px !important;
+    }
+    .no-print {
+      display: none !important;
+    }
+    .slip-container {
+      background: #fff !important;
+      color: #000 !important;
+      border: 1px solid #000 !important;
+      box-shadow: none !important;
+    }
+    .text-white, .text-white-50 {
+      color: #000 !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  
+  <div class="text-center mb-4 no-print">
+    <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width:72px; height:72px; border-radius:50%; background:rgba(34, 197, 94, 0.2); border:2px solid #22c55e; color:#22c55e; font-size:2.2rem;">
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <h2 class="display-6 fw-bold text-white mb-1">Application Registered Successfully!</h2>
+    <p class="text-white-50">Please preserve your official application reference number for all future correspondence.</p>
+  </div>
+
+  <div class="max-w-900 mx-auto">
+    
+    <!-- Printable Official Acknowledgement Slip -->
+    <div class="slip-container printable-slip mb-4">
+      <div class="watermark-crest">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+
+      <!-- Slip Header -->
+      <div class="d-flex justify-content-between align-items-center border-bottom border-secondary border-opacity-50 pb-4 mb-4 flex-wrap gap-3 position-relative" style="z-index:1;">
+        <div class="d-flex align-items-center gap-3">
+          <div class="navbar-brand-logo" style="width:56px; height:56px; font-size:1.6rem;">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold text-white mb-0">Horizon Premier Public School</h4>
+            <span class="text-warning small">Affiliated to CBSE, New Delhi (Affiliation No. 2430089 • School Code: 15614)</span>
+          </div>
+        </div>
+        <div class="text-end">
+          <span class="badge bg-warning text-dark fw-bold px-3 py-2 fs-6">
+            {{ app.application_number|default:app_num }}
+          </span>
+          <span class="d-block text-white-50 small mt-1">Application Reference No.</span>
+        </div>
+      </div>
+
+      <!-- Key Applicant Data Grid -->
+      <div class="row g-4 mb-4 position-relative" style="z-index:1;">
+        <div class="col-md-6">
+          <div class="p-3 rounded-3" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">
+            <span class="text-warning small text-uppercase fw-bold d-block mb-1">Applicant Details</span>
+            <h5 class="fw-bold text-white mb-1">{{ app.applicant_full_name }}</h5>
+            <div class="text-white-50 small mb-1"><strong>Gender / DOB:</strong> {{ app.get_gender_display }} • {{ app.date_of_birth|date:"d M Y" }}</div>
+            <div class="text-white-50 small mb-1"><strong>Grade Applied For:</strong> <span class="text-white fw-bold">{{ app.applying_for_class.name }}</span></div>
+            {% if app.stream_preference %}
+              <div class="text-white-50 small"><strong>Stream Preference:</strong> <span class="text-info">{{ app.get_stream_preference_display }}</span></div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="p-3 rounded-3" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">
+            <span class="text-warning small text-uppercase fw-bold d-block mb-1">Parent &amp; Contact Info</span>
+            <h5 class="fw-bold text-white mb-1">{{ app.parent_name }}</h5>
+            <div class="text-white-50 small mb-1"><strong>Contact Phone:</strong> {{ app.parent_phone }}</div>
+            <div class="text-white-50 small mb-1"><strong>Email:</strong> {{ app.parent_email }}</div>
+            <div class="text-white-50 small"><strong>Address:</strong> {{ app.residential_address|truncatewords:8 }}</div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="p-3 rounded-3" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">
+            <span class="text-warning small text-uppercase fw-bold d-block mb-1">Academic Session &amp; Status</span>
+            <div class="text-white small mb-1"><strong>Academic Year:</strong> {{ app.academic_year.name }}</div>
+            <div class="text-white small mb-1"><strong>Submission Date:</strong> {{ app.applied_date|date:"d F Y" }} ({{ submission_time|date:"H:i" }} IST)</div>
+            <div class="text-white small"><strong>Current Stage:</strong> <span class="badge bg-primary text-white">{{ app.get_status_display }}</span></div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="p-3 rounded-3 text-center" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">
+            <div class="d-inline-block p-2 bg-white rounded-2 mb-1">
+              <!-- QR Code Mock placeholder -->
+              <i class="fa-solid fa-qrcode text-dark fs-2"></i>
+            </div>
+            <span class="d-block text-white-50 small" style="font-size:0.72rem;">Digital Verification QR Authenticator</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instructions & Next Steps -->
+      <div class="p-3 rounded-3 bg-secondary bg-opacity-10 border border-secondary border-opacity-25 position-relative" style="z-index:1;">
+        <h6 class="fw-bold text-warning mb-2"><i class="fa-solid fa-circle-info me-1"></i> Important Instructions for Parents:</h6>
+        <ol class="text-white-50 small mb-0 ps-3" style="line-height:1.6;">
+          <li>A confirmation SMS and email have been dispatched to your registered phone and email address.</li>
+          <li>Our Admissions Committee will review your application and schedule the student interaction/assessment within 3 working days.</li>
+          <li>Please bring a printed copy of this acknowledgment slip along with original birth certificate and previous report cards during the campus visit.</li>
+        </ol>
+      </div>
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 no-print">
+      <a href="{% url 'website:home' %}" class="btn btn-outline-light" style="border-radius:20px;">
+        <i class="fa-solid fa-arrow-left me-1"></i> Return to Homepage
+      </a>
+      <div class="d-flex gap-2">
+        <button onclick="window.print()" class="btn btn-warning fw-bold px-4" style="border-radius:20px;">
+          <i class="fa-solid fa-print me-1"></i> Print Application Slip
+        </button>
+        <a href="{% url 'website:public_apply_track' %}?app_num={{ app.application_number }}" class="btn-site-glass" style="border-radius:20px;">
+          <i class="fa-solid fa-magnifying-glass me-1"></i> Track Status Online
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

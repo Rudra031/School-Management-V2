@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Exam Schedule{% endblock %}
+{% block page_heading %}Exam Schedules & Datesheets{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Examination Schedules</h5>
+    <p class="text-muted small mb-0">Dates, timings, maximum marks, and rooms for scheduled examinations.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'examinations:marks_entry' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-pen-to-square me-1"></i> Marks Entry</a>
+    <a href="{% url 'examinations:schedule_create' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Schedule Exam</a>
+  </div>
+</div>
+
+<div class="card-saas p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-5">
+      <select name="term" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">All Exam Terms</option>
+        {% for t in terms %}
+          <option value="{{ t.id }}" {% if selected_term == t.id|stringformat:"s" %}selected{% endif %}>{{ t.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-5">
+      <select name="class_level" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">All Grade Levels</option>
+        {% for cl in classes %}
+          <option value="{{ cl.id }}" {% if selected_class == cl.id|stringformat:"s" %}selected{% endif %}>{{ cl.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <a href="{% url 'examinations:schedule_list' %}" class="btn btn-saas-secondary btn-sm w-100">Reset</a>
+    </div>
+  </form>
+</div>
+
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Grade Level</th>
+            <th>Subject</th>
+            <th>Duration</th>
+            <th>Max Marks</th>
+            <th>Pass Marks</th>
+            <th>Room</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sched in schedules %}
+            <tr>
+              <td class="fw-semibold">{{ sched.exam_date|date:"d M Y" }} at {{ sched.start_time|time:"H:i" }}</td>
+              <td><span class="badge bg-light text-dark border">{{ sched.class_level.name }}</span></td>
+              <td class="fw-bold text-primary">{{ sched.subject.name }} ({{ sched.subject.code }})</td>
+              <td class="small">{{ sched.duration_minutes }} Mins</td>
+              <td class="small fw-semibold">{{ sched.max_marks }} Pts</td>
+              <td class="small">{{ sched.pass_marks }} Pts</td>
+              <td class="small text-muted">{{ sched.room_number|default:"-" }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4 small">No exams scheduled matching current criteria.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

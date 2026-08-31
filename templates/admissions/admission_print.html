@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Official Admission Form &amp; Enrollment Dossier | {% firstof student.full_name app.applicant_full_name "Student" %}</title>
+  
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* ==========================================================================
+       OFFICIAL INDIAN SCHOOL ADMISSION CERTIFICATE & ENROLLMENT DOSSIER
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      line-height: 1.45;
+      font-size: 12.5px;
+      padding: 20px;
+    }
+
+    /* Screen Action Bar (Hidden on print) */
+    .screen-action-bar {
+      max-width: 850px;
+      margin: 0 auto 20px auto;
+      background: #1e293b;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-action {
+      background: #4f46e5;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      background: #4338ca;
+      transform: translateY(-1px);
+    }
+
+    .btn-action.btn-secondary {
+      background: #334155;
+    }
+
+    /* Main Printable Document Page */
+    .document-page {
+      max-width: 850px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 36px 42px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      position: relative;
+    }
+
+    /* Institutional Header */
+    .institutional-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .header-crest {
+      width: 70px;
+      height: 70px;
+      border-radius: 10px;
+      background: #1e1b4b;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.85rem;
+      border: 2px solid #cbd5e1;
+      flex-shrink: 0;
+    }
+
+    .header-text {
+      text-align: center;
+      flex-grow: 1;
+      padding: 0 15px;
+    }
+
+    .school-title {
+      font-family: 'Cinzel', serif;
+      font-size: 19px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .school-subtitle {
+      font-size: 11px;
+      color: #1e293b;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .school-meta {
+      font-size: 9.5px;
+      color: #64748b;
+    }
+
+    .header-barcode-box {
+      text-align: right;
+      font-family: monospace;
+      font-size: 10.5px;
+      color: #0f172a;
+      flex-shrink: 0;
+    }
+
+    /* Title Ribbon */
+    .document-title-ribbon {
+      background: #f8fafc;
+      border: 1px solid #0f172a;
+      text-align: center;
+      padding: 5px 10px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #0f172a;
+    }
+
+    /* Primary Credentials Grid */
+    .credentials-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+    }
+
+    .cred-item label {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .cred-item value {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+      font-family: monospace;
+    }
+
+    /* Section Blocks */
+    .section-block {
+      margin-bottom: 12px;
+    }
+
+    .section-heading {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #1e1b4b;
+      border-bottom: 1.5px solid #cbd5e1;
+      padding-bottom: 3px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .section-heading i {
+      color: #4f46e5;
+      font-size: 10.5px;
+    }
+
+    /* Data Table Matrix */
+    .data-matrix {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 4px;
+    }
+
+    .data-matrix td {
+      padding: 4.5px 7px;
+      border: 1px solid #e2e8f0;
+      font-size: 11px;
+      vertical-align: middle;
+    }
+
+    .data-matrix td.matrix-label {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #475569;
+      width: 22%;
+    }
+
+    .data-matrix td.matrix-value {
+      color: #0f172a;
+      width: 28%;
+    }
+
+    /* Photo Placeholder Box */
+    .photo-box-frame {
+      width: 100px;
+      height: 120px;
+      border: 1.5px dashed #94a3b8;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: #f8fafc;
+      color: #94a3b8;
+      font-size: 9.5px;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
+    .photo-box-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    /* Fee Table Matrix */
+    .fee-summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 6px;
+    }
+
+    .fee-summary-table th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 7px;
+      border: 1px solid #cbd5e1;
+      text-align: left;
+    }
+
+    .fee-summary-table td {
+      padding: 4px 7px;
+      border: 1px solid #cbd5e1;
+      font-size: 10.5px;
+    }
+
+    /* Declarations Box */
+    .declaration-box {
+      border: 1px solid #cbd5e1;
+      background: #fdfdfd;
+      padding: 7px 10px;
+      font-size: 9.5px;
+      line-height: 1.4;
+      color: #334155;
+      border-radius: 4px;
+      margin-bottom: 14px;
+    }
+
+    /* Signature Matrix */
+    .signature-matrix {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 18px;
+      padding-top: 6px;
+    }
+
+    .signature-slot {
+      text-align: center;
+    }
+
+    .signature-line {
+      border-bottom: 1.5px solid #0f172a;
+      height: 32px;
+      margin-bottom: 4px;
+    }
+
+    .signature-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: #0f172a;
+      text-transform: uppercase;
+    }
+
+    .signature-subtitle {
+      font-size: 8.5px;
+      color: #64748b;
+    }
+
+    .seal-box {
+      width: 65px;
+      height: 65px;
+      border: 1.5px dashed #94a3b8;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      font-size: 8.5px;
+      font-weight: 700;
+      margin: 0 auto;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    /* Official Footer */
+    .official-footer {
+      border-top: 1px solid #e2e8f0;
+      margin-top: 14px;
+      padding-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: #64748b;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm 10mm;
+      }
+
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        font-size: 11px !important;
+      }
+
+      .screen-action-bar {
+        display: none !important;
+      }
+
+      .document-page {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+
+      .credentials-grid,
+      .data-matrix td.matrix-label,
+      .fee-summary-table th,
+      .document-title-ribbon {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen Floating Action Bar (Hidden when printed) -->
+  <div class="screen-action-bar">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <i class="fa-solid fa-file-invoice" style="color:#818cf8; font-size:1.2rem;"></i>
+      <div>
+        <strong style="font-size:14px; display:block;">Student Admission &amp; Enrollment Dossier</strong>
+        <span style="font-size:11px; color:#94a3b8;">CBSE / Indian School Standard Format</span>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button onclick="window.print()" class="btn-action">
+        <i class="fa-solid fa-print"></i> Print Official Dossier
+      </button>
+      <a href="javascript:history.back()" class="btn-action btn-secondary">
+        <i class="fa-solid fa-arrow-left"></i> Return
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Printable Document Container -->
+  <div class="document-page">
+
+    <!-- 1. Institutional Letterhead -->
+    <div class="institutional-header">
+      <div class="header-crest">
+        <i class="fa-solid fa-school"></i>
+      </div>
+
+      <div class="header-text">
+        <h1 class="school-title">{% firstof school.name "Horizon Public School" %}</h1>
+        <p class="school-subtitle">Affiliated to CBSE, New Delhi &bull; Affiliation No: 2130894 &bull; School Code: 45892 &bull; UDISE+: 07040108902</p>
+        <p class="school-meta">
+          Campus: Sector 14, Urban Estate, Rohini, New Delhi - 110085 &bull; Ph: +91 (011) 2748-9012 / +91 98765 43210 &bull; admissions@horizonpublicschool.edu.in
+        </p>
+      </div>
+
+      <div class="header-barcode-box">
+        <strong>OFFICIAL COPY</strong><br>
+        <span style="font-size:9.5px; color:#64748b;">Date: {% now "d/m/Y" %}</span><br>
+        <span style="font-size:9px; color:#94a3b8;">Ref: {% firstof app.application_number student.admission_number "ADM-2026-0419" %}</span>
+      </div>
+    </div>
+
+    <!-- 2. Document Title Ribbon -->
+    <div class="document-title-ribbon">
+      Student Admission &amp; Enrollment Confirmation Certificate (Session {% firstof academic_year.name "2026–27" %})
+    </div>
+
+    <!-- 3. Key Credentials Grid -->
+    <div class="credentials-grid">
+      <div class="cred-item">
+        <label>Admission / Scholar No</label>
+        <value>{% firstof student.admission_number app.application_number "ADM-2026-0419" %}</value>
+      </div>
+      <div class="cred-item">
+        <label>Permanent Student ID (PEN)</label>
+        <value>{% firstof student.student_id "PEN-2026-0419" %}</value>
+      </div>
+      <div class="cred-item">
+        <label>Class &amp; Section Allocated</label>
+        <value>{% firstof student.current_class_section app.applying_for_class.name "Class X - Section A" %}</value>
+      </div>
+      <div class="cred-item">
+        <label>Academic Session</label>
+        <value>{% firstof academic_year.name "2026–2027" %}</value>
+      </div>
+    </div>
+
+    <!-- 4. Section: Student Personal Information -->
+    <div class="section-block">
+      <div class="section-heading">
+        <i class="fa-solid fa-user-graduate"></i> I. Student Personal Information
+      </div>
+
+      <div style="display:flex; gap:12px; align-items:flex-start;">
+        <table class="data-matrix" style="flex-grow:1;">
+          <tbody>
+            <tr>
+              <td class="matrix-label">Student Full Name:</td>
+              <td class="matrix-value" colspan="3"><strong>{% firstof student.full_name app.applicant_full_name "Aarav Sharma" %}</strong></td>
+            </tr>
+            <tr>
+              <td class="matrix-label">Date of Birth:</td>
+              <td class="matrix-value">{% firstof student.date_of_birth|date:"d/m/Y" app.date_of_birth|date:"d/m/Y" "14/03/2010" %}</td>
+              <td class="matrix-label">Gender / Blood Group:</td>
+              <td class="matrix-value">
+                {% firstof student.get_gender_display app.get_gender_display "Male" %} &bull; 
+                {% firstof student.blood_group "O+" %}
+              </td>
+            </tr>
+            <tr>
+              <td class="matrix-label">Nationality / Domicile:</td>
+              <td class="matrix-value">Indian &bull; Delhi</td>
+              <td class="matrix-label">Category / Caste:</td>
+              <td class="matrix-value">General</td>
+            </tr>
+            <tr>
+              <td class="matrix-label">Mother Tongue:</td>
+              <td class="matrix-value">Hindi / English</td>
+              <td class="matrix-label">Aadhaar / APAAR ID:</td>
+              <td class="matrix-value font-monospace">XXXX-XXXX-8921</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Passport Photo Frame -->
+        <div class="photo-box-frame">
+          {% if student.photo %}
+            <img src="{{ student.photo.url }}" alt="Student Photograph">
+          {% else %}
+            <i class="fa-regular fa-user" style="font-size:1.8rem; margin-bottom:4px;"></i>
+            <span>Affix Student<br>Passport Photo</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Section: Parent & Guardian Details -->
+    <div class="section-block">
+      <div class="section-heading">
+        <i class="fa-solid fa-users"></i> II. Parents &amp; Guardian Information
+      </div>
+
+      <table class="data-matrix">
+        <tbody>
+          <tr>
+            <td class="matrix-label">Father's Full Name:</td>
+            <td class="matrix-value"><strong>{% firstof student.guardian_name app.parent_name "Rajesh Sharma" %}</strong></td>
+            <td class="matrix-label">Father's Occupation:</td>
+            <td class="matrix-value">Senior Engineer (PSU)</td>
+          </tr>
+          <tr>
+            <td class="matrix-label">Mother's Full Name:</td>
+            <td class="matrix-value"><strong>Sunita Sharma</strong></td>
+            <td class="matrix-label">Mother's Occupation:</td>
+            <td class="matrix-value">Teacher (Govt. School)</td>
+          </tr>
+          <tr>
+            <td class="matrix-label">Contact Mobile No:</td>
+            <td class="matrix-value font-monospace">{% firstof student.emergency_contact_phone app.parent_phone "+91 98765 43210" %}</td>
+            <td class="matrix-label">Parent Email ID:</td>
+            <td class="matrix-value">{% firstof student.user.email app.parent_email "rajesh.sharma@example.in" %}</td>
+          </tr>
+          <tr>
+            <td class="matrix-label">Residential Address:</td>
+            <td class="matrix-value" colspan="3">{% firstof student.residential_address app.residential_address "Flat 402, Shanti Kunj Apartments, Sector 14, Rohini, New Delhi - 110085" %}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6. Section: Previous Academic Record & Transfer Certificate -->
+    <div class="section-block">
+      <div class="section-heading">
+        <i class="fa-solid fa-graduation-cap"></i> III. Previous Academic Background &amp; Transfer Certificate
+      </div>
+
+      <table class="data-matrix">
+        <tbody>
+          <tr>
+            <td class="matrix-label">Previous School Name:</td>
+            <td class="matrix-value">{% firstof app.previous_school student.previous_school_name "St. Xavier Senior Secondary School, Delhi" %}</td>
+            <td class="matrix-label">Last Class Passed:</td>
+            <td class="matrix-value">Class IX (CBSE Board - 88.6%)</td>
+          </tr>
+          <tr>
+            <td class="matrix-label">Transfer Certificate (TC) #:</td>
+            <td class="matrix-value font-monospace">TC/CBSE/2026/0891</td>
+            <td class="matrix-label">TC Issue Date:</td>
+            <td class="matrix-value">28/03/2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7. Section: Fee Structure & Initial Billing Allocation (in INR ₹) -->
+    <div class="section-block">
+      <div class="section-heading">
+        <i class="fa-solid fa-indian-rupee-sign"></i> IV. Initial Fee Schedule &amp; Admission Billing Allocation (INR)
+      </div>
+
+      <table class="fee-summary-table">
+        <thead>
+          <tr>
+            <th>Fee Particulars</th>
+            <th>Category</th>
+            <th>Billing Schedule</th>
+            <th style="text-align:right;">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>One-Time Admission &amp; Registration Fee</td>
+            <td>Non-Refundable</td>
+            <td>At Admission</td>
+            <td style="text-align:right; font-weight:600;">₹5,000.00</td>
+          </tr>
+          <tr>
+            <td>Quarter 1 Composite Tuition Fee (Apr–Jun 2026)</td>
+            <td>Tuition</td>
+            <td>Quarterly</td>
+            <td style="text-align:right; font-weight:600;">₹18,500.00</td>
+          </tr>
+          <tr>
+            <td>Science, Computer Lab &amp; Smart Class Facility Charges</td>
+            <td>Academic Service</td>
+            <td>Annual</td>
+            <td style="text-align:right; font-weight:600;">₹3,500.00</td>
+          </tr>
+          <tr>
+            <td>Annual Development, Sports &amp; Examination Fund</td>
+            <td>Institutional Fund</td>
+            <td>Annual</td>
+            <td style="text-align:right; font-weight:600;">₹2,500.00</td>
+          </tr>
+          <tr style="background:#f8fafc; font-weight:800;">
+            <td colspan="3" style="text-align:right; text-transform:uppercase;">Total Admission Fee Payable:</td>
+            <td style="text-align:right; color:#1e1b4b; font-size:12px;">₹29,500.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 8. Section: Parent & Student Declaration -->
+    <div class="section-block">
+      <div class="section-heading">
+        <i class="fa-solid fa-file-signature"></i> V. Statutory Declaration &amp; Undertaking
+      </div>
+
+      <div class="declaration-box">
+        <strong>Parent / Guardian Undertaking:</strong><br>
+        1. I hereby declare that all particulars stated in this admission dossier are true, correct, and verified as per official birth and transfer records.<br>
+        2. I agree to abide by the discipline, code of conduct, and academic regulations established by the school and Central Board of Secondary Education.<br>
+        3. I understand that maintaining a minimum of 75% attendance is mandatory for appearing in CBSE board / annual examinations.<br>
+        4. I undertake to remit school fees within scheduled quarterly due dates.
+      </div>
+    </div>
+
+    <!-- 9. Signatures & School Seal -->
+    <div class="signature-matrix">
+      <div class="signature-slot">
+        <div class="signature-line"></div>
+        <div class="signature-title">Parent / Guardian Signature</div>
+        <div class="signature-subtitle">Date: ________________________</div>
+      </div>
+
+      <div class="signature-slot">
+        <div class="seal-box">
+          Official<br>School<br>Seal
+        </div>
+      </div>
+
+      <div class="signature-slot">
+        <div class="signature-line"></div>
+        <div class="signature-title">Principal &amp; Head of School</div>
+        <div class="signature-subtitle">Horizon Public School, New Delhi</div>
+      </div>
+    </div>
+
+    <!-- 10. Official Document Footer -->
+    <div class="official-footer">
+      <span>System Generated Academic Record &bull; Verification Hash: SHA256-{% firstof student.id app.id "E8942A9B" as doc_id %}{{ doc_id|slice:":12" }}</span>
+      <span>Page 1 of 1 &bull; Horizon SIS ERP (CBSE Edition)</span>
+    </div>
+
+  </div>
+
+</body>
+</html>

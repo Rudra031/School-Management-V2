@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit Academic Session{% else %}New Academic Session{% endif %}{% endblock %}
+{% block page_heading %}{% if object %}Edit Academic Session{% else %}New Academic Session{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-calendar-plus text-primary me-2"></i> Academic Session Details</span>
+      </div>
+      <div class="card-saas-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Session Name</label>
+            {{ form.name }}
+            {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Start Date</label>
+              {{ form.start_date }}
+              {% if form.start_date.errors %}<div class="text-danger small">{{ form.start_date.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">End Date</label>
+              {{ form.end_date }}
+              {% if form.end_date.errors %}<div class="text-danger small">{{ form.end_date.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="form-check mb-2">
+            {{ form.is_current }}
+            <label class="form-check-label small" for="{{ form.is_current.id_for_label }}">
+              Set as current active academic session
+            </label>
+          </div>
+          <div class="form-check mb-4">
+            {{ form.is_closed }}
+            <label class="form-check-label small" for="{{ form.is_closed.id_for_label }}">
+              Close / lock this session
+            </label>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'academics:year_list' %}" class="btn btn-saas-secondary">Cancel</a>
+            <button type="submit" class="btn btn-saas-primary">Save Session</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,658 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{% block title %}{{ school.name|default:"Horizon Public School" }}{% endblock %} | SMS</title>
+
+  <!-- Preload Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Horizon Design System 2026 -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4.3">
+
+  <!-- Inline theme & sidebar init to prevent flash -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('horizon-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+      if (localStorage.getItem('horizon-sidebar-collapsed') === 'true') {
+        document.addEventListener('DOMContentLoaded', function() {
+          document.body.classList.add('sidebar-collapsed');
+        });
+      }
+    })();
+  </script>
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  {% include "includes/splash_screen.html" %}
+
+  <div class="app-wrapper">
+
+    <!-- =============================================
+         SIDEBAR
+         ============================================= -->
+    <aside class="app-sidebar" id="appSidebar">
+      <!-- Ambient Glow Atmosphere -->
+      <div class="sidebar-ambient-aura-1"></div>
+      <div class="sidebar-ambient-aura-2"></div>
+      <div class="sidebar-glass-edge"></div>
+
+      <!-- Brand -->
+      <a href="{% url 'accounts:dashboard_router' %}" class="sidebar-brand text-decoration-none">
+        <div class="sidebar-brand-icon-wrapper">
+          <div class="sidebar-brand-icon-glow"></div>
+          <div class="sidebar-brand-icon">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+        </div>
+        <div class="d-flex flex-column overflow-hidden">
+          <div class="d-flex align-items-center gap-1">
+            <span class="fw-bold text-white text-truncate" style="font-size:0.96rem; font-family:'Geist',sans-serif; letter-spacing:-0.02em;">{{ school.name|default:"Apex International" }}</span>
+            <span class="sidebar-pro-badge">PRO</span>
+          </div>
+          <div class="sidebar-session-indicator">
+            <span class="sidebar-live-dot"></span>
+            <span class="text-truncate">{{ active_academic_year.name|default:"Session 2026–27" }}</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Quick Filter Search Box -->
+      <div class="sidebar-search-container">
+        <div class="sidebar-search-wrap">
+          <i class="fa-solid fa-magnifying-glass sidebar-search-icon"></i>
+          <input type="text" id="sidebarSearchInput" class="sidebar-search-input" placeholder="Quick find tab... (Ctrl+K)" autocomplete="off" oninput="filterSidebarNav(this)">
+          <span class="sidebar-search-shortcut">⌘K</span>
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <ul class="sidebar-menu" id="sidebarMenu">
+
+        <!-- 1. CORE OVERVIEW -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Core Overview</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'accounts:dashboard_router' %}" class="sidebar-link {% if 'dashboard' in request.resolver_match.url_name or request.path == '/accounts/dashboard/' or request.path == '/' %}active{% endif %}" data-magnetic="true" data-tooltip="Dashboard">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-gauge-high text-primary"></i></span>
+            <span class="sidebar-link-text">Dashboard</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        {% if user.is_superadmin or user.is_principal or user.is_school_admin %}
+        <li class="sidebar-item">
+          <a href="{% url 'reports:hub' %}" class="sidebar-link {% if 'reports' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Reports Hub">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-chart-pie text-success"></i></span>
+            <span class="sidebar-link-text">Reports &amp; Analytics</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% if user.is_superadmin or user.is_principal or user.is_school_admin %}
+        <!-- 2. STUDENT ADMISSIONS & SIS -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Admissions &amp; SIS</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'admissions:pipeline' %}" class="sidebar-link {% if 'admissions' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Admissions">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-door-open text-primary"></i></span>
+            <span class="sidebar-link-text">Admissions</span>
+            <span class="sidebar-counter-badge badge-new">New</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a href="{% url 'admissions:full_admission' %}" class="sidebar-sublink {% if 'admissions/full' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Full Enrolment Form</a></li>
+            <li><a href="{% url 'admissions:quick_admission' %}" class="sidebar-sublink {% if 'admissions/quick' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Quick Admission</a></li>
+          </ul>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'students:student_list' %}" class="sidebar-link {% if 'students' in request.path or 'parents' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Students">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-user-graduate text-info"></i></span>
+            <span class="sidebar-link-text">Students &amp; Parents</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a href="{% url 'students:student_register' %}" class="sidebar-sublink {% if 'students/register' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Register Student</a></li>
+            <li><a href="{% url 'parents:parent_list' %}" class="sidebar-sublink {% if 'parents' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Parent &amp; Guardian List</a></li>
+          </ul>
+        </li>
+        {% endif %}
+
+        {% if user.is_superadmin or user.is_principal or user.is_school_admin %}
+        <!-- 3. ACADEMICS & CURRICULUM -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Academics &amp; Classes</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'academics:overview' %}" class="sidebar-link {% if 'academics' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Academics">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-school text-warning"></i></span>
+            <span class="sidebar-link-text">Academic Setup</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a href="{% url 'academics:class_manage' %}" class="sidebar-sublink {% if 'academics/classes' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Classes &amp; Sections</a></li>
+            <li><a href="{% url 'academics:subject_list' %}" class="sidebar-sublink {% if 'academics/subjects' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Subjects &amp; Curriculum</a></li>
+            <li><a href="{% url 'academics:allocation_list' %}" class="sidebar-sublink {% if 'academics/allocations' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Teacher Allocations</a></li>
+            <li><a href="{% url 'academics:year_list' %}" class="sidebar-sublink {% if 'academics/years' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Academic Years &amp; Sessions</a></li>
+          </ul>
+        </li>
+        {% endif %}
+
+        {% if user.is_superadmin or user.is_principal or user.is_school_admin %}
+        <!-- 4. FACULTY & HR -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Faculty &amp; HR</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'staff:staff_list' %}" class="sidebar-link {% if 'staff' in request.path or 'leave' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Staff & HR">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-chalkboard-user text-violet"></i></span>
+            <span class="sidebar-link-text">Faculty &amp; Payroll</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a href="{% url 'staff:staff_create' %}" class="sidebar-sublink {% if 'staff/create' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Add Faculty Member</a></li>
+            <li><a href="{% url 'attendance:staff_attendance' %}" class="sidebar-sublink {% if 'attendance/staff' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Staff Attendance</a></li>
+            <li><a href="{% url 'leave:list' %}" class="sidebar-sublink {% if 'leave' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Leave Management</a></li>
+            <li><a href="{% url 'staff:payroll_dashboard' %}" class="sidebar-sublink {% if 'payroll' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Payroll &amp; Salaries</a></li>
+          </ul>
+        </li>
+        {% endif %}
+
+        {% if user.is_superadmin or user.is_principal or user.is_school_admin or user.is_teacher %}
+        <!-- 5. DAILY OPERATIONS -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Daily Operations</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'timetable:overview' %}" class="sidebar-link {% if 'timetable' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Timetable">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-calendar-week text-info"></i></span>
+            <span class="sidebar-link-text">Class Timetable</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'attendance:mark' %}" class="sidebar-link {% if 'attendance' in request.path and 'staff' not in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Attendance">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-clipboard-user text-success"></i></span>
+            <span class="sidebar-link-text">Attendance</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a href="{% url 'attendance:mark' %}" class="sidebar-sublink {% if request.path == '/attendance/' %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Daily Register</a></li>
+            <li><a href="{% url 'attendance:monthly_matrix' %}" class="sidebar-sublink {% if 'attendance/monthly' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Monthly Matrix Grid</a></li>
+            <li><a href="{% url 'attendance:report' %}" class="sidebar-sublink {% if 'attendance/report' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Attendance Analytics</a></li>
+          </ul>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'assignments:list' %}" class="sidebar-link {% if 'assignments' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Assignments">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-book-open text-primary"></i></span>
+            <span class="sidebar-link-text">Assignments &amp; Work</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% if user.is_superadmin or user.is_principal or user.is_school_admin or user.is_teacher %}
+        <!-- 6. CBSE EXAMINATIONS & EVALUATION -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">CBSE Examinations</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'examinations:schedule_list' %}" class="sidebar-link {% if 'examinations' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Examinations">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-award text-danger"></i></span>
+            <span class="sidebar-link-text">Exams &amp; Results</span>
+            <span class="sidebar-counter-badge badge-cbse">CBSE</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a href="{% url 'examinations:marks_entry' %}" class="sidebar-sublink {% if 'marks-entry' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Marks Entry Gradebook</a></li>
+            <li><a href="{% url 'examinations:tabulation_sheet' %}" class="sidebar-sublink {% if 'tabulation' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Tabulation Master Sheet</a></li>
+            <li><a href="{% url 'examinations:admit_card' %}" class="sidebar-sublink {% if 'admit-card' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Generate Admit Cards</a></li>
+            <li><a href="{% url 'examinations:academic_promotion' %}" class="sidebar-sublink {% if 'promotion' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Annual Promotion Engine</a></li>
+            <li><a href="{% url 'examinations:term_list' %}" class="sidebar-sublink {% if 'terms' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Exam Terms Master</a></li>
+          </ul>
+        </li>
+        {% endif %}
+
+        {% if user.is_superadmin or user.is_principal or user.is_accountant %}
+        <!-- 7. FEE REGULATION & BILLING -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Fee Regulation</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'fees:overview' %}" class="sidebar-link {% if 'fees' in request.path and 'pos' not in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Fees & Billing">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-file-invoice-dollar text-success"></i></span>
+            <span class="sidebar-link-text">Fees &amp; Collection</span>
+            <span class="sidebar-counter-badge badge-pos">POS</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a href="{% url 'fees:pos_counter' %}" class="sidebar-sublink fw-bold text-success {% if 'fees/pos' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet" style="background:#10b981;"></span>Instant POS Counter</a></li>
+            <li><a href="{% url 'fees:invoice_list' %}" class="sidebar-sublink {% if 'fees/invoices' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Student Fee Invoices</a></li>
+            <li><a href="{% url 'fees:defaulters_list' %}" class="sidebar-sublink text-danger {% if 'fees/defaulters' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet" style="background:#ef4444;"></span>Dues Defaulters List</a></li>
+            <li><a href="{% url 'fees:structure_list' %}" class="sidebar-sublink {% if 'fees/structures' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Class Fee Structures</a></li>
+            <li><a href="{% url 'fees:concession_list' %}" class="sidebar-sublink {% if 'fees/concessions' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Concessions &amp; Schemes</a></li>
+          </ul>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'expenses:list' %}" class="sidebar-link {% if 'expenses' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Expenses">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-receipt text-danger"></i></span>
+            <span class="sidebar-link-text">Operating Expenses</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% if user.is_superadmin or user.is_principal or user.is_school_admin or user.is_teacher %}
+        <!-- 8. DIGITAL CERTIFICATES & ID STUDIO -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Credentials Studio</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'documents:certificate_studio' %}" class="sidebar-link {% if 'documents' in request.path and 'id-cards' not in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Certificates & Badges">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-certificate text-warning"></i></span>
+            <span class="sidebar-link-text">Certificates &amp; IDs</span>
+            <span class="sidebar-counter-badge badge-cr80">CR80</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a href="{% url 'documents:id_card_studio' %}" class="sidebar-sublink {% if 'documents/id-cards' in request.path and 'bulk-print' not in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Student &amp; Staff ID Studio</a></li>
+            <li><a href="{% url 'documents:id_card_bulk_print' %}" class="sidebar-sublink {% if 'documents/id-cards/bulk-print' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>8-per-A4 Batch ID Print</a></li>
+            <li><a href="{% url 'documents:certificate_verify_search' %}" target="_blank" class="sidebar-sublink"><span class="sidebar-sublink-bullet"></span>Public QR Verification</a></li>
+            <li><a href="{% url 'documents:list' %}" class="sidebar-sublink {% if request.path == '/documents/' %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Document Vault</a></li>
+          </ul>
+        </li>
+        {% endif %}
+
+        <!-- 9. CAMPUS & RESOURCE HUB -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Campus Hub</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        {% if user.is_superadmin or user.is_librarian or user.is_principal %}
+        <li class="sidebar-item">
+          <a href="{% url 'library:catalog' %}" class="sidebar-link {% if 'library' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Library">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-book-bookmark text-primary"></i></span>
+            <span class="sidebar-link-text">Library Center</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+          <ul class="sidebar-submenu">
+            <li><a href="{% url 'library:circulation_list' %}" class="sidebar-sublink {% if 'circulation' in request.path %}active{% endif %}"><span class="sidebar-sublink-bullet"></span>Circulation (Issue/Return)</a></li>
+          </ul>
+        </li>
+        {% endif %}
+
+        <li class="sidebar-item">
+          <a href="{% url 'communication:notice_board' %}" class="sidebar-link {% if 'communication' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Notice Board">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-bullhorn text-danger"></i></span>
+            <span class="sidebar-link-text">Notice Board</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+
+        {% if user.is_superadmin or user.is_principal or user.is_school_admin %}
+        <li class="sidebar-item">
+          <a href="{% url 'inventory:dashboard' %}" class="sidebar-link {% if 'inventory' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="Inventory">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-boxes-stacked text-violet"></i></span>
+            <span class="sidebar-link-text">Campus Inventory</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% if user.is_superadmin or user.is_principal or user.is_school_admin %}
+        <!-- 10. SYSTEM & ADMINISTRATION -->
+        <li class="sidebar-section-header">
+          <span class="sidebar-section-title">Control Center</span>
+          <span class="sidebar-section-line"></span>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'accounts:user_list' %}" class="sidebar-link {% if 'accounts/users' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="User Accounts">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-users-gear text-info"></i></span>
+            <span class="sidebar-link-text">User Accounts &amp; RBAC</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'website:customizer_studio' %}" class="sidebar-link {% if 'customizer' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="3D Customizer">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-wand-magic-sparkles text-warning"></i></span>
+            <span class="sidebar-link-text">3D Web Customizer</span>
+            <span class="sidebar-counter-badge badge-3d">3D</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="/core/settings/" class="sidebar-link {% if 'settings' in request.path or 'core' in request.path %}active{% endif %}" data-magnetic="true" data-tooltip="School Settings">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-sliders text-secondary"></i></span>
+            <span class="sidebar-link-text">School Settings</span>
+            <span class="sidebar-active-jewel"></span>
+          </a>
+        </li>
+        <li class="sidebar-item">
+          <a href="{% url 'website:home' %}" target="_blank" class="sidebar-link" data-magnetic="true" data-tooltip="Live Portal">
+            <span class="sidebar-icon-box"><i class="fa-solid fa-globe text-primary"></i></span>
+            <span class="sidebar-link-text">Live Public Website</span>
+            <i class="fa-solid fa-arrow-up-right-from-square ms-auto small opacity-50" style="font-size:0.7rem;"></i>
+          </a>
+        </li>
+        {% endif %}
+
+        <!-- Empty search state -->
+        <li id="sidebarNoResults" class="sidebar-no-results">
+          <i class="fa-solid fa-magnifying-glass mb-2 d-block fs-5 text-muted"></i>
+          No matching menu items found.
+        </li>
+
+      </ul>
+
+      <!-- Self-Contained Real-Time Sidebar Search Script -->
+      <script>
+        function filterSidebarNav(input) {
+          const q = input.value.toLowerCase().trim();
+          const items = document.querySelectorAll('.sidebar-item');
+          const sectionHeaders = document.querySelectorAll('.sidebar-section-header');
+          const noResults = document.getElementById('sidebarNoResults');
+          let matches = 0;
+
+          if (!q) {
+            items.forEach(el => el.style.display = '');
+            sectionHeaders.forEach(el => el.style.display = '');
+            document.querySelectorAll('.sidebar-sublink').forEach(sl => sl.style.display = '');
+            if (noResults) noResults.style.display = 'none';
+            return;
+          }
+
+          items.forEach(el => {
+            const mainLink = el.querySelector('.sidebar-link');
+            const mainText = mainLink ? mainLink.textContent.toLowerCase() : '';
+            const sublinks = el.querySelectorAll('.sidebar-sublink');
+            let itemHasMatch = mainText.includes(q);
+            let subMatchCount = 0;
+
+            sublinks.forEach(sl => {
+              const text = sl.textContent.toLowerCase();
+              if (text.includes(q) || itemHasMatch) {
+                sl.style.display = '';
+                subMatchCount++;
+              } else {
+                sl.style.display = 'none';
+              }
+            });
+
+            if (itemHasMatch || subMatchCount > 0) {
+              el.style.display = '';
+              matches++;
+            } else {
+              el.style.display = 'none';
+            }
+          });
+
+          sectionHeaders.forEach(sh => sh.style.display = 'none');
+          if (noResults) noResults.style.display = matches === 0 ? 'block' : 'none';
+        }
+      </script>
+
+      <!-- Luxury Executive User Profile Footer -->
+      <div class="sidebar-footer">
+        <div class="user-profile-capsule" data-magnetic="true">
+          <div class="user-avatar-wrapper">
+            <div class="user-avatar-ring"></div>
+            <div class="user-avatar">{{ user.first_name|first|default:"U" }}{{ user.last_name|first|default:"" }}</div>
+            <span class="user-online-beacon" title="Online Active"></span>
+          </div>
+          <div class="d-flex flex-column overflow-hidden flex-grow-1">
+            <span class="text-white fw-semibold small text-truncate" style="font-size:0.83rem; letter-spacing:-0.01em;">{{ user.full_name }}</span>
+            <span class="sidebar-user-role-badge text-truncate">{{ user.get_user_type_display }}</span>
+          </div>
+          <div class="sidebar-footer-actions">
+            <a href="{% url 'accounts:logout' %}" class="sidebar-footer-btn" title="Sign Out">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- =============================================
+         MAIN AREA
+         ============================================= -->
+    <div class="app-main">
+
+      <!-- Topbar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <!-- Desktop Sidebar Collapse Toggle -->
+          <button id="sidebarCollapseBtn" class="topbar-btn d-none d-lg-flex" title="Toggle Sidebar (Collapse / Expand)" aria-label="Toggle Sidebar" style="border:none; cursor:pointer;">
+            <i class="fa-solid fa-bars-staggered"></i>
+          </button>
+
+          <!-- Mobile sidebar toggle -->
+          <button id="sidebarToggle" class="topbar-btn d-lg-none" aria-label="Toggle sidebar">
+            <i class="fa-solid fa-bars" style="font-size:1rem;"></i>
+          </button>
+
+          <!-- Search Trigger -->
+          <button class="topbar-search-trigger d-none d-md-flex" style="border:none;cursor:pointer;" aria-label="Open command palette">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span style="font-size:0.83rem;">Search anything...</span>
+            <span class="kbd-badge ms-auto">Ctrl K</span>
+          </button>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Theme Toggle -->
+          <button id="themeToggleBtn" class="topbar-btn" title="Toggle dark/light mode" style="border:none;">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+
+          {% if user.is_superadmin or user.is_principal or user.is_school_admin %}
+          <!-- School Settings Quick Button -->
+          <a href="/settings/" class="topbar-btn text-decoration-none" title="School Settings & Control Center" style="border:none;">
+            <i class="fa-solid fa-gear"></i>
+          </a>
+          {% endif %}
+
+          <!-- Notifications -->
+          <div class="dropdown">
+            <button class="topbar-btn position-relative" style="border:none;" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-regular fa-bell"></i>
+              {% if unread_notifications_count > 0 %}
+                <span class="position-absolute badge rounded-pill bg-danger badge-pulse"
+                      style="top:-4px;right:-4px;font-size:0.6rem;padding:2px 5px;">
+                  {{ unread_notifications_count }}
+                </span>
+              {% endif %}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2"
+                style="width:300px;border-radius:16px;overflow:hidden;background:var(--card-bg);backdrop-filter:blur(16px);">
+              <li class="px-4 py-3 border-bottom" style="border-color:var(--card-border)!important;">
+                <span class="fw-bold small" style="color:var(--text-main);">Notifications</span>
+              </li>
+              {% for notif in recent_notifications %}
+                <li>
+                  <a class="dropdown-item py-2 px-4 {% if not notif.is_read %}fw-medium{% endif %}"
+                     href="{{ notif.link_url|default:'#' }}"
+                     style="color:var(--text-main); background:transparent;">
+                    <div class="small fw-semibold text-truncate">{{ notif.title }}</div>
+                    <div style="font-size:0.74rem; color:var(--text-muted);">{{ notif.message|truncatechars:50 }}</div>
+                  </a>
+                </li>
+              {% empty %}
+                <li class="text-center py-4" style="color:var(--text-muted); font-size:0.83rem;">
+                  <i class="fa-regular fa-bell-slash mb-2 d-block" style="font-size:1.4rem;"></i>
+                  All caught up!
+                </li>
+              {% endfor %}
+              <li class="border-top" style="border-color:var(--card-border)!important;">
+                <a class="dropdown-item text-center py-2 fw-semibold" href="/communication/"
+                   style="color:var(--primary);font-size:0.83rem;background:transparent;">
+                  View all notices →
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- User Menu -->
+          <div class="dropdown">
+            <button class="d-flex align-items-center gap-2 bg-transparent border-0 p-0 rounded-pill px-2 py-1"
+                    style="cursor:pointer;transition:all 0.2s ease;"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="user-avatar" style="width:32px;height:32px;font-size:0.78rem;">
+                {{ user.first_name|first|default:"U" }}
+              </div>
+              <span class="d-none d-md-inline small fw-semibold" style="color:var(--text-main);">{{ user.full_name }}</span>
+              <i class="fa-solid fa-chevron-down d-none d-md-inline" style="font-size:0.65rem;color:var(--text-muted);"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2"
+                style="border-radius:16px;overflow:hidden;background:var(--card-bg);backdrop-filter:blur(16px);min-width:200px;">
+              <li class="px-4 py-3 border-bottom" style="border-color:var(--card-border)!important;">
+                <div class="fw-bold small" style="color:var(--text-main);">{{ user.full_name }}</div>
+                <div style="font-size:0.73rem;color:var(--text-muted);">{{ user.email }}</div>
+                <span class="badge mt-1" style="background:var(--primary-light);color:var(--primary);font-size:0.68rem;">{{ user.get_user_type_display }}</span>
+              </li>
+              <li><a class="dropdown-item py-2 px-4" href="{% url 'accounts:profile' %}" style="color:var(--text-main);background:transparent;">
+                <i class="fa-regular fa-user me-2" style="color:var(--text-muted);"></i>My Profile</a></li>
+              <li><a class="dropdown-item py-2 px-4" href="{% url 'accounts:change_password' %}" style="color:var(--text-main);background:transparent;">
+                <i class="fa-solid fa-key me-2" style="color:var(--text-muted);"></i>Change Password</a></li>
+              {% if user.is_superadmin or user.is_principal or user.is_school_admin %}
+              <li><a class="dropdown-item py-2 px-4" href="/settings/" style="color:var(--text-main);background:transparent;">
+                <i class="fa-solid fa-sliders me-2" style="color:var(--primary);"></i>School Settings</a></li>
+              {% endif %}
+              {% if user.is_staff %}
+              <li><a class="dropdown-item py-2 px-4" href="/admin/" target="_blank" style="color:var(--text-main);background:transparent;">
+                <i class="fa-solid fa-screwdriver-wrench me-2" style="color:var(--text-muted);"></i>Django Admin</a></li>
+              {% endif %}
+              <li><hr class="dropdown-divider my-1" style="border-color:var(--card-border);"></li>
+              <li><a class="dropdown-item py-2 px-4" href="{% url 'accounts:logout' %}" style="color:#ef4444;background:transparent;">
+                <i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Sign Out</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+      <!-- 7-Day Trial Mode Live Indicator Banner -->
+      {% if system_license and system_license.is_trial and not system_license.is_expired %}
+        <div class="trial-banner" style="background:linear-gradient(90deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); color:#fff; padding:0.5rem 1.75rem; font-size:0.82rem; border-bottom:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; z-index:90;">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge" style="background:#ffb800; color:#0f172a; font-weight:800; font-size:0.7rem; padding:3px 8px; border-radius:6px; letter-spacing:0.04em;">
+              <i class="fa-solid fa-hourglass-half me-1"></i> 7-DAY TRIAL MODE
+            </span>
+            <span>
+              Evaluation period active &mdash;
+              <strong style="color:#38bdf8;">{{ system_license.days_remaining }} day{{ system_license.days_remaining|pluralize }} {{ system_license.hours_remaining }} hr{{ system_license.hours_remaining|pluralize }} remaining</strong> (Expires: {{ system_license.expires_str }}).
+            </span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'core:settings' %}?tab=11" class="btn btn-sm text-white fw-bold" style="background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.3); border-radius:20px; font-size:0.75rem; padding:3px 14px; transition:all 0.2s ease;">
+              <i class="fa-solid fa-key text-warning me-1"></i> Activate License Key
+            </a>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Flash Messages -->
+      {% if messages %}
+        <div style="padding:1rem 1.75rem 0;">
+          {% for message in messages %}
+            <div class="alert alert-dismissible fade show mb-2"
+                 style="border-radius:14px; border:1px solid var(--card-border);
+                        background:var(--card-bg); color:var(--text-main);
+                        backdrop-filter:blur(12px); box-shadow:var(--shadow-sm);
+                        padding:0.9rem 1.25rem; display:flex; align-items:center; gap:0.75rem;">
+              {% if message.tags == 'success' %}
+                <i class="fa-solid fa-circle-check" style="color:var(--success);font-size:1.1rem;"></i>
+              {% elif message.tags == 'danger' or message.tags == 'error' %}
+                <i class="fa-solid fa-circle-exclamation" style="color:var(--danger);font-size:1.1rem;"></i>
+              {% elif message.tags == 'warning' %}
+                <i class="fa-solid fa-triangle-exclamation" style="color:var(--warning);font-size:1.1rem;"></i>
+              {% else %}
+                <i class="fa-solid fa-circle-info" style="color:var(--info);font-size:1.1rem;"></i>
+              {% endif %}
+              <span style="font-size:0.875rem;font-weight:500;">{{ message }}</span>
+              <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close" style="filter:opacity(0.4);"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Page Content -->
+      <main class="app-content">
+        {% block breadcrumb %}{% endblock %}
+        {% block page_header %}{% endblock %}
+        {% block content %}{% endblock %}
+      </main>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        &copy; {% now "Y" %} {{ school.name|default:"Horizon International Academy" }} &mdash; School Management & Administration System
+      </footer>
+    </div>
+  </div>
+
+  <!-- =============================================
+       COMMAND PALETTE (Ctrl+K)
+       ============================================= -->
+  <div id="commandPalette" class="command-palette-backdrop">
+    <div class="command-palette-dialog">
+      <div class="command-search-bar">
+        <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted);font-size:1rem;"></i>
+        <input id="commandInput" type="text" placeholder="Search modules, students, actions..." autocomplete="off">
+        <span class="kbd-badge">ESC</span>
+      </div>
+      <ul class="command-list">
+        <li><a href="{% url 'accounts:dashboard_router' %}" class="command-item text-decoration-none"><i class="fa-solid fa-gauge-high" style="color:var(--primary);"></i><span>Dashboard Portal</span></a></li>
+        <li><a href="/academics/" class="command-item text-decoration-none"><i class="fa-solid fa-school" style="color:var(--info);"></i><span>Academics & Classes</span></a></li>
+        <li><a href="/students/" class="command-item text-decoration-none"><i class="fa-solid fa-user-graduate" style="color:var(--success);"></i><span>Student Directory</span></a></li>
+        <li><a href="/students/register/" class="command-item text-decoration-none"><i class="fa-solid fa-user-plus" style="color:var(--primary);"></i><span>Enroll New Student</span></a></li>
+        <li><a href="/staff/" class="command-item text-decoration-none"><i class="fa-solid fa-chalkboard-user" style="color:var(--violet);"></i><span>Faculty Directory</span></a></li>
+        <li><a href="/timetable/" class="command-item text-decoration-none"><i class="fa-solid fa-calendar-days" style="color:var(--warning);"></i><span>Timetable Planner</span></a></li>
+        <li><a href="/attendance/" class="command-item text-decoration-none"><i class="fa-solid fa-clipboard-user" style="color:var(--primary);"></i><span>Daily Attendance</span></a></li>
+        <li><a href="/examinations/" class="command-item text-decoration-none"><i class="fa-solid fa-award" style="color:var(--danger);"></i><span>Examinations & Gradebook</span></a></li>
+        <li><a href="/assignments/" class="command-item text-decoration-none"><i class="fa-solid fa-book-open" style="color:var(--info);"></i><span>Assignments & Homework</span></a></li>
+        <li><a href="/fees/" class="command-item text-decoration-none"><i class="fa-solid fa-file-invoice-dollar" style="color:var(--success);"></i><span>Fees & Invoicing</span></a></li>
+        <li><a href="/staff/payroll/dashboard/" class="command-item text-decoration-none"><i class="fa-solid fa-money-check-dollar" style="color:var(--primary);"></i><span>Staff Payroll &amp; Salaries</span></a></li>
+        <li><a href="/library/" class="command-item text-decoration-none"><i class="fa-solid fa-book-bookmark" style="color:var(--warning);"></i><span>Library Catalog</span></a></li>
+        <li><a href="/admissions/" class="command-item text-decoration-none"><i class="fa-solid fa-door-open" style="color:var(--primary);"></i><span>Admissions Pipeline</span></a></li>
+        <li><a href="/inventory/" class="command-item text-decoration-none"><i class="fa-solid fa-boxes-stacked" style="color:var(--violet);"></i><span>Asset Inventory</span></a></li>
+        <li><a href="/expenses/" class="command-item text-decoration-none"><i class="fa-solid fa-receipt" style="color:var(--danger);"></i><span>Operating Expenses</span></a></li>
+        <li><a href="/reports/" class="command-item text-decoration-none"><i class="fa-solid fa-chart-pie" style="color:var(--success);"></i><span>Consolidated Reports</span></a></li>
+        <li><a href="/accounts/users/" class="command-item text-decoration-none"><i class="fa-solid fa-users-gear" style="color:var(--primary);"></i><span>User Accounts Directory</span></a></li>
+        <li><a href="/accounts/users/create/" class="command-item text-decoration-none"><i class="fa-solid fa-user-plus" style="color:var(--success);"></i><span>Create User Account (Manual)</span></a></li>
+        <li><a href="/core/settings/" class="command-item text-decoration-none"><i class="fa-solid fa-sliders" style="color:var(--primary);"></i><span>School Settings & Control Center</span></a></li>
+        <li><a href="{% url 'accounts:profile' %}" class="command-item text-decoration-none"><i class="fa-solid fa-user" style="color:var(--text-muted);"></i><span>My Account Profile</span></a></li>
+        <li><a href="{% url 'accounts:logout' %}" class="command-item text-decoration-none"><i class="fa-solid fa-arrow-right-from-bracket" style="color:var(--danger);"></i><span>Sign Out</span></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Horizon Animation Engine -->
+  <script src="{% static 'js/app.js' %}?v=4.3"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

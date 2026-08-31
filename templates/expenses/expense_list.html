@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Expense Vouchers{% endblock %}
+{% block page_heading %}Operating Expense Vouchers{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Expense Vouchers Directory</h5>
+    <p class="text-muted small mb-0">Total {{ paginator.count }} vouchers on file.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'expenses:export' %}?format=csv" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-file-csv me-1"></i> Export CSV</a>
+    <a href="{% url 'expenses:export' %}?format=excel" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-file-excel me-1"></i> Export Excel</a>
+    <a href="{% url 'expenses:create' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Record Expense</a>
+  </div>
+</div>
+
+<!-- Search & Category Filter -->
+<div class="card-saas p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-6">
+      <input type="text" name="search" class="form-control form-control-sm" placeholder="Search by title, voucher #, or vendor..." value="{{ search_query }}">
+    </div>
+    <div class="col-md-4">
+      <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+        <option value="">All Expense Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-saas-primary btn-sm w-100">Search</button>
+      <a href="{% url 'expenses:list' %}" class="btn btn-saas-secondary btn-sm">Reset</a>
+    </div>
+  </form>
+</div>
+
+<!-- Expense Table -->
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Voucher #</th>
+            <th>Expense Item</th>
+            <th>Category</th>
+            <th>Vendor / Supplier</th>
+            <th>Date</th>
+            <th>Method</th>
+            <th>Amount (₹)</th>
+            <th>Receipt</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for exp in expenses %}
+            <tr>
+              <td class="fw-bold text-primary small">{{ exp.voucher_number }}</td>
+              <td class="fw-semibold text-dark">{{ exp.title }}</td>
+              <td><span class="badge bg-light text-secondary border">{{ exp.category.name }}</span></td>
+              <td class="small text-muted">{{ exp.vendor_name|default:"-" }}</td>
+              <td class="small">{{ exp.expense_date|date:"d M Y" }}</td>
+              <td><span class="badge bg-light text-dark border">{{ exp.get_payment_method_display }}</span></td>
+              <td class="fw-bold text-danger">₹{{ exp.amount }}</td>
+              <td>
+                {% if exp.receipt_file %}
+                  <a href="{{ exp.receipt_file.url }}" class="btn btn-sm btn-outline-primary py-0" download><i class="fa-solid fa-paperclip"></i></a>
+                {% else %}
+                  <span class="text-muted small">-</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center text-muted py-4 small">No expense vouchers found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

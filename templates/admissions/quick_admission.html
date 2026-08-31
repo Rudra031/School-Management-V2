@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Quick Admission | Apex SMS{% endblock %}
+
+{% block content %}
+
+<!-- Header & Breadcrumb -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1" style="font-size:0.8rem;">
+        <li class="breadcrumb-item"><a href="{% url 'admissions:pipeline' %}" class="text-decoration-none">Admissions</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Quick Admission</li>
+      </ol>
+    </nav>
+    <div class="d-flex align-items-center gap-2">
+      <h3 class="fw-bold mb-0" style="font-family:'Geist',sans-serif;color:var(--text-main);letter-spacing:-0.02em;">
+        Quick Admission (Fast Track Enrollment)
+      </h3>
+      <span class="badge" style="background:var(--warning-light);color:var(--warning);font-size:0.75rem;font-weight:600;padding:4px 8px;border-radius:6px;">
+        <i class="fa-solid fa-bolt me-1"></i> Mode 1 (Speed Track)
+      </span>
+    </div>
+    <p class="text-muted mb-0" style="font-size:0.85rem;">
+      Register and enroll a student rapidly with core mandatory details. Full profile can be updated later.
+    </p>
+  </div>
+
+  <div>
+    <a href="{% url 'admissions:full_admission' %}" class="btn btn-saas-secondary btn-sm">
+      <i class="fa-solid fa-list-ol me-1"></i> Switch to Full Multi-Step Admission &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- Duplicate Detection AI Banner -->
+<div class="alert alert-info d-flex align-items-center justify-content-between p-2 px-3 mb-4 rounded-3 border-0" style="background:rgba(30,64,175,0.08);color:var(--primary);font-size:0.82rem;">
+  <div class="d-flex align-items-center gap-2">
+    <i class="fa-solid fa-shield-halved"></i>
+    <span><strong>Intelligent Duplicate Detection Active:</strong> Real-time cross-checks against student names, DOB, and guardian contact numbers.</span>
+  </div>
+  <span class="badge bg-primary">Active</span>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <div class="row g-3 mb-5">
+    <!-- Left Column: Student Bio & Photo -->
+    <div class="col-lg-6">
+      <div class="card-saas h-100">
+        <div class="card-saas-header d-flex align-items-center gap-2 py-2 px-3">
+          <i class="fa-solid fa-user text-primary" style="font-size:0.85rem;"></i>
+          <span class="fw-bold" style="font-size:0.88rem;">Student Information &amp; Photo</span>
+        </div>
+        <div class="card-saas-body p-3">
+          <!-- Photo Box -->
+          <div class="d-flex align-items-center gap-3 mb-3 p-3" style="background:var(--card-bg);border:1px dashed var(--card-border);border-radius:10px;">
+            <div style="width:70px;height:70px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:1.5rem;">
+              <i class="fa-solid fa-camera"></i>
+            </div>
+            <div>
+              <div class="fw-bold text-main" style="font-size:0.85rem;">Student Passport Photo</div>
+              <div class="text-muted" style="font-size:0.75rem;">JPG, PNG up to 2MB (35x45mm)</div>
+              <div class="mt-2 d-flex gap-2">
+                <button type="button" class="btn btn-saas-secondary btn-sm py-0 px-2" style="font-size:0.75rem;">
+                  <i class="fa-solid fa-upload me-1"></i> Upload
+                </button>
+                <button type="button" class="btn btn-saas-secondary btn-sm py-0 px-2" style="font-size:0.75rem;">
+                  <i class="fa-solid fa-video me-1"></i> Camera Snap
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-semibold">First Name <span class="text-danger">*</span></label>
+              {{ form.first_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-semibold">Last Name <span class="text-danger">*</span></label>
+              {{ form.last_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-semibold">Date of Birth <span class="text-danger">*</span></label>
+              {{ form.date_of_birth }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-semibold">Gender <span class="text-danger">*</span></label>
+              {{ form.gender }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-semibold">Applying Class <span class="text-danger">*</span></label>
+              {{ form.applying_for_class }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-semibold">Assign Section</label>
+              {{ form.section }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-semibold">Academic Session <span class="text-danger">*</span></label>
+              {{ form.academic_year }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-semibold">Admission Category</label>
+              {{ form.admission_type }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Parent, Previous School & Address -->
+    <div class="col-lg-6">
+      <div class="card-saas h-100">
+        <div class="card-saas-header d-flex align-items-center gap-2 py-2 px-3">
+          <i class="fa-solid fa-users text-primary" style="font-size:0.85rem;"></i>
+          <span class="fw-bold" style="font-size:0.88rem;">Parent &amp; Previous Education</span>
+        </div>
+        <div class="card-saas-body p-3">
+          <div class="row g-2">
+            <div class="col-12">
+              <label class="form-label text-muted small fw-semibold">Father / Guardian Full Name <span class="text-danger">*</span></label>
+              {{ form.parent_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-semibold">Primary Contact Phone <span class="text-danger">*</span></label>
+              {{ form.parent_phone }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted small fw-semibold">Guardian Email Address <span class="text-danger">*</span></label>
+              {{ form.parent_email }}
+            </div>
+            <div class="col-12">
+              <label class="form-label text-muted small fw-semibold">Residential Address</label>
+              {{ form.residential_address }}
+            </div>
+            <div class="col-md-8">
+              <label class="form-label text-muted small fw-semibold">Previous School Name (Optional)</label>
+              {{ form.previous_school }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-muted small fw-semibold">Previous Grade</label>
+              {{ form.previous_class }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Bottom Action Bar -->
+  <div class="position-sticky bottom-0 bg-surface p-3 border-top d-flex justify-content-between align-items-center shadow-sm" style="margin: 0 -1.5rem -1.5rem -1.5rem; background: var(--bg-surface); border-color: var(--card-border) !important; z-index: 100;">
+    <div>
+      <a href="{% url 'admissions:pipeline' %}" class="btn btn-saas-secondary btn-sm me-2">Cancel</a>
+      <button type="submit" name="action" value="draft" class="btn btn-outline-secondary btn-sm">
+        <i class="fa-regular fa-floppy-disk me-1"></i> Save as Draft
+      </button>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      <button type="submit" name="action" value="enroll" class="btn btn-saas-secondary btn-sm px-3">
+        <i class="fa-solid fa-check me-1"></i> Save &amp; Finish Quick Admission
+      </button>
+      <button type="submit" name="action" value="enroll_and_continue" class="btn btn-saas-primary btn-sm px-4">
+        <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Save &amp; Continue Full Admission Process &rarr;
+      </button>
+    </div>
+  </div>
+</form>
+
+{% endblock %}

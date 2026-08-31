@@ -1,0 +1,801 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ school.name|default:"Horizon Primary World School" }}{% endblock %} — Early Childhood &amp; Primary Education</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffb800'><path d='M12 2L1 7l11 5 9-4.09V17h2V7L12 2z'/></svg>">
+
+  <!-- Google Fonts: Montserrat, Roboto, Inter, Quicksand -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS & FontAwesome 6 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* ==========================================================================
+       HORIZON PRIMARY WORLD SCHOOL - CLEAN & VIBRANT LIGHT THEME
+       ========================================================================== */
+    :root {
+      --mea-blue-dark: #0f172a;
+      --mea-blue-primary: #0284c7;
+      --mea-blue-deep: #0369a1;
+      --mea-blue-light: #f0f9ff;
+      --mea-blue-sky: #e0f2fe;
+      --mea-blue-soft: #bae6fd;
+      --mea-gold: #f59e0b;
+      --mea-amber: #d97706;
+      --mea-text-dark: #0f172a;
+      --mea-surface: #f8fafc;
+      --kid-yellow: #ffb800;
+      --kid-blue: #0284c7;
+      --kid-green: #16a34a;
+      --kid-coral: #f43f5e;
+      --kid-purple: #8b5cf6;
+      --canvas-porcelain: #faf9f6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: #faf9f6;
+      color: #334155;
+      font-family: 'Quicksand', 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Quicksand', 'Montserrat', sans-serif;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* Stitch Bento Box & Card Tokens */
+    .bento-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .bento-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+      border-color: #cbd5e1;
+    }
+    .bento-tab-pill {
+      background: #ffffff;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+      border-radius: 9999px;
+      padding: 10px 22px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .bento-tab-pill:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+      border-color: #bae6fd;
+    }
+    .bento-tab-pill.active {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.3);
+    }
+    .bento-tab-pill-yellow.active {
+      background: #ffb800;
+      color: #0f172a;
+      border-color: #ffb800;
+      box-shadow: 0 4px 16px rgba(255, 184, 0, 0.35);
+    }
+
+    /* --------------------------------------------------------------------------
+       TOP UTILITY STRIP (CONTACT & ACCREDITATION)
+       -------------------------------------------------------------------------- */
+    .top-info-strip {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 9px 0;
+      color: #475569;
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    .top-info-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #475569;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .top-info-item:hover {
+      color: #0284c7;
+    }
+
+    .btn-mega-toggle {
+      background: #f0f9ff;
+      color: #0284c7;
+      border: 1px solid #bae6fd;
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s ease;
+    }
+    .btn-mega-toggle:hover {
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    /* --------------------------------------------------------------------------
+       COLLAPSIBLE MEGA-DRAWER / MULTI-PAGE DIRECTORY (LIGHT MODE)
+       -------------------------------------------------------------------------- */
+    .collapsible-drawer {
+      background: #ffffff;
+      border-bottom: 3px solid #ffb800;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+      display: none;
+      padding: 2.25rem 0 1.5rem;
+      position: relative;
+      z-index: 1060;
+      animation: drawerSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes drawerSlideDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .drawer-col-title {
+      color: #0f172a;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 6px;
+    }
+
+    .drawer-links-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .drawer-links-list li {
+      margin-bottom: 8px;
+    }
+
+    .drawer-links-list a {
+      color: #475569;
+      text-decoration: none;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .drawer-links-list a:hover {
+      color: #0284c7;
+      transform: translateX(4px);
+    }
+
+    /* --------------------------------------------------------------------------
+       PRIMARY STICKY NAVBAR (CRISP LIGHT CLEAN THEME)
+       -------------------------------------------------------------------------- */
+    .site-navbar {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 1040;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .nav-link-mea {
+      color: #334155 !important;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.9rem 0.85rem !important;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+      border-radius: 8px;
+    }
+
+    .nav-link-mea:hover, .nav-link-mea.active {
+      color: #0284c7 !important;
+      background: #f0f9ff;
+    }
+
+    /* Dropdown Menus */
+    .dropdown-menu-mea {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+      padding: 8px 0;
+      margin-top: 0;
+    }
+
+    .dropdown-item-mea {
+      color: #334155;
+      font-size: 0.85rem;
+      padding: 8px 18px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .dropdown-item-mea:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+      padding-left: 22px;
+    }
+
+    .btn-apply-header {
+      background: linear-gradient(135deg, #ffb800, #f59e0b);
+      color: #0f172a;
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 8px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+      transition: all 0.25s ease;
+    }
+    .btn-apply-header:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(245, 158, 11, 0.45);
+      color: #000;
+    }
+
+    /* Universal Cards & Panels (Clean Light Mode) */
+    .glass-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    }
+
+    .glass-panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Standardized Institutional Button Styles */
+    .btn-site-primary {
+      background: #0284c7;
+      color: #ffffff !important;
+      border: 1px solid #0284c7;
+      padding: 9px 22px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+    .btn-site-primary:hover {
+      background: #0369a1;
+      border-color: #0369a1;
+      color: #ffffff !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.35);
+    }
+
+    .btn-site-gold {
+      background: linear-gradient(135deg, #ffb800 0%, #f59e0b 100%);
+      color: #0f172a !important;
+      border: none;
+      padding: 9px 24px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+    }
+    .btn-site-gold:hover {
+      background: linear-gradient(135deg, #ffd700 0%, #ea580c 100%);
+      color: #000 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+    }
+
+    .btn-site-glass {
+      background: #ffffff;
+      color: #334155 !important;
+      border: 1px solid #cbd5e1;
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+    .btn-site-glass:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #0f172a !important;
+      transform: translateY(-2px);
+    }
+
+    /* Badges, Gradients & Utilites */
+    .badge-tag {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #b45309;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 5px 14px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 60%, #ffb800 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+      animation: pulseAnimation 2s infinite;
+      display: inline-block;
+    }
+
+    @keyframes pulseAnimation {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .max-w-700 { max-width: 700px; }
+    .max-w-800 { max-width: 800px; }
+    .max-w-900 { max-width: 900px; }
+
+    /* Footer */
+    .site-footer {
+      background: #0f172a;
+      border-top: 3px solid #ffb800;
+      padding: 4rem 0 1.5rem;
+      margin-top: 5rem;
+      color: #94a3b8;
+    }
+
+    .footer-title {
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      position: relative;
+      padding-bottom: 8px;
+    }
+    .footer-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: #ffb800;
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. TOP INSTITUTIONAL CONTACT & COMPLIANCE STRIP (PRIMARY WORLD SCHOOL)
+       ========================================================================= -->
+  <div class="top-info-strip d-none d-md-block">
+    <div class="container d-flex justify-content-between align-items-center">
+      
+      <!-- Left: Contact & CBSE / Montessori Accreditation -->
+      <div class="d-flex align-items-center gap-4">
+        <span class="top-info-item">
+          <i class="fa-solid fa-phone text-warning"></i>
+          <strong>011 2748 9012</strong> / +91 98765 43210
+        </span>
+        <span class="top-info-item">
+          <i class="fa-solid fa-envelope text-primary"></i>
+          admissions@horizonprimary.edu.in
+        </span>
+        <span class="top-info-item text-secondary">
+          <i class="fa-solid fa-shapes text-warning"></i>
+          CBSE Affil. No: <strong>2430089</strong> • Montessori &amp; EYFS Accredited
+        </span>
+      </div>
+
+      <!-- Right: Online Portals & Collapsible Mega-Drawer Toggle -->
+      <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'website:admissions' %}#sec-admissions-tuition" class="top-info-item fw-bold text-dark">
+          <i class="fa-solid fa-indian-rupee-sign text-warning"></i> Fee Structure
+        </a>
+        {% if request.user.is_authenticated %}
+          <a href="{% url 'accounts:dashboard_router' %}" class="top-info-item fw-bold text-success">
+            <i class="fa-solid fa-gauge-high"></i> My ERP Dashboard
+          </a>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="top-info-item fw-bold text-primary">
+            <i class="fa-solid fa-user-lock"></i> Teacher &amp; Parent Sign In
+          </a>
+        {% endif %}
+        <button type="button" class="btn-mega-toggle" id="megaDrawerToggleBtn" onclick="toggleMegaDrawer()">
+          <i class="fa-solid fa-shapes"></i>
+          <span id="megaToggleText">Primary Explorer Directory ▼</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. COLLAPSIBLE MEGA-DRAWER (PRIMARY WORLD SCHOOL HUB)
+       ========================================================================= -->
+  <div class="collapsible-drawer" id="collapsibleHeaderDrawer">
+    <div class="container">
+      
+      <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-child-reaching text-warning fs-5"></i>
+          <h5 class="fw-bold text-white mb-0">Horizon Primary School Explorer Directory</h5>
+          <span class="badge bg-warning text-dark fw-bold ms-2">Ages 2.5 – 10 Years • Session 2026–2027</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="toggleMegaDrawer()">
+          <i class="fa-solid fa-xmark me-1"></i> Close Directory
+        </button>
+      </div>
+
+      <div class="row g-4">
+        <!-- Col 1: Early Learning Stages -->
+        <div class="col-md-6 col-lg-3">
+          <div class="drawer-col-title">
+            <i class="fa-solid fa-shapes"></i> Early Learning Stages
+          </div>
+          <ul class="drawer-links-list">
+            <li><a href="{% url 'website:academics' %}"><i class="fa-solid fa-caret-right text-warning"></i> Playgroup &amp; Nursery (Ages 2.5–3.5)</a></li>
+            <li><a href="{% url 'website:academics' %}"><i class="fa-solid fa-caret-right text-warning"></i> Kindergarten LKG / UKG (Ages 4–5)</a></li>
+            <li><a href="{% url 'website:academics' %}"><i class="fa-solid fa-caret-right text-warning"></i> Lower Primary: Grades 1–3 (Ages 6–8)</a></li>
+            <li><a href="{% url 'website:academics' %}"><i class="fa-solid fa-caret-right text-warning"></i> Upper Primary: Grades 4–5 (Ages 9–10)</a></li>
+            <li><a href="{% url 'website:academics' %}"><i class="fa-solid fa-caret-right text-warning"></i> Phonics &amp; Singapore Math for Kids</a></li>
+            <li><a href="{% url 'website:academics' %}"><i class="fa-solid fa-caret-right text-warning"></i> Primary Calendar &amp; Activity Holidays</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 2: Play & Discovery Areas -->
+        <div class="col-md-6 col-lg-3">
+          <div class="drawer-col-title">
+            <i class="fa-solid fa-puzzle-piece"></i> Play &amp; Campus Life
+          </div>
+          <ul class="drawer-links-list">
+            <li><a href="{% url 'website:campus_life' %}"><i class="fa-solid fa-caret-right text-warning"></i> Sensory Sandbox &amp; Playpark</a></li>
+            <li><a href="{% url 'website:campus_life' %}"><i class="fa-solid fa-caret-right text-warning"></i> Junior STEM &amp; Robotics Discovery Lab</a></li>
+            <li><a href="{% url 'website:campus_life' %}"><i class="fa-solid fa-caret-right text-warning"></i> Treehouse Story Library &amp; Puppet Theatre</a></li>
+            <li><a href="{% url 'website:campus_life' %}"><i class="fa-solid fa-caret-right text-warning"></i> Junior Splash Arena &amp; Soft Play Gym</a></li>
+            <li><a href="{% url 'website:campus_life' %}"><i class="fa-solid fa-caret-right text-warning"></i> 4 Junior Houses (Butterflies, Dolphins, Lions, Eagles)</a></li>
+            <li><a href="{% url 'website:campus_life' %}"><i class="fa-solid fa-caret-right text-warning"></i> Daycare &amp; After-School Hobby Clubs</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Admissions & Enrollment -->
+        <div class="col-md-6 col-lg-3">
+          <div class="drawer-col-title">
+            <i class="fa-solid fa-file-signature"></i> Admissions &amp; Fees
+          </div>
+          <ul class="drawer-links-list">
+            <li><a href="{% url 'website:public_apply' %}" class="fw-bold text-warning"><i class="fa-solid fa-pen-nib text-warning"></i> Online Primary Admission (2026–27)</a></li>
+            <li><a href="{% url 'website:public_apply_track' %}"><i class="fa-solid fa-caret-right text-warning"></i> Track Application Status</a></li>
+            <li><a href="{% url 'website:admissions' %}#sec-admissions-tuition"><i class="fa-solid fa-caret-right text-warning"></i> Class-Wise Fee Schedule</a></li>
+            <li><a href="{% url 'website:admissions' %}"><i class="fa-solid fa-caret-right text-warning"></i> Age Criteria &amp; Child Readiness</a></li>
+            <li><a href="{% url 'website:admissions' %}#sec-admissions-tuition"><i class="fa-solid fa-caret-right text-warning"></i> Sibling Discounts &amp; Scholarships</a></li>
+            <li><a href="{% url 'website:contact' %}"><i class="fa-solid fa-caret-right text-warning"></i> Book a Guided Family Tour</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Child Safety & Care -->
+        <div class="col-md-6 col-lg-3">
+          <div class="drawer-col-title">
+            <i class="fa-solid fa-shield-heart"></i> Care &amp; Verification
+          </div>
+          <ul class="drawer-links-list">
+            <li><a href="{% url 'website:about' %}"><i class="fa-solid fa-caret-right text-warning"></i> Joyful Early Learning Philosophy</a></li>
+            <li><a href="{% url 'website:faculty' %}"><i class="fa-solid fa-caret-right text-warning"></i> Certified Montessori Teachers &amp; Mentors</a></li>
+            <li><a href="{% url 'website:about' %}#safety"><i class="fa-solid fa-caret-right text-warning"></i> 100% CCTV &amp; Child Safety Standards</a></li>
+            <li><a href="{% url 'documents:certificate_verify_search' %}"><i class="fa-solid fa-qrcode text-warning"></i> TC / CC Real-Time QR Verification</a></li>
+            <li><a href="{% url 'website:news_events' %}"><i class="fa-solid fa-caret-right text-warning"></i> Newsletters &amp; Event Circulars</a></li>
+            <li><a href="{% url 'accounts:login' %}" class="fw-bold text-info"><i class="fa-solid fa-lock text-info"></i> Parent ERP Portal Sign In</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       3. PRIMARY STICKY NAVIGATION BAR (HORIZON PRIMARY WORLD SCHOOL)
+       ========================================================================= -->
+  <nav class="site-navbar">
+    <div class="container d-flex align-items-center justify-content-between">
+      
+      <!-- Brand Logo & Motto -->
+      <a href="{% url 'website:home' %}" class="d-flex align-items-center gap-3 text-decoration-none py-2">
+        <div class="d-flex align-items-center justify-content-center rounded-circle shadow-sm" style="width:48px; height:48px; background:linear-gradient(135deg, #ffb800, #f59e0b);">
+          <i class="fa-solid fa-shapes text-dark fs-4"></i>
+        </div>
+        <div>
+          <div class="fw-bold text-white fs-5" style="letter-spacing:0.3px; line-height:1.2;">{{ school.name|default:"Horizon Primary World School" }}</div>
+          <span class="text-warning small" style="font-size:0.75rem; letter-spacing:0.5px;">Where Little Minds Bloom • Nursery to Grade 5</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <div class="d-none d-lg-flex align-items-center">
+        <a href="{% url 'website:home' %}" class="nav-link-mea {% if active_page == 'home' %}active{% endif %}">Home</a>
+
+        <!-- Dropdown: The School -->
+        <div class="nav-item-custom dropdown">
+          <a class="nav-link-mea dropdown-toggle {% if active_page == 'about' %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+            About School
+          </a>
+          <ul class="dropdown-menu dropdown-menu-mea">
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:about' %}">Early Childhood Philosophy</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:about' %}#founder">Founder's Vision</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:about' %}#principal">Headmistress Desk</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:faculty' %}">Caring Teachers &amp; Mentors</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:about' %}#values">Child Safety &amp; Care Standards</a></li>
+          </ul>
+        </div>
+
+        <!-- Dropdown: Early Learning -->
+        <div class="nav-item-custom dropdown">
+          <a class="nav-link-mea dropdown-toggle {% if active_page == 'academics' %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+            Curriculum
+          </a>
+          <ul class="dropdown-menu dropdown-menu-mea">
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:academics' %}#sec-academic-wings">Playgroup &amp; Nursery (Ages 2.5–3.5)</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:academics' %}#sec-academic-wings">Kindergarten LKG / UKG (Ages 4–5)</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:academics' %}#sec-academic-wings">Lower Primary: Grades 1–3 (Ages 6–8)</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:academics' %}#sec-academic-wings">Upper Primary: Grades 4–5 (Ages 9–10)</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:academics' %}#sec-evaluation">Joyful Assessment &amp; Growth Reports</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:academics' %}#sec-academic-calendar">Activity Calendar 2026–27</a></li>
+          </ul>
+        </div>
+
+        <!-- Dropdown: Play & Campus Life -->
+        <div class="nav-item-custom dropdown">
+          <a class="nav-link-mea dropdown-toggle {% if active_page == 'campus_life' %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+            Campus Life
+          </a>
+          <ul class="dropdown-menu dropdown-menu-mea">
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:campus_life' %}">Sensory Sandbox &amp; Playparks</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:campus_life' %}">Junior STEM Discovery Lab</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:campus_life' %}">Story Treehouse Library</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:campus_life' %}">Kids Splash Arena &amp; Soft Gym</a></li>
+            <li><a href="{% url 'website:campus_life' %}#sec-houses" class="dropdown-item dropdown-item-mea">4 Junior Houses</a></li>
+            <li><a href="{% url 'website:campus_life' %}#sec-clubs" class="dropdown-item dropdown-item-mea">After-School Activity Clubs</a></li>
+          </ul>
+        </div>
+
+        <!-- Dropdown: Admissions -->
+        <div class="nav-item-custom dropdown">
+          <a class="nav-link-mea dropdown-toggle {% if active_page == 'admissions' %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+            Admissions
+          </a>
+          <ul class="dropdown-menu dropdown-menu-mea">
+            <li><a class="dropdown-item dropdown-item-mea fw-bold text-warning" href="{% url 'website:public_apply' %}"><i class="fa-solid fa-pen-to-square me-1"></i> Apply Online (2026–27)</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:public_apply_track' %}">Track Application Status</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:admissions' %}#sec-admissions-tuition">Class-Wise Fee Matrix</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:admissions' %}">Age Eligibility Matrix</a></li>
+            <li><a class="dropdown-item dropdown-item-mea" href="{% url 'website:contact' %}">Book Campus Tour</a></li>
+          </ul>
+        </div>
+
+        <a href="{% url 'website:testimonials' %}" class="nav-link-mea {% if active_page == 'testimonials' %}active{% endif %}">Parent Smiles</a>
+        <a href="{% url 'website:news_events' %}" class="nav-link-mea {% if active_page == 'news_events' %}active{% endif %}">Events &amp; News</a>
+        <a href="{% url 'website:contact' %}" class="nav-link-mea {% if active_page == 'contact' %}active{% endif %}">Contact</a>
+      </div>
+
+      <!-- Header Action Buttons -->
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'website:contact' %}" class="btn btn-sm btn-outline-light rounded-pill px-3 d-none d-sm-inline-flex align-items-center gap-1" style="font-size:0.82rem;">
+          <i class="fa-solid fa-calendar-check text-warning"></i> Tour Campus
+        </a>
+        <a href="{% url 'website:public_apply' %}" class="btn-apply-header rounded-pill">
+          <i class="fa-solid fa-shapes"></i> Enroll for 2026–27
+        </a>
+        <button class="btn btn-sm btn-outline-light d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileNavDrawer">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Mobile Offcanvas Drawer -->
+  <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="mobileNavDrawer" style="background:#021028 !important; border-right:1px solid rgba(255,255,255,0.1);">
+    <div class="offcanvas-header border-bottom border-secondary border-opacity-25">
+      <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center justify-content-center rounded-circle" style="width:36px; height:36px; background:linear-gradient(135deg, #ffb800, #f59e0b);">
+          <i class="fa-solid fa-shapes text-dark"></i>
+        </div>
+        <h6 class="offcanvas-title fw-bold text-white mb-0">{{ school.name|default:"Horizon Primary World School" }}</h6>
+      </div>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-4 d-flex flex-column justify-content-between">
+      <ul class="navbar-nav gap-2">
+        <li class="nav-item"><a class="nav-link text-white fw-semibold" href="{% url 'website:home' %}"><i class="fa-solid fa-house me-2 text-warning"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link text-white fw-semibold" href="{% url 'website:about' %}"><i class="fa-solid fa-heart me-2 text-danger"></i> About Early Learning</a></li>
+        <li class="nav-item"><a class="nav-link text-white fw-semibold" href="{% url 'website:academics' %}"><i class="fa-solid fa-book-open me-2 text-info"></i> Primary Curriculum</a></li>
+        <li class="nav-item"><a class="nav-link text-white fw-semibold" href="{% url 'website:campus_life' %}"><i class="fa-solid fa-puzzle-piece me-2 text-success"></i> Play &amp; Campus Life</a></li>
+        <li class="nav-item"><a class="nav-link text-white fw-semibold" href="{% url 'website:admissions' %}"><i class="fa-solid fa-receipt me-2 text-warning"></i> Fee Structure</a></li>
+        <li class="nav-item"><a class="nav-link text-white fw-semibold" href="{% url 'website:testimonials' %}"><i class="fa-solid fa-star me-2 text-warning"></i> Parent Smiles</a></li>
+        <li class="nav-item"><a class="nav-link text-white fw-semibold" href="{% url 'website:news_events' %}"><i class="fa-solid fa-calendar me-2 text-primary"></i> Events &amp; News</a></li>
+        <li class="nav-item"><a class="nav-link text-white fw-semibold" href="{% url 'website:contact' %}"><i class="fa-solid fa-headset me-2 text-info"></i> Contact Helpdesk</a></li>
+      </ul>
+      <div class="pt-4 border-top border-secondary border-opacity-25 d-flex flex-column gap-2">
+        <a href="{% url 'website:public_apply' %}" class="btn btn-warning fw-bold rounded-pill w-100 py-2">
+          <i class="fa-solid fa-shapes me-1"></i> Enroll Online (2026–27)
+        </a>
+        <a href="{% url 'accounts:login' %}" class="btn btn-outline-light rounded-pill w-100 py-2 small">
+          <i class="fa-solid fa-user-lock me-1"></i> Teacher &amp; Parent Sign In
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MAIN CONTENT CONTAINER
+       ========================================================================= -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- =========================================================================
+       SITE FOOTER (HORIZON PRIMARY WORLD SCHOOL)
+       ========================================================================= -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="row g-4 mb-5">
+        
+        <!-- Col 1: Identity -->
+        <div class="col-lg-4">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="d-flex align-items-center justify-content-center rounded-circle" style="width:44px; height:44px; background:linear-gradient(135deg, #ffb800, #f59e0b);">
+              <i class="fa-solid fa-shapes text-dark fs-5"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold text-white mb-0">{{ school.name|default:"Horizon Primary World School" }}</h5>
+              <span class="text-warning small" style="font-size:0.75rem;">Where Little Minds Bloom with Joy &amp; Wonder</span>
+            </div>
+          </div>
+          <p class="text-white-50 small pe-lg-3" style="line-height:1.7;">
+            Affiliated to CBSE (Primary Wing No. 2430089) &amp; Early Years Montessori Accredited. Providing safe, nurturing, play-based foundational education for children aged 2.5 to 10 years.
+          </p>
+          <div class="d-flex gap-2 mt-3">
+            <a href="#" class="btn btn-sm btn-outline-secondary text-white" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="btn btn-sm btn-outline-secondary text-white" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="btn btn-sm btn-outline-secondary text-white" style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fa-brands fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <!-- Col 2: Early Childhood Wing -->
+        <div class="col-md-6 col-lg-3">
+          <h6 class="footer-title text-warning">EARLY CHILDHOOD WING</h6>
+          <p class="text-white-50 small mb-2"><i class="fa-solid fa-location-dot text-warning me-2"></i> Horizon Kids Campus, Sector 14, Academic Enclave, New Delhi - 110085</p>
+          <p class="text-white-50 small mb-2"><i class="fa-solid fa-phone text-info me-2"></i> 011 2748 9012 / +91 98765 43210</p>
+          <p class="text-white-50 small mb-2"><i class="fa-solid fa-envelope text-success me-2"></i> earlyyears@horizonprimary.edu.in</p>
+          <span class="badge bg-secondary bg-opacity-25 text-warning small">Playgroup, Nursery &amp; Kindergarten (08:30 AM – 12:30 PM)</span>
+        </div>
+
+        <!-- Col 3: Primary School Wing -->
+        <div class="col-md-6 col-lg-3">
+          <h6 class="footer-title text-info">PRIMARY LEARNING WING</h6>
+          <p class="text-white-50 small mb-2"><i class="fa-solid fa-location-dot text-info me-2"></i> Main Primary Complex, Sector 14, New Delhi - 110085</p>
+          <p class="text-white-50 small mb-2"><i class="fa-solid fa-phone text-warning me-2"></i> 011 2748 9014 / 9015</p>
+          <p class="text-white-50 small mb-2"><i class="fa-solid fa-envelope text-success me-2"></i> admissions@horizonprimary.edu.in</p>
+          <span class="badge bg-secondary bg-opacity-25 text-info small">Grades 1 to 5 &amp; Daycare (08:00 AM – 02:00 PM)</span>
+        </div>
+
+        <!-- Col 4: Quick Portals -->
+        <div class="col-lg-2">
+          <h6 class="footer-title text-white">PARENT PORTALS</h6>
+          <ul class="list-unstyled d-flex flex-column gap-2 small text-white-50">
+            <li><a href="{% url 'website:public_apply' %}" class="text-warning fw-semibold text-decoration-none">Enroll Online (2026–27)</a></li>
+            <li><a href="{% url 'website:admissions' %}#sec-admissions-tuition" class="text-white-50 text-decoration-none hover-white">Primary Fee Schedule</a></li>
+            <li><a href="{% url 'website:public_apply_track' %}" class="text-white-50 text-decoration-none hover-white">Track Application</a></li>
+            <li><a href="{% url 'documents:certificate_verify_search' %}" class="text-white-50 text-decoration-none hover-white">Verify TC / Certificate</a></li>
+            <li><a href="{% url 'accounts:login' %}" class="text-info text-decoration-none fw-semibold">Parent ERP Sign In</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="pt-4 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center flex-wrap gap-2 text-white-50 small">
+        <span>&copy; 2026 {{ school.name|default:"Horizon Primary World School" }}. Affiliated to CBSE, New Delhi. All Rights Reserved.</span>
+        <span>Where Little Minds Bloom with Joy &amp; Wonder</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Collapsible Header Drawer Toggle JS -->
+  <script>
+    function toggleMegaDrawer() {
+      const drawer = document.getElementById('collapsibleHeaderDrawer');
+      const toggleText = document.getElementById('megaToggleText');
+      if (drawer.style.display === 'block') {
+        drawer.style.display = 'none';
+        if (toggleText) toggleText.textContent = 'Primary Explorer Directory ▼';
+      } else {
+        drawer.style.display = 'block';
+        if (toggleText) toggleText.textContent = 'Close Directory ▲';
+        drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

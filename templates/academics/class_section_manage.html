@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Classes & Sections Management | Horizon School{% endblock %}
+{% block page_heading %}Classes & Sections Architecture{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h4 class="fw-bold text-dark mb-1">Class Levels &amp; Section Allocation</h4>
+    <p class="text-muted small mb-0">Create, configure, modify, and remove academic classes, divisions, and assigned class teachers.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'academics:class_create' %}" class="btn btn-primary btn-sm fw-semibold rounded-3">
+      <i class="fa-solid fa-plus me-1"></i> Add Class Level
+    </a>
+    <a href="{% url 'academics:section_create' %}" class="btn btn-outline-primary btn-sm fw-semibold rounded-3">
+      <i class="fa-solid fa-layer-group me-1"></i> Add New Section
+    </a>
+  </div>
+</div>
+
+<div class="row g-4">
+  {% for class in classes %}
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 rounded-4 overflow-hidden h-100 bg-white">
+        <!-- Class Level Header -->
+        <div class="card-header bg-light py-3 px-4 d-flex justify-content-between align-items-center border-bottom border-light">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-primary fs-6 px-3 py-1 rounded-3 fw-bold">{{ class.numeric_level }}</span>
+            <div>
+              <h5 class="fw-bold text-dark mb-0">{{ class.name }}</h5>
+              <span class="text-muted small" style="font-size:0.75rem;">Department: {{ class.department.name|default:"General Academics" }}</span>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center gap-1">
+            <span class="badge bg-secondary-subtle text-secondary me-2">{{ class.sections.count }} Sections</span>
+            <a href="{% url 'academics:section_create' %}?class_id={{ class.id }}" class="btn btn-sm btn-outline-success rounded-pill px-2 py-1" title="Add Section to {{ class.name }}" style="font-size:0.75rem;">
+              <i class="fa-solid fa-plus"></i> Section
+            </a>
+            <a href="{% url 'academics:class_edit' class.id %}" class="btn btn-sm btn-outline-secondary rounded-pill px-2 py-1" title="Edit Class Details" style="font-size:0.75rem;">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+            <a href="{% url 'academics:class_delete' class.id %}" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1" title="Remove Class Level" style="font-size:0.75rem;">
+              <i class="fa-solid fa-trash-can"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Sections Table -->
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr style="font-size:0.8rem;">
+                  <th class="ps-4">Section</th>
+                  <th>Room</th>
+                  <th>Class Teacher</th>
+                  <th>Capacity</th>
+                  <th class="text-end pe-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for sec in class.sections.all %}
+                  {% if not sec.is_deleted %}
+                  <tr>
+                    <td class="ps-4 fw-bold text-primary">
+                      <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-2 py-1">
+                        Section {{ sec.name }}
+                      </span>
+                    </td>
+                    <td class="small text-muted">{{ sec.room_number|default:"Room TBD" }}</td>
+                    <td>
+                      {% if sec.class_teacher %}
+                        <span class="small fw-semibold text-dark"><i class="fa-solid fa-user-tie text-secondary me-1"></i> {{ sec.class_teacher.full_name }}</span>
+                      {% else %}
+                        <span class="badge bg-warning bg-opacity-10 text-warning small">Unassigned</span>
+                      {% endif %}
+                    </td>
+                    <td class="small text-secondary">{{ sec.max_capacity }} Students</td>
+                    <td class="text-end pe-4">
+                      <div class="btn-group btn-group-sm">
+                        <a href="{% url 'academics:section_edit' sec.id %}" class="btn btn-outline-secondary btn-sm" title="Edit Section">
+                          <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        <a href="{% url 'academics:section_delete' sec.id %}" class="btn btn-outline-danger btn-sm" title="Remove Section">
+                          <i class="fa-solid fa-trash-can"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endif %}
+                {% empty %}
+                  <tr>
+                    <td colspan="5" class="text-center text-muted py-4 small">
+                      <i class="fa-solid fa-layer-group text-muted d-block mb-1"></i>
+                      No active sections in {{ class.name }}. <a href="{% url 'academics:section_create' %}?class_id={{ class.id }}" class="text-primary fw-semibold">Add Section Now</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+      <div class="p-5 bg-white rounded-4 shadow-sm">
+        <i class="fa-solid fa-graduation-cap fs-1 text-muted d-block mb-2"></i>
+        <h5>No Class Levels Created Yet</h5>
+        <p class="text-muted small mb-3">Initialize your school's class hierarchy (e.g. Nursery, Class 1 to Class 12).</p>
+        <a href="{% url 'academics:class_create' %}" class="btn btn-primary fw-bold px-4">
+          <i class="fa-solid fa-plus me-1"></i> Create First Class Level
+        </a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

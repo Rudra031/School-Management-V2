@@ -1,0 +1,1381 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}School Settings & Governance Control Center{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Floating Field */
+  .float-field { position: relative; margin-bottom: 1.15rem; }
+  .float-field input, .float-field select, .float-field textarea {
+    background: var(--input-bg) !important;
+    border: 1.5px solid var(--input-border) !important;
+    border-radius: var(--radius-md) !important;
+    color: var(--text-main) !important;
+    padding: 1.1rem 0.9rem 0.5rem 0.9rem !important;
+    font-size: 0.88rem !important;
+    width: 100%;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+    outline: none !important;
+  }
+  .float-field input:focus, .float-field select:focus, .float-field textarea:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(79,70,229,0.15) !important;
+  }
+  .float-label {
+    position: absolute; top: 0.85rem; left: 0.9rem;
+    font-size: 0.82rem; color: var(--text-muted);
+    transition: all 0.2s ease; pointer-events: none; font-weight: 500;
+  }
+  .float-field input:focus ~ .float-label,
+  .float-field input:not(:placeholder-shown) ~ .float-label,
+  .float-field select:focus ~ .float-label,
+  .float-field textarea:focus ~ .float-label,
+  .float-field textarea:not(:placeholder-shown) ~ .float-label {
+    top: 0.25rem; font-size: 0.68rem; color: var(--primary); font-weight: 600;
+  }
+
+  /* Navigation Tabs */
+  .settings-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .settings-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.68rem 0.85rem;
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-smooth);
+    user-select: none;
+  }
+  .settings-nav-item:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    transform: translateX(3px);
+  }
+  .settings-nav-item.active {
+    background: linear-gradient(135deg, var(--primary), var(--violet));
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 4px 16px var(--primary-glow);
+  }
+  .settings-nav-item .nav-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .settings-nav-item:not(.active) .nav-icon {
+    background: var(--bg-main);
+    color: var(--text-muted);
+  }
+
+  /* Form Sections */
+  .settings-section { display: none; }
+  .settings-section.active {
+    display: block;
+    animation: slideUp 0.35s var(--ease-spring) both;
+  }
+
+  /* Live Preview Sticky Card */
+  .preview-sticky {
+    position: sticky;
+    top: calc(var(--topbar-height) + 1.25rem);
+  }
+  .brand-banner-preview {
+    background: linear-gradient(135deg, var(--primary), var(--violet));
+    border-radius: var(--radius-xl);
+    padding: 1.35rem;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 30px var(--primary-glow);
+  }
+  .brand-banner-preview::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 50%;
+  }
+  .brand-logo-preview {
+    width: 62px; height: 62px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.7rem;
+    color: #fff;
+    font-weight: 800;
+    margin: 0 auto 0.65rem;
+    border: 2px solid rgba(255,255,255,0.4);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    font-family: 'Geist', sans-serif;
+  }
+
+  /* Custom Switch Toggle */
+  .form-check-input {
+    width: 2.7rem;
+    height: 1.45rem;
+    cursor: pointer;
+    background-color: var(--input-border);
+    border-color: var(--input-border);
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+  .form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 0 12px var(--primary-glow);
+  }
+  .toggle-card {
+    background: var(--bg-main);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 0.9rem 1.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    transition: all 0.2s ease;
+  }
+  .toggle-card:hover {
+    border-color: rgba(79,70,229,0.3);
+    transform: translateY(-1px);
+  }
+  .rule-pill-badge {
+    background: rgba(79, 70, 229, 0.12);
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.73rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(79, 70, 229, 0.25);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Hero -->
+<div class="page-hero reveal-up mb-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="d-flex align-items-center gap-3">
+      <div style="width:48px;height:48px;border-radius:var(--radius-md);background:linear-gradient(135deg,var(--primary),var(--violet));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.3rem;box-shadow:0 4px 20px var(--primary-glow);">
+        <i class="fa-solid fa-sliders"></i>
+      </div>
+      <div>
+        <h4 class="fw-bold mb-0" style="font-family:'Geist',sans-serif;">
+          School Settings &amp; Governance Center
+        </h4>
+        <p class="mb-0 small" style="color:var(--text-muted);">
+          Institutional rules &amp; regulations, CBSE compliance, bell schedule, communication gateways &amp; security
+        </p>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="submit" form="settingsForm" class="btn btn-saas-primary">
+        <i class="fa-solid fa-floppy-disk me-1"></i> Save All Settings
+      </button>
+    </div>
+  </div>
+</div>
+
+<form method="post" enctype="multipart/form-data" novalidate id="settingsForm">
+  {% csrf_token %}
+  <div class="row g-4">
+
+    <!-- Left: Navigation Sidebar -->
+    <div class="col-lg-3">
+      <div class="card-saas reveal-up delay-1">
+        <div class="card-saas-body p-2">
+          <div class="settings-nav">
+            <div class="settings-nav-item active" onclick="switchSettingsSection(0)" id="navItem0">
+              <div class="nav-icon"><i class="fa-solid fa-school"></i></div>
+              <span>Institutional Identity</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(1)" id="navItem1">
+              <div class="nav-icon"><i class="fa-solid fa-location-dot"></i></div>
+              <span>Contact &amp; Location</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(2)" id="navItem2">
+              <div class="nav-icon"><i class="fa-solid fa-scale-balanced text-warning"></i></div>
+              <span class="fw-bold text-warning">Rules &amp; Regulations</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(3)" id="navItem3">
+              <div class="nav-icon"><i class="fa-solid fa-award text-primary"></i></div>
+              <span>Board Affiliation &amp; Legal</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(4)" id="navItem4">
+              <div class="nav-icon"><i class="fa-solid fa-clock text-info"></i></div>
+              <span>Shifts &amp; Bell Timings</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(5)" id="navItem5">
+              <div class="nav-icon"><i class="fa-solid fa-globe"></i></div>
+              <span>Localization &amp; Currency</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(6)" id="navItem6">
+              <div class="nav-icon"><i class="fa-brands fa-whatsapp text-success"></i></div>
+              <span>Omnichannel Gateways</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(7)" id="navItem7">
+              <div class="nav-icon"><i class="fa-solid fa-signature text-secondary"></i></div>
+              <span>Print Master &amp; Seals</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(8)" id="navItem8">
+              <div class="nav-icon"><i class="fa-solid fa-toggle-on"></i></div>
+              <span>Portal Access Control</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(9)" id="navItem9">
+              <div class="nav-icon"><i class="fa-solid fa-shield-halved text-danger"></i></div>
+              <span>Security &amp; Audit Trail</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(10)" id="navItem10" style="color:#ef4444;">
+              <div class="nav-icon" style="background:rgba(239,68,68,0.15);color:#ef4444;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <span class="fw-bold">Maintenance &amp; Reset</span>
+            </div>
+            <div class="settings-nav-item" onclick="switchSettingsSection(11)" id="navItem11" style="color:#6366f1;">
+              <div class="nav-icon" style="background:rgba(99,102,241,0.15);color:#6366f1;"><i class="fa-solid fa-key"></i></div>
+              <span class="fw-bold">License &amp; Activation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center: Form Section Contents -->
+    <div class="col-lg-5">
+      <div class="card-saas reveal-up delay-2">
+        <div class="card-saas-body">
+
+          <!-- Section 0: Institutional Identity -->
+          <div id="section0" class="settings-section active">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-school" style="color:var(--primary);font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">Institutional Identity &amp; Branding</h6>
+            </div>
+            <div class="float-field">
+              {{ form.name }}
+              <label class="float-label">Official School Name *</label>
+              {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="float-field">
+              {{ form.code }}
+              <label class="float-label">School Registration Code (e.g. HPS-DELHI)</label>
+              {% if form.code.errors %}<div class="text-danger small mt-1">{{ form.code.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="float-field">
+              {{ form.tagline }}
+              <label class="float-label">School Motto / Tagline</label>
+            </div>
+            <div class="mb-3">
+              <label class="small fw-semibold mb-1" style="color:var(--text-main);">School Crest / Brand Logo</label>
+              <div class="d-flex align-items-center gap-3">
+                {% if form.instance.logo %}
+                  <img src="{{ form.instance.logo.url }}" alt="Logo" style="width:48px;height:48px;object-fit:cover;border-radius:10px;border:1px solid var(--card-border);">
+                {% endif %}
+                <div class="flex-grow-1">{{ form.logo }}</div>
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="small fw-semibold mb-1" style="color:var(--text-main);">Browser Favicon</label>
+              <div class="d-flex align-items-center gap-3">
+                {% if form.instance.favicon %}
+                  <img src="{{ form.instance.favicon.url }}" alt="Favicon" style="width:32px;height:32px;object-fit:cover;border-radius:6px;border:1px solid var(--card-border);">
+                {% endif %}
+                <div class="flex-grow-1">{{ form.favicon }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: Contact & Location -->
+          <div id="section1" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-location-dot" style="color:var(--primary);font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">Campus Location &amp; Contact Details</h6>
+            </div>
+            <div class="float-field">
+              {{ form.address }}
+              <label class="float-label">Campus Physical Address</label>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.city }}
+                  <label class="float-label">City</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.state }}
+                  <label class="float-label">State / UT</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.postal_code }}
+                  <label class="float-label">Postal / PIN Code</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.country }}
+                  <label class="float-label">Country</label>
+                </div>
+              </div>
+            </div>
+            <div class="float-field">{{ form.phone }}<label class="float-label">Official Helpline Phone</label></div>
+            <div class="float-field">{{ form.email }}<label class="float-label">Official Inquiries Email</label></div>
+            <div class="float-field">{{ form.website }}<label class="float-label">Official Website URL</label></div>
+          </div>
+
+          <!-- Section 2: Rules & Regulations & Student Discipline -->
+          <div id="section2" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-scale-balanced text-warning" style="font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">School Rules, Discipline &amp; Code of Conduct</h6>
+            </div>
+
+            <div class="float-field">
+              {{ form.discipline_policy }}
+              <label class="float-label">General Student Code of Conduct &amp; Anti-Bullying Policy</label>
+            </div>
+
+            <div class="float-field">
+              {{ form.uniform_policy }}
+              <label class="float-label">Uniform &amp; Grooming Code (Summer / Winter)</label>
+            </div>
+
+            <div class="mb-3">
+              <label class="small fw-semibold mb-1" style="color:var(--text-main);">Mobile &amp; Smart Device Policy</label>
+              {{ form.mobile_device_policy }}
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.late_coming_grace_minutes }}
+                  <label class="float-label">Late Grace Period (Mins)</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.late_marks_for_half_day }}
+                  <label class="float-label">Lates per Half-Day Penalty</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.consecutive_absence_warning_days }}
+                  <label class="float-label">Absence Days for Notice</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.medical_leave_cert_threshold_days }}
+                  <label class="float-label">Medical Leave Cert Days</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.fee_due_day_of_month }}
+                  <label class="float-label">Fee Due Day of Month</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.late_fee_per_day }}
+                  <label class="float-label">Late Fee Fine Per Day (₹)</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.sibling_concession_percentage }}
+                  <label class="float-label">Sibling Concession (%)</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.passing_marks_percentage }}
+                  <label class="float-label">Subject Pass Marks (%)</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="float-field">
+              {{ form.ptm_visiting_hours }}
+              <label class="float-label">PTM &amp; Parent Visiting Hours</label>
+            </div>
+
+            <div class="float-field">
+              {{ form.grievance_escalation_matrix }}
+              <label class="float-label">Grievance Redressal Escalation Matrix</label>
+            </div>
+          </div>
+
+          <!-- Section 3: Board Affiliation & Legal Master -->
+          <div id="section3" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-award text-primary" style="font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">Board Affiliation &amp; Legal Recognition</h6>
+            </div>
+            <div class="mb-3">
+              <label class="small fw-semibold mb-1" style="color:var(--text-main);">Educational Board Affiliation</label>
+              {{ form.board_name }}
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.affiliation_number }}
+                  <label class="float-label">Board Affiliation Number</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.school_board_code }}
+                  <label class="float-label">School Board Code / Center Code</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.trust_society_name }}
+                  <label class="float-label">Governing Trust / Society Name</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.trust_registration_no }}
+                  <label class="float-label">Trust / Society Registration No.</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.affiliation_valid_upto }}
+                  <label class="float-label">Affiliation Valid Upto Date</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.rte_quota_seats_percentage }}
+                  <label class="float-label">RTE 25% Seat Quota (%)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Shifts & Bell Schedule -->
+          <div id="section4" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-clock text-info" style="font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">Operating Shifts &amp; Bell Schedule</h6>
+            </div>
+            <div class="mb-3">
+              <label class="small fw-semibold mb-1" style="color:var(--text-main);">Operating Shift Mode</label>
+              {{ form.operating_shift }}
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.school_start_time }}
+                  <label class="float-label">School Start Time (Assembly)</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.school_end_time }}
+                  <label class="float-label">School Dismissal Time</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="float-field">
+                  {{ form.assembly_duration_minutes }}
+                  <label class="float-label">Assembly (Mins)</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="float-field">
+                  {{ form.period_duration_minutes }}
+                  <label class="float-label">Period (Mins)</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="float-field">
+                  {{ form.recess_duration_minutes }}
+                  <label class="float-label">Recess (Mins)</label>
+                </div>
+              </div>
+            </div>
+            <div class="mb-2">
+              <label class="small fw-semibold mb-1" style="color:var(--text-main);">Weekly Working Days</label>
+              {{ form.working_days_per_week }}
+            </div>
+          </div>
+
+          <!-- Section 5: Localization & Currency -->
+          <div id="section5" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-globe text-success" style="font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">Localization, Currency &amp; Formats</h6>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.currency_symbol }}
+                  <label class="float-label">Currency Symbol (e.g. ₹)</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.currency_code }}
+                  <label class="float-label">Currency Code (e.g. INR)</label>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="small fw-semibold mb-1" style="color:var(--text-main);">Global Date Display Format</label>
+              {{ form.date_format }}
+            </div>
+            <div class="float-field">
+              {{ form.timezone }}
+              <label class="float-label">System Timezone (e.g. Asia/Kolkata)</label>
+            </div>
+          </div>
+
+          <!-- Section 6: Omnichannel Communication -->
+          <div id="section6" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-brands fa-whatsapp text-success" style="font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">Omnichannel WhatsApp &amp; SMS Gateway</h6>
+            </div>
+
+            <div class="d-flex flex-column gap-3 mb-3">
+              <div class="toggle-card">
+                <div>
+                  <div class="fw-semibold small text-success"><i class="fa-brands fa-whatsapp me-1"></i>Official WhatsApp Cloud Notifications</div>
+                  <div class="text-muted" style="font-size:0.75rem;">Instant fee receipts, daily absentee alerts &amp; report card PDF dispatches</div>
+                </div>
+                <div class="form-check form-switch mb-0">
+                  {{ form.enable_whatsapp_notifications }}
+                </div>
+              </div>
+
+              <div class="mb-2">
+                <label class="small fw-semibold mb-1" style="color:var(--text-main);">WhatsApp API Provider</label>
+                {{ form.whatsapp_api_provider }}
+              </div>
+
+              <div class="toggle-card">
+                <div>
+                  <div class="fw-semibold small" style="color:var(--text-main);"><i class="fa-solid fa-comment-sms me-1 text-primary"></i>TRAI / DLT Compliant SMS Gateway</div>
+                  <div class="text-muted" style="font-size:0.75rem;">Dispatches emergency alerts, OTPs, and circulars via registered DLT templates</div>
+                </div>
+                <div class="form-check form-switch mb-0">
+                  {{ form.enable_sms_dlt_gateway }}
+                </div>
+              </div>
+
+              <div class="float-field">
+                {{ form.sms_sender_id }}
+                <label class="float-label">SMS Header / 6-Digit DLT Sender ID (e.g. HRZNSC)</label>
+              </div>
+
+              <div class="toggle-card">
+                <div>
+                  <div class="fw-semibold small" style="color:var(--text-main);"><i class="fa-solid fa-envelope me-1 text-violet"></i>Email Newsletter &amp; Invoice Gateway</div>
+                  <div class="text-muted" style="font-size:0.75rem;">Sends automated HTML invoices and circulars via SMTP relay</div>
+                </div>
+                <div class="form-check form-switch mb-0">
+                  {{ form.enable_email_notifications }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 7: Print Master & Signatures -->
+          <div id="section7" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-signature text-secondary" style="font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">Print Master, Signatures &amp; Document Seals</h6>
+            </div>
+
+            <div class="mb-3">
+              <label class="small fw-semibold mb-1" style="color:var(--text-main);">Fee Receipt Print Layout</label>
+              {{ form.fee_receipt_format }}
+            </div>
+
+            <div class="mb-3">
+              <label class="small fw-semibold mb-1" style="color:var(--text-main);">Exam Report Card Template Format</label>
+              {{ form.report_card_layout }}
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6 mb-2">
+                <label class="small fw-semibold mb-1" style="color:var(--text-main);">Principal Digital Signature Stamp</label>
+                {{ form.principal_signature }}
+              </div>
+              <div class="col-md-6 mb-2">
+                <label class="small fw-semibold mb-1" style="color:var(--text-main);">Exam Controller Signature Stamp</label>
+                {{ form.exam_incharge_signature }}
+              </div>
+              <div class="col-12 mb-2">
+                <label class="small fw-semibold mb-1" style="color:var(--text-main);">Official Institutional Seal / Round Stamp</label>
+                {{ form.school_stamp }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 8: Portal Access Control -->
+          <div id="section8" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-toggle-on" style="color:var(--primary);font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">Portal Permissions &amp; Feature Access</h6>
+            </div>
+
+            <div class="d-flex flex-column gap-3">
+              <div class="toggle-card">
+                <div>
+                  <div class="fw-semibold small" style="color:var(--text-main);">Student Portal Access</div>
+                  <div class="text-muted" style="font-size:0.75rem;">Allow students to log in, view timetables, assignments &amp; admit cards</div>
+                </div>
+                <div class="form-check form-switch mb-0">
+                  {{ form.enable_student_login }}
+                </div>
+              </div>
+
+              <div class="toggle-card">
+                <div>
+                  <div class="fw-semibold small" style="color:var(--text-main);">Parent / Guardian Portal Access</div>
+                  <div class="text-muted" style="font-size:0.75rem;">Allow parents to view child attendance, results &amp; pay fees online</div>
+                </div>
+                <div class="form-check form-switch mb-0">
+                  {{ form.enable_parent_login }}
+                </div>
+              </div>
+
+              <div class="toggle-card">
+                <div>
+                  <div class="fw-semibold small" style="color:var(--text-main);">Public Online Admissions Pipeline</div>
+                  <div class="text-muted" style="font-size:0.75rem;">Accept online admission application forms from prospective students</div>
+                </div>
+                <div class="form-check form-switch mb-0">
+                  {{ form.enable_online_admissions }}
+                </div>
+              </div>
+
+              <div class="float-field mt-2">
+                {{ form.attendance_threshold_percentage }}
+                <label class="float-label">Minimum Attendance for Exam Eligibility (%)</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 9: Security & Audit Trail -->
+          <div id="section9" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-shield-halved text-danger" style="font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">Enterprise Security &amp; Audit Trail</h6>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.session_timeout_minutes }}
+                  <label class="float-label">Inactivity Auto-Lock (Mins)</label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="toggle-card h-100">
+                  <div>
+                    <div class="fw-semibold small" style="color:var(--text-main);">Staff 2FA Verification</div>
+                    <div class="text-muted" style="font-size:0.72rem;">Require OTP for Admins</div>
+                  </div>
+                  <div class="form-check form-switch mb-0">
+                    {{ form.enable_staff_2fa }}
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="toggle-card mb-2">
+                  <div>
+                    <div class="fw-semibold small" style="color:var(--text-main);">Campus IP Whitelisting</div>
+                    <div class="text-muted" style="font-size:0.72rem;">Restrict Fee POS Counter to campus network subnet</div>
+                  </div>
+                  <div class="form-check form-switch mb-0">
+                    {{ form.enable_ip_whitelisting }}
+                  </div>
+                </div>
+                <div class="float-field">
+                  {{ form.whitelisted_ips }}
+                  <label class="float-label">Authorized Subnets (comma separated)</label>
+                </div>
+              </div>
+            </div>
+
+            <h6 class="fw-bold small mb-2 text-muted">Recent Administrative Actions Log</h6>
+            <div class="table-responsive">
+              <table class="table-saas mb-0" style="font-size:0.78rem;">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Module</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for log in recent_audits %}
+                    <tr>
+                      <td style="color:var(--text-muted);white-space:nowrap;">{{ log.timestamp|date:"d M H:i" }}</td>
+                      <td class="fw-semibold" style="white-space:nowrap;">{{ log.user.email|default:"System"|truncatechars:16 }}</td>
+                      <td><span style="background:var(--primary-light);color:var(--primary);padding:2px 6px;border-radius:4px;font-size:0.68rem;font-weight:600;">{{ log.module }}</span></td>
+                      <td><span style="background:var(--success-light);color:var(--success);padding:2px 6px;border-radius:4px;font-size:0.68rem;font-weight:600;">{{ log.get_action_display }}</span></td>
+                    </tr>
+                  {% empty %}
+                    <tr><td colspan="4" class="text-center py-3 text-muted">No audit logs recorded yet.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section 10: System Maintenance, Backup & Factory Reset -->
+          <div id="section10" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-arrows-rotate text-danger" style="font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">System Maintenance, Disaster Recovery &amp; Reset</h6>
+            </div>
+
+            <!-- Card 1: Backup & Export -->
+            <div class="p-3 mb-3" style="background:var(--bg-main);border:1px solid rgba(16,185,129,0.3);border-radius:var(--radius-lg);">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fa-solid fa-cloud-arrow-down text-success fs-5"></i>
+                <div>
+                  <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.9rem;">1. Full System Data Backup</h6>
+                  <p class="text-muted small mb-0" style="font-size:0.75rem;">Export all 18 modules (students, staff, finances, attendance, exams) into a single portable .json backup file.</p>
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-top border-white border-opacity-10 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span class="badge bg-success bg-opacity-25 text-success small font-monospace"><i class="fa-solid fa-shield-check me-1"></i>Format: JSON Snapshot</span>
+                <a href="{% url 'core:backup_download' %}" class="btn btn-sm btn-success d-flex align-items-center gap-2 px-3" style="border-radius:10px;font-weight:600;">
+                  <i class="fa-solid fa-download"></i>
+                  <span>Download Backup File</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Card 2: Restore from Backup -->
+            <div class="p-3 mb-3" style="background:var(--bg-main);border:1px solid rgba(59,130,246,0.3);border-radius:var(--radius-lg);">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fa-solid fa-cloud-arrow-up text-primary fs-5"></i>
+                <div>
+                  <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.9rem;">2. Restore Database from Backup</h6>
+                  <p class="text-muted small mb-0" style="font-size:0.75rem;">Upload a previously exported .json snapshot to restore all institutional records.</p>
+                </div>
+              </div>
+              <div class="mt-3 pt-2 border-top border-white border-opacity-10 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span class="text-muted small" style="font-size:0.75rem;"><i class="fa-solid fa-lock text-warning me-1"></i>Requires Admin Password</span>
+                <button type="button" class="btn btn-sm btn-primary d-flex align-items-center gap-2 px-3" data-bs-toggle="modal" data-bs-target="#restoreModal" style="border-radius:10px;font-weight:600;">
+                  <i class="fa-solid fa-upload"></i>
+                  <span>Restore from Backup</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card 3: Danger Zone Factory Reset -->
+            <div class="p-3" style="background:rgba(239,68,68,0.06);border:1.5px dashed rgba(239,68,68,0.45);border-radius:var(--radius-lg);">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <div style="width:36px;height:36px;border-radius:10px;background:rgba(239,68,68,0.15);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">
+                  <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                  <h6 class="fw-bold mb-0 text-danger" style="font-size:0.92rem;">3. Danger Zone: Institutional Hard Factory Reset</h6>
+                  <p class="text-muted small mb-0" style="font-size:0.75rem;">Permanently erase all operational data, students, teachers, invoices, exams, and attendance.</p>
+                </div>
+              </div>
+
+              <div class="p-2 mb-3 rounded-2" style="background:rgba(0,0,0,0.25);font-size:0.78rem;">
+                <div class="text-danger fw-semibold mb-1"><i class="fa-solid fa-trash-can me-1"></i> Data to be permanently wiped:</div>
+                <div class="text-muted small ps-3">
+                  &bull; All Students, Enrollments, Medical &amp; Health Records<br>
+                  &bull; All Faculty, Staff Profiles, Designations &amp; Allocations<br>
+                  &bull; All Fee Invoices, Receipts, Concessions &amp; Staff Payroll<br>
+                  &bull; All Exam Terms, Mark Sheets, Tabulation &amp; Timetables<br>
+                  &bull; All Daily Attendance Sheets, Registers &amp; Leave Requests<br>
+                  &bull; All Parent Profiles, Notices, Documents &amp; Dynamic Website Data
+                </div>
+                <div class="text-success fw-semibold mt-2"><i class="fa-solid fa-shield-check me-1"></i> Preserved &amp; Baseline Initialized:</div>
+                <div class="text-muted small ps-3">
+                  &bull; Active Super Administrator Account (<strong>{{ request.user.email }}</strong>)<br>
+                  &bull; System settings restored to pristine institutional baseline<br>
+                  &bull; New active Academic Session ({{ active_academic_year.name|default:"Current Year" }}) automatically created
+                </div>
+              </div>
+
+              <!-- Action Buttons: Modal Trigger & Inline Fallback -->
+              <div class="pt-2 border-top border-white border-opacity-10 d-flex flex-column gap-2">
+                <button type="button" class="btn btn-sm btn-danger d-flex align-items-center gap-2 px-3 w-100 justify-content-center" data-bs-toggle="modal" data-bs-target="#factoryResetModal" style="border-radius:10px;font-weight:700;padding:0.6rem;">
+                  <i class="fa-solid fa-fire"></i>
+                  <span>Initiate Hard Factory Reset (Requires Authentication)</span>
+                </button>
+
+                <div class="text-center">
+                  <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none p-0 opacity-75" style="font-size:0.75rem;" onclick="document.getElementById('inlineResetForm').classList.toggle('d-none')">
+                    <i class="fa-solid fa-chevron-down me-1"></i> Toggle Inline Reset Form
+                  </button>
+                </div>
+
+                <!-- Inline Fallback Form -->
+                <div id="inlineResetForm" class="d-none mt-2 p-3 rounded-3" style="background:rgba(20, 10, 10, 0.95);border:1.5px solid rgba(239, 68, 68, 0.5);">
+                  <div class="fw-bold text-danger mb-2 small"><i class="fa-solid fa-radiation me-1"></i> Quick Authorization Panel</div>
+                  
+                  <div class="mb-2">
+                    <label class="form-label text-danger small fw-semibold mb-1 text-uppercase" style="font-size:0.72rem;">1. Type FACTORY-RESET to confirm:</label>
+                    <input type="text" id="inlineConfirmPhrase" placeholder="FACTORY-RESET" class="form-control form-control-sm font-monospace text-uppercase" style="background:rgba(0,0,0,0.5);border:1px solid rgba(239,68,68,0.5);color:#ff6b6b;border-radius:8px;font-weight:700;">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label text-muted small fw-semibold mb-1 text-uppercase" style="font-size:0.72rem;">2. Administrator Password:</label>
+                    <div class="input-group input-group-sm">
+                      <input type="password" id="inlinePassword" placeholder="Enter superadmin password" class="form-control" style="background:rgba(0,0,0,0.5);border:1px solid var(--input-border);color:#fff;border-radius:8px 0 0 8px;">
+                      <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('inlinePassword', this)" style="border-radius:0 8px 8px 0;background:rgba(255,255,255,0.05);border-color:var(--input-border);color:#aaa;">
+                        <i class="fa-regular fa-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <button type="button" id="inlineResetBtn" onclick="executeInlineReset()" class="btn btn-danger btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-2" style="border-radius:8px;">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Execute Factory Reset &amp; Erase All Data</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Section 11: Software License & Activation -->
+          <div id="section11" class="settings-section">
+            <div class="d-flex align-items-center gap-2 mb-3 pb-2" style="border-bottom:1px solid var(--card-border);">
+              <i class="fa-solid fa-key" style="color:#6366f1;font-size:1.1rem;"></i>
+              <h6 class="fw-bold mb-0" style="color:var(--text-main);font-size:0.95rem;">Software License &amp; 1-Time Activation Portal</h6>
+            </div>
+
+            <!-- Current License Status Banner -->
+            <div class="p-3 mb-3 rounded-3" style="background:var(--bg-main);border:1px solid var(--card-border);">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small fw-semibold text-muted text-uppercase" style="font-size:0.73rem;letter-spacing:0.04em;">CURRENT LICENSE HEALTH</span>
+                {% if license_eval.is_trial and not license_eval.is_expired %}
+                  <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fw-bold">
+                    <i class="fa-solid fa-hourglass-half me-1"></i> 7-Day Trial Active
+                  </span>
+                {% elif license_eval.is_active and not license_eval.is_expired %}
+                  <span class="badge bg-success text-white rounded-pill px-3 py-1 fw-bold">
+                    <i class="fa-solid fa-circle-check me-1"></i> Commercial License Active
+                  </span>
+                {% else %}
+                  <span class="badge bg-danger text-white rounded-pill px-3 py-1 fw-bold">
+                    <i class="fa-solid fa-lock me-1"></i> License Expired / Renewal Required
+                  </span>
+                {% endif %}
+              </div>
+
+              <div class="row g-2 pt-2">
+                <div class="col-6">
+                  <div class="p-2 rounded-2 bg-card border" style="border-color:var(--card-border) !important;">
+                    <div class="text-muted small" style="font-size:0.72rem;">License Tier</div>
+                    <strong class="small" style="color:var(--text-main);">{{ license_eval.plan_type|default:"TRIAL" }}</strong>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="p-2 rounded-2 bg-card border" style="border-color:var(--card-border) !important;">
+                    <div class="text-muted small" style="font-size:0.72rem;">Valid Until / Expiry</div>
+                    <strong class="small text-info">{{ license_eval.expires_str|default:"N/A" }}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3-Step Guided Workflow: How to Get License Key -->
+            <div class="p-3 mb-3 rounded-3" style="background:rgba(56, 189, 248, 0.06);border:1.5px solid rgba(56, 189, 248, 0.25);">
+              <div class="fw-bold mb-2 small text-info d-flex align-items-center gap-1">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>How to Get Your License Key (3 Steps):</span>
+              </div>
+              
+              <ol class="small mb-3 ps-3 text-muted" style="font-size:0.78rem;line-height:1.6;">
+                <li><strong class="text-white">Step 1:</strong> Copy your <strong>School Code</strong> &amp; <strong>Server Installation ID</strong> below.</li>
+                <li><strong class="text-white">Step 2:</strong> Send the details to your software developer via <strong>WhatsApp</strong> or <strong>Email</strong>.</li>
+                <li><strong class="text-white">Step 3:</strong> Paste the signed activation code you receive and click <strong>Activate</strong>.</li>
+              </ol>
+
+              <!-- Hardware Node & School Code -->
+              <div class="mb-2">
+                <label class="form-label small fw-semibold text-muted mb-1 text-uppercase" style="font-size:0.7rem;">
+                  Server Installation ID (Hardware Machine Fingerprint):
+                </label>
+                <div class="input-group input-group-sm mb-2">
+                  <input type="text" class="form-control font-monospace" id="settingsInstallIdVal" value="{{ license_eval.installation_id }}" readonly style="background:var(--bg-main);border-color:var(--input-border);color:var(--text-main);font-weight:600;font-size:0.8rem;">
+                  <button type="button" class="btn btn-outline-info" onclick="navigator.clipboard.writeText('{{ license_eval.installation_id }}'); alert('Installation ID copied!');" style="border-color:var(--input-border);">
+                    <i class="fa-regular fa-copy me-1"></i> Copy Node ID
+                  </button>
+                </div>
+              </div>
+
+              <!-- Instant Request Buttons -->
+              <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="copyFullLicenseRequest('{{ form.instance.name|default:'Horizon Public School' }}', '{{ form.instance.code|default:'HPS-DELHI' }}', '{{ license_eval.installation_id }}')" style="font-size:0.75rem;">
+                  <i class="fa-solid fa-copy me-1"></i> Copy Full Request Text
+                </button>
+                <a href="https://wa.me/?text=Hello%20Developer,%20please%20generate%20a%20license%20key%20for:%0A%E2%80%A2%20School:%20{{ form.instance.name|default:'Horizon%20Public%20School'|urlencode }}%0A%E2%80%A2%20Code:%20{{ form.instance.code|default:'HPS-DELHI'|urlencode }}%0A%E2%80%A2%20Install%20ID:%20{{ license_eval.installation_id|urlencode }}" target="_blank" class="btn btn-sm btn-success rounded-pill px-3" style="font-size:0.75rem;">
+                  <i class="fa-brands fa-whatsapp me-1"></i> WhatsApp Request
+                </a>
+                <a href="mailto:support@horizonacademy.edu?subject=License%20Key%20Request%20for%20{{ form.instance.code|default:'HPS-DELHI' }}&body=Hello%20Developer,%0A%0APlease%20generate%20a%20license%20key%20for%20our%20school:%0A%E2%80%A2%20School%20Name:%20{{ form.instance.name|default:'Horizon%20Public%20School' }}%0A%E2%80%A2%20School%20Code:%20{{ form.instance.code|default:'HPS-DELHI' }}%0A%E2%80%A2%20Server%20Installation%20ID:%20{{ license_eval.installation_id }}" class="btn btn-sm btn-outline-info rounded-pill px-3" style="font-size:0.75rem;">
+                  <i class="fa-solid fa-envelope me-1"></i> Email Request
+                </a>
+              </div>
+            </div>
+
+            <!-- Enter License Key Form -->
+            <div class="p-3 rounded-3" style="background:rgba(99,102,241,0.06);border:1.5px solid rgba(99,102,241,0.25);">
+              <div class="fw-bold mb-1 small" style="color:#6366f1;">
+                <i class="fa-solid fa-key me-1"></i> Step 3: Enter &amp; Activate License Key
+              </div>
+              <div class="text-muted small mb-2" style="font-size:0.74rem;">
+                <i class="fa-solid fa-shield-halved text-success me-1"></i> <strong>1-Time Activation Guard:</strong> Once expired, this key cannot be replayed. The developer will issue a fresh renewal code.
+              </div>
+              <div class="mb-2">
+                <textarea id="settingsLicenseKeyInput" class="form-control font-monospace" placeholder="Paste your developer-issued license key string here (e.g. HRZN.eyJ...)" style="background:var(--bg-main);border:1px solid var(--input-border);color:var(--text-main);font-size:0.8rem;resize:vertical;min-height:85px;"></textarea>
+              </div>
+              <button type="button" onclick="submitSettingsLicenseActivation()" class="btn btn-sm btn-primary fw-bold w-100 d-flex align-items-center justify-content-center gap-2" style="background:linear-gradient(135deg, #4f46e5, #7c3aed);border:none;border-radius:8px;padding:0.55rem;">
+                <i class="fa-solid fa-shield-check"></i>
+                <span>Validate &amp; Activate License Key</span>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Bottom Action Bar -->
+          <div class="mt-4 pt-3 d-flex justify-content-between align-items-center" style="border-top:1px solid var(--card-border);">
+            <span class="small text-muted" id="unsavedNotice">
+              <i class="fa-solid fa-shield-check text-success me-1"></i>All settings synchronized
+            </span>
+            <button type="submit" class="btn btn-saas-primary">
+              <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Live Branding & Governance Cards Preview -->
+    <div class="col-lg-4">
+      <div class="preview-sticky reveal-up delay-3">
+        
+        <!-- Live School Badge -->
+        <div class="brand-banner-preview">
+          <div class="brand-logo-preview" id="previewLogo">
+            {{ form.instance.name|first|default:"H" }}
+          </div>
+          <h5 class="fw-bold mb-1" id="previewSchoolName" style="font-family:'Geist',sans-serif;">
+            {{ form.instance.name|default:"Horizon Public School" }}
+          </h5>
+          <div class="badge bg-white text-primary mb-2" id="previewCode" style="font-size:0.75rem;padding:3px 10px;border-radius:20px;font-weight:700;">
+            {{ form.instance.code|default:"HPS-DELHI" }}
+          </div>
+          <p class="small mb-0" id="previewTagline" style="opacity:0.88;font-size:0.78rem;">
+            {{ form.instance.tagline|default:"Affiliated to CBSE, New Delhi" }}
+          </p>
+        </div>
+
+        <!-- Live Rules & Governance Card -->
+        <div class="card-saas mb-3">
+          <div class="card-saas-body" style="padding:1rem 1.25rem;">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h6 class="fw-bold small mb-0" style="color:var(--text-main);"><i class="fa-solid fa-scale-balanced me-2 text-warning"></i>Active Rules &amp; Policies</h6>
+              <span class="rule-pill-badge" id="previewBoard">{{ form.instance.board_name }}</span>
+            </div>
+            
+            <div class="d-flex justify-content-between py-1 border-bottom" style="border-color:var(--card-border) !important;">
+              <span class="small text-muted">Late Grace Time</span>
+              <strong class="small" id="previewLateGrace" style="color:var(--text-main);">{{ form.instance.late_coming_grace_minutes }} mins</strong>
+            </div>
+
+            <div class="d-flex justify-content-between py-1 border-bottom" style="border-color:var(--card-border) !important;">
+              <span class="small text-muted">Late Fee Penalty</span>
+              <strong class="small text-danger" id="previewLateFee">₹{{ form.instance.late_fee_per_day }}/day</strong>
+            </div>
+
+            <div class="d-flex justify-content-between py-1 border-bottom" style="border-color:var(--card-border) !important;">
+              <span class="small text-muted">Exam Attendance</span>
+              <strong class="small text-success" id="previewThreshold">{{ form.instance.attendance_threshold_percentage }}%</strong>
+            </div>
+
+            <div class="d-flex justify-content-between py-1 border-bottom" style="border-color:var(--card-border) !important;">
+              <span class="small text-muted">Shift Operating</span>
+              <span class="small fw-semibold" id="previewShift" style="color:var(--primary);">{{ form.instance.get_operating_shift_display }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between py-1">
+              <span class="small text-muted">WhatsApp Engine</span>
+              <span class="small fw-semibold" id="previewWhatsApp" style="color:var(--success);">● Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Summary Box -->
+        <div class="p-3" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius-lg);">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="fa-solid fa-shield-check text-success"></i>
+            <span class="small fw-bold" style="color:var(--text-main);">Institutional Security Status</span>
+          </div>
+          <p class="text-muted small mb-0" style="font-size:0.75rem;">
+            All administrative, exam, and fee policy changes are logged in the immutable security audit log with timestamps and user attribution.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</form>
+
+<!-- Modal: Restore Database -->
+<div class="modal fade" id="restoreModal" tabindex="-1" aria-labelledby="restoreModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background:var(--card-glass, #1e293b);border:1px solid var(--card-border);border-radius:18px;color:#fff;">
+      <div class="modal-header border-bottom border-white border-opacity-10">
+        <h5 class="modal-title fw-bold" id="restoreModalLabel">
+          <i class="fa-solid fa-cloud-arrow-up text-primary me-2"></i>Restore Database from Backup
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'core:restore_upload' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="alert alert-info py-2 px-3 small rounded-3 mb-3">
+            <i class="fa-solid fa-info-circle me-1"></i> Restoring will load the records from your <code>.json</code> snapshot into the database.
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted text-uppercase" style="font-size:0.75rem;">Select JSON Backup File</label>
+            <input type="file" name="backup_file" accept=".json" required class="form-control" style="background:var(--input-bg);border:1px solid var(--input-border);color:#fff;border-radius:10px;">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small fw-semibold text-muted text-uppercase" style="font-size:0.75rem;">Administrator Password</label>
+            <input type="password" name="password" required placeholder="Enter your superadmin password" class="form-control" style="background:var(--input-bg);border:1px solid var(--input-border);color:#fff;border-radius:10px;">
+          </div>
+        </div>
+        <div class="modal-footer border-top border-white border-opacity-10">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal" style="border-radius:10px;">Cancel</button>
+          <button type="submit" class="btn btn-primary d-flex align-items-center gap-2" style="border-radius:10px;font-weight:600;">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Confirm &amp; Restore</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Factory Reset Danger Zone -->
+<div class="modal fade" id="factoryResetModal" tabindex="-1" aria-labelledby="factoryResetModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background:rgba(20, 10, 10, 0.96);border:1.5px solid rgba(239, 68, 68, 0.55);border-radius:20px;color:#fff;box-shadow:0 25px 60px rgba(0,0,0,0.85);backdrop-filter:blur(20px);">
+      <div class="modal-header border-bottom border-danger border-opacity-20 pb-3">
+        <div class="d-flex align-items-center gap-2">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(239,68,68,0.2);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <h5 class="modal-title fw-bold text-danger mb-0" id="factoryResetModalLabel">
+            Institutional Hard Factory Reset
+          </h5>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'core:factory_reset' %}" id="modalResetForm" onsubmit="return handleModalResetSubmit(event)">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="p-3 mb-3 rounded-3" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);">
+            <div class="fw-bold text-danger mb-1 small"><i class="fa-solid fa-radiation me-1"></i> CRITICAL WARNING: IRREVERSIBLE ACTION</div>
+            <p class="small mb-0 text-white-50" style="font-size:0.79rem;line-height:1.45;">
+              This will permanently delete all student, faculty, attendance, examination, marksheet, fee invoice, receipt, and admission records across all 18 modules. Your Superadmin account (<strong>{{ request.user.email }}</strong>) will remain active.
+            </p>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-danger text-uppercase" style="font-size:0.73rem;letter-spacing:0.03em;">
+              1. Type <strong>FACTORY-RESET</strong> to confirm authorization:
+            </label>
+            <input type="text" name="confirm_phrase" id="modalConfirmPhrase" required placeholder="FACTORY-RESET" class="form-control font-monospace text-uppercase" style="background:rgba(0,0,0,0.55);border:1.5px solid rgba(239,68,68,0.5);color:#ff6b6b;border-radius:10px;font-weight:700;font-size:0.9rem;">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small fw-semibold text-muted text-uppercase" style="font-size:0.73rem;letter-spacing:0.03em;">
+              2. Administrator Password (Authentication Required):
+            </label>
+            <div class="input-group">
+              <input type="password" name="password" id="modalPassword" required placeholder="Enter your superadmin password" class="form-control" style="background:rgba(0,0,0,0.55);border:1px solid var(--input-border);color:#fff;border-radius:10px 0 0 10px;font-size:0.9rem;">
+              <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('modalPassword', this)" style="border-radius:0 10px 10px 0;background:rgba(255,255,255,0.05);border-color:var(--input-border);color:#aaa;">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top border-danger border-opacity-20 pt-3">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal" style="border-radius:10px;">Cancel</button>
+          <button type="submit" id="modalSubmitBtn" class="btn btn-danger d-flex align-items-center gap-2" style="border-radius:10px;font-weight:700;padding:0.55rem 1.25rem;">
+            <i class="fa-solid fa-fire"></i>
+            <span>Confirm &amp; Erase All Data</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      if (icon) {
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      }
+    } else {
+      input.type = 'password';
+      if (icon) {
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+  }
+
+  function handleModalResetSubmit(event) {
+    const phrase = document.getElementById('modalConfirmPhrase')?.value.trim();
+    const pw = document.getElementById('modalPassword')?.value;
+    const valid = ['FACTORY-RESET', 'FACTORYRESET', 'RESET', 'CONFIRM-RESET', 'HARD-RESET'];
+    if (!phrase || !valid.includes(phrase.toUpperCase())) {
+      alert("Authorization Error: Please type 'FACTORY-RESET' in the confirmation box.");
+      event.preventDefault();
+      return false;
+    }
+    if (!pw) {
+      alert("Authentication Error: Please enter your administrator password.");
+      event.preventDefault();
+      return false;
+    }
+    if (!confirm("FINAL WARNING: This will permanently erase ALL student, faculty, financial, examination, and attendance records. Click OK to proceed.")) {
+      event.preventDefault();
+      return false;
+    }
+
+    const btn = document.getElementById('modalSubmitBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Erasing Data &amp; Resetting...';
+    }
+    return true;
+  }
+
+  function switchSettingsSection(idx) {
+    for (let i = 0; i <= 11; i++) {
+      const sec = document.getElementById('section' + i);
+      const nav = document.getElementById('navItem' + i);
+      if (sec) sec.classList.toggle('active', i === idx);
+      if (nav) nav.classList.toggle('active', i === idx);
+    }
+  }
+
+  function submitSettingsLicenseActivation() {
+    const key = document.getElementById('settingsLicenseKeyInput')?.value.trim();
+    if (!key) {
+      alert("Please paste your license key before activating.");
+      return;
+    }
+    const f = document.createElement('form');
+    f.method = 'POST';
+    f.action = '{% url "core:license_activate" %}';
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = 'csrfmiddlewaretoken';
+    csrf.value = '{{ csrf_token }}';
+    f.appendChild(csrf);
+    const k = document.createElement('input');
+    k.type = 'hidden';
+    k.name = 'license_key';
+    k.value = key;
+    f.appendChild(k);
+    document.body.appendChild(f);
+    f.submit();
+  }
+
+  function copyFullLicenseRequest(schoolName, schoolCode, installId) {
+    const today = new Date().toISOString().split('T')[0];
+    const text = `Hello Developer, please generate an activation license key for our school:\n• School Name: ${schoolName}\n• School Code: ${schoolCode}\n• Server Installation ID: ${installId}\n• Request Date: ${today}`;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("License request details copied to clipboard! You can now paste and send to the developer via WhatsApp or Email.");
+    });
+  }
+
+
+
+  function syncSettingsPreview() {
+    const name = document.getElementById('id_name')?.value.trim() || 'Horizon Public School';
+    const code = document.getElementById('id_code')?.value.trim() || 'HPS-DELHI';
+    const tagline = document.getElementById('id_tagline')?.value.trim() || 'Affiliated to CBSE, New Delhi';
+    const currSym = document.getElementById('id_currency_symbol')?.value.trim() || '₹';
+    const lateGrace = document.getElementById('id_late_coming_grace_minutes')?.value.trim() || '10';
+    const lateFee = document.getElementById('id_late_fee_per_day')?.value.trim() || '20';
+    const threshold = document.getElementById('id_attendance_threshold_percentage')?.value.trim() || '75.00';
+    const boardSelect = document.getElementById('id_board_name');
+    const board = boardSelect ? boardSelect.options[boardSelect.selectedIndex]?.text.split('(')[0].trim() : 'CBSE';
+    const shiftSelect = document.getElementById('id_operating_shift');
+    const shift = shiftSelect ? shiftSelect.options[shiftSelect.selectedIndex]?.text.split('(')[0].trim() : 'Single Shift';
+    const waChecked = document.getElementById('id_enable_whatsapp_notifications')?.checked;
+
+    const schoolNameEl = document.getElementById('previewSchoolName');
+    if (schoolNameEl) schoolNameEl.textContent = name;
+    
+    const logoEl = document.getElementById('previewLogo');
+    if (logoEl) logoEl.textContent = (name[0] || 'H').toUpperCase();
+    
+    const codeEl = document.getElementById('previewCode');
+    if (codeEl) codeEl.textContent = code;
+    
+    const tagEl = document.getElementById('previewTagline');
+    if (tagEl) tagEl.textContent = tagline;
+    
+    const lateGraceEl = document.getElementById('previewLateGrace');
+    if (lateGraceEl) lateGraceEl.textContent = `${lateGrace} mins`;
+    
+    const lateFeeEl = document.getElementById('previewLateFee');
+    if (lateFeeEl) lateFeeEl.textContent = `${currSym}${lateFee}/day`;
+    
+    const threshEl = document.getElementById('previewThreshold');
+    if (threshEl) threshEl.textContent = `${threshold}%`;
+
+    const boardEl = document.getElementById('previewBoard');
+    if (boardEl) boardEl.textContent = board;
+
+    const shiftEl = document.getElementById('previewShift');
+    if (shiftEl) shiftEl.textContent = shift;
+
+    const waEl = document.getElementById('previewWhatsApp');
+    if (waEl) {
+      waEl.textContent = waChecked ? '● Active' : '○ Disabled';
+      waEl.style.color = waChecked ? 'var(--success)' : 'var(--danger)';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const inputIds = [
+      'id_name', 'id_code', 'id_tagline', 'id_currency_symbol', 'id_currency_code',
+      'id_attendance_threshold_percentage', 'id_late_coming_grace_minutes', 'id_late_fee_per_day'
+    ];
+    inputIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', syncSettingsPreview);
+    });
+
+    const changeIds = [
+      'id_board_name', 'id_operating_shift', 'id_enable_whatsapp_notifications',
+      'id_enable_student_login', 'id_enable_parent_login', 'id_enable_online_admissions'
+    ];
+    changeIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', syncSettingsPreview);
+    });
+
+    document.querySelectorAll('.float-field input, .float-field select, .float-field textarea').forEach(el => {
+      if (!el.getAttribute('placeholder')) el.setAttribute('placeholder', ' ');
+    });
+
+    // Mark unsaved changes on any form change
+    const form = document.getElementById('settingsForm');
+    if (form) {
+      form.addEventListener('input', () => {
+        const notice = document.getElementById('unsavedNotice');
+        if (notice) {
+          notice.innerHTML = '<i class="fa-solid fa-circle-dot text-warning me-1"></i>Unsaved changes pending';
+        }
+      });
+    }
+
+    syncSettingsPreview();
+
+    // Auto-select tab from URL query params (e.g. ?tab=10)
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam !== null) {
+      switchSettingsSection(parseInt(tabParam, 10) || 0);
+    }
+  });
+
+  function executeInlineReset() {
+    const phrase = document.getElementById('inlineConfirmPhrase')?.value.trim();
+    const pw = document.getElementById('inlinePassword')?.value;
+    const valid = ['FACTORY-RESET', 'FACTORYRESET', 'RESET', 'CONFIRM-RESET', 'HARD-RESET'];
+    if (!phrase || !valid.includes(phrase.toUpperCase())) {
+      alert("Please type 'FACTORY-RESET' in the confirmation box.");
+      return;
+    }
+    if (!pw) {
+      alert("Please enter your administrator password.");
+      return;
+    }
+    if (!confirm("CRITICAL WARNING: Are you ABSOLUTELY certain? All students, staff, attendance, fees, exams, and notices will be permanently deleted.")) {
+      return;
+    }
+
+    const btn = document.getElementById('inlineResetBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Executing Data Wipe...';
+    }
+    
+    // Create and submit form dynamically
+    const f = document.createElement('form');
+    f.method = 'POST';
+    f.action = '{% url "core:factory_reset" %}';
+    
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = 'csrfmiddlewaretoken';
+    csrf.value = '{{ csrf_token }}';
+    f.appendChild(csrf);
+
+    const cp = document.createElement('input');
+    cp.type = 'hidden';
+    cp.name = 'confirm_phrase';
+    cp.value = phrase;
+    f.appendChild(cp);
+
+    const p = document.createElement('input');
+    p.type = 'hidden';
+    p.name = 'password';
+    p.value = pw;
+    f.appendChild(p);
+
+    document.body.appendChild(f);
+    f.submit();
+  }
+</script>
+{% endblock %}

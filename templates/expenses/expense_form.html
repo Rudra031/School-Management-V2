@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Record Expense{% endblock %}
+{% block page_heading %}Record Operating Expenditure{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card-saas">
+      <div class="card-saas-header">
+        <span><i class="fa-solid fa-receipt text-primary me-2"></i> Payment Voucher Details</span>
+      </div>
+      <div class="card-saas-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Academic Session</label>
+              {{ form.academic_year }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Expense Category</label>
+              {{ form.category }}
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label small fw-semibold">Expenditure Title / Description</label>
+              {{ form.title }}
+              {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-semibold">Amount (₹)</label>
+              {{ form.amount }}
+              {% if form.amount.errors %}<div class="text-danger small">{{ form.amount.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Date of Expenditure</label>
+              {{ form.expense_date }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Payment Method</label>
+              {{ form.payment_method }}
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Vendor / Supplier Name</label>
+              {{ form.vendor_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Scanned Bill / Receipt File</label>
+              {{ form.receipt_file }}
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Notes / Rationale</label>
+            {{ form.notes }}
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'expenses:list' %}" class="btn btn-saas-secondary">Cancel</a>
+            <button type="submit" class="btn btn-saas-primary">Record Payment Voucher</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

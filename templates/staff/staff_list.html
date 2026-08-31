@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty & Staff Directory{% endblock %}
+{% block page_heading %}Faculty & Staff Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Staff & Faculty Directory</h5>
+    <p class="text-muted small mb-0">Total {{ paginator.count }} staff members recorded in the institution.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <div class="btn-group">
+      <a href="{% url 'staff:staff_export' %}?format=excel" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-file-excel text-success me-1"></i> Excel</a>
+      <a href="{% url 'staff:staff_export' %}?format=csv" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-file-csv text-primary me-1"></i> CSV</a>
+    </div>
+    <a href="{% url 'staff:staff_create' %}" class="btn btn-saas-primary btn-sm">
+      <i class="fa-solid fa-user-plus me-1"></i> Add Staff Member
+    </a>
+  </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="card-saas p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-4">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+        <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, employee ID, or email..." value="{{ search_query }}">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <select name="department" class="form-select form-select-sm">
+        <option value="">All Departments</option>
+        {% for dept in departments %}
+          <option value="{{ dept.id }}" {% if selected_dept == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select name="designation" class="form-select form-select-sm">
+        <option value="">All Designations</option>
+        {% for des in designations %}
+          <option value="{{ des.id }}" {% if selected_designation == des.id|stringformat:"s" %}selected{% endif %}>{{ des.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-saas-primary btn-sm w-100">Filter</button>
+      <a href="{% url 'staff:staff_list' %}" class="btn btn-saas-secondary btn-sm">Reset</a>
+    </div>
+  </form>
+</div>
+
+<!-- Staff Table -->
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>Faculty / Staff</th>
+            <th>Designation</th>
+            <th>Department</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for member in staff_members %}
+            <tr>
+              <td class="fw-bold text-primary small">{{ member.employee_id }}</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-weight: 600; font-size: 0.8rem;">
+                    {{ member.first_name|first }}{{ member.last_name|first }}
+                  </div>
+                  <div>
+                    <div class="fw-semibold text-dark">{{ member.full_name }}</div>
+                    <small class="text-muted">{{ member.email }}</small>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge bg-light text-dark border">{{ member.designation.title }}</span></td>
+              <td class="small">{{ member.department.name|default:"General" }}</td>
+              <td class="small text-muted">{{ member.user.phone_number|default:"-" }}</td>
+              <td>
+                {% if member.status == 'ACTIVE' %}
+                  <span class="badge bg-success-subtle text-success">Active</span>
+                {% elif member.status == 'ON_LEAVE' %}
+                  <span class="badge bg-warning-subtle text-warning">On Leave</span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary">{{ member.get_status_display }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'staff:staff_detail' member.pk %}" class="btn btn-sm btn-outline-primary py-0">View Profile</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4 small">No staff members found matching criteria.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

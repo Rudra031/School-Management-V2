@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Financial P&L Statement{% endblock %}
+{% block page_heading %}Institutional Financial Statement (P&L){% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Financial Profit & Loss Statement</h5>
+    <p class="text-muted small mb-0">{{ academic_year.name|default:"Active Academic Session" }} | Institutional Income vs Operating Expenditure</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'reports:financial_export' %}?format=csv" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-file-csv me-1"></i> Export CSV</a>
+    <a href="{% url 'reports:financial_export' %}?format=excel" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-file-excel me-1"></i> Export Excel</a>
+    <a href="{% url 'reports:hub' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Reports Hub</a>
+  </div>
+</div>
+
+<!-- Summary Statement Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-md-4">
+    <div class="card-saas p-3 border-start border-success border-4">
+      <div class="text-muted small">Total Operating Income (Fees)</div>
+      <h3 class="fw-bold text-success mb-0">₹{{ total_income|floatformat:2 }}</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card-saas p-3 border-start border-danger border-4">
+      <div class="text-muted small">Total Operating Outflows (Expenses)</div>
+      <h3 class="fw-bold text-danger mb-0">₹{{ total_expenses|floatformat:2 }}</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card-saas p-3 border-start {% if is_surplus %}border-primary{% else %}border-warning{% endif %} border-4">
+      <div class="text-muted small">Net Operating Surplus / (Deficit)</div>
+      <h3 class="fw-bold {% if is_surplus %}text-primary{% else %}text-danger{% endif %} mb-0">₹{{ net_balance|floatformat:2 }}</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Statement Ledger -->
+<div class="card-saas">
+  <div class="card-saas-header">
+    <span class="fw-bold text-dark"><i class="fa-solid fa-scale-balanced text-primary me-2"></i> Statement of Institutional Operations</span>
+  </div>
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table table-bordered mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Line Item / Account Description</th>
+            <th class="text-end" style="width: 250px;">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fw-bold text-success"><i class="fa-solid fa-plus-circle me-2"></i> Fee Invoicing & Collections (Operating Income)</td>
+            <td class="text-end fw-bold text-success">₹{{ total_income|floatformat:2 }}</td>
+          </tr>
+          <tr>
+            <td class="fw-bold text-danger"><i class="fa-solid fa-minus-circle me-2"></i> Operating Expenditures & Vendor Vouchers (Outflow)</td>
+            <td class="text-end fw-bold text-danger">(₹{{ total_expenses|floatformat:2 }})</td>
+          </tr>
+          <tr class="table-light fs-6">
+            <td class="fw-bold text-dark">Net Operating Surplus / (Deficit)</td>
+            <td class="text-end fw-bold {% if is_surplus %}text-primary{% else %}text-danger{% endif %}">
+              ₹{{ net_balance|floatformat:2 }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

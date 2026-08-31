@@ -1,0 +1,897 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Faculty Profile{% else %}Teacher &amp; Faculty Enrollment{% endif %} | {{ school.name|default:"Horizon SMS" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ==========================================================================
+     TEACHER & FACULTY ENROLLMENT — NEXT-GEN LUXURY STYLING
+     ========================================================================== */
+
+  /* Floating Labels */
+  .float-field {
+    position: relative;
+    margin-bottom: 1.35rem;
+  }
+
+  .float-field input,
+  .float-field select,
+  .float-field textarea {
+    background: var(--input-bg, rgba(15, 23, 42, 0.6)) !important;
+    border: 1.5px solid var(--input-border, rgba(255, 255, 255, 0.12)) !important;
+    border-radius: 14px !important;
+    color: var(--text-main, #ffffff) !important;
+    padding: 1.15rem 0.95rem 0.45rem 0.95rem !important;
+    font-size: 0.9rem !important;
+    width: 100%;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    outline: none !important;
+  }
+
+  [data-theme="light"] .float-field input,
+  [data-theme="light"] .float-field select,
+  [data-theme="light"] .float-field textarea {
+    background: #ffffff !important;
+    border-color: rgba(15, 23, 42, 0.15) !important;
+    color: #0f172a !important;
+  }
+
+  .float-field input:focus,
+  .float-field select:focus,
+  .float-field textarea:focus {
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3.5px rgba(16, 185, 129, 0.2) !important;
+  }
+
+  .float-label {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.95rem;
+    font-size: 0.82rem;
+    color: var(--text-muted, #94a3b8);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    font-weight: 500;
+  }
+
+  .float-field input:focus ~ .float-label,
+  .float-field input:not(:placeholder-shown) ~ .float-label,
+  .float-field select:focus ~ .float-label,
+  .float-field select:not([value=""]) ~ .float-label,
+  .float-field textarea:focus ~ .float-label,
+  .float-field textarea:not(:placeholder-shown) ~ .float-label {
+    top: 0.22rem;
+    font-size: 0.68rem;
+    color: #10b981;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* Section Navigation Tabs */
+  .section-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.75rem 1.15rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    color: var(--text-muted, #94a3b8);
+    font-weight: 600;
+    font-size: 0.86rem;
+    border: 1px solid transparent;
+    user-select: none;
+  }
+
+  .section-tab-btn:hover {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+  }
+
+  .section-tab-btn.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+  }
+
+  .section-tab-btn .tab-icon-box {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  .section-tab-btn:not(.active) .tab-icon-box {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-muted, #94a3b8);
+  }
+
+  /* Form Sections Animation */
+  .form-step-section {
+    display: none;
+  }
+
+  .form-step-section.active {
+    display: block;
+    animation: stepSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes stepSlideUp {
+    0% { opacity: 0; transform: translateY(14px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Sticky Faculty Preview Card */
+  .faculty-sticky-card {
+    position: sticky;
+    top: calc(var(--topbar-height, 70px) + 1.25rem);
+    background: var(--card-glass, rgba(15, 23, 42, 0.75));
+    border: 1px solid var(--card-glass-border, rgba(255, 255, 255, 0.1));
+    border-radius: 24px;
+    padding: 1.6rem;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    text-align: center;
+  }
+
+  [data-theme="light"] .faculty-sticky-card {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+    border-color: rgba(15, 23, 42, 0.08);
+  }
+
+  .preview-avatar-wrapper {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 1rem;
+  }
+
+  .preview-avatar-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10b981, #06b6d4);
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Geist', sans-serif;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+    border: 3px solid rgba(255, 255, 255, 0.25);
+    overflow: hidden;
+  }
+
+  .preview-avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .preview-online-dot {
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #10b981;
+    border: 2.5px solid #0f172a;
+    box-shadow: 0 0 8px #10b981;
+  }
+
+  [data-theme="light"] .preview-online-dot {
+    border-color: #ffffff;
+  }
+
+  .helper-btn-pill {
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 8px;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .helper-btn-pill:hover {
+    background: #10b981;
+    color: #ffffff;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================================================================
+     PAGE HERO HEADER
+     ========================================================================= -->
+<div class="dashboard-hero-card mb-4" style="padding: 1.3rem 1.8rem;">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="d-flex align-items-center gap-3">
+      <div style="width:48px; height:48px; border-radius:16px; background:linear-gradient(135deg, #10b981, #059669); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.35rem; box-shadow:0 8px 20px rgba(16,185,129,0.35);">
+        <i class="fa-solid fa-chalkboard-user"></i>
+      </div>
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-40 px-2 py-0" style="font-size:0.72rem;">Faculty Desk</span>
+          <span class="text-muted small">&bull; {{ academic_year.name|default:"Active Academic Session" }}</span>
+        </div>
+        <h4 class="fw-bold mb-0" style="font-family:'Geist',sans-serif; letter-spacing:-0.02em;">
+          {% if form.instance.pk %}Edit Faculty Profile{% else %}Teacher &amp; Faculty Enrollment{% endif %}
+        </h4>
+      </div>
+    </div>
+
+    <div>
+      <a href="{% url 'staff:staff_list' %}" class="btn btn-sm btn-outline-light d-flex align-items-center gap-2" style="border-radius:10px; padding:0.5rem 0.9rem;">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Back to Faculty Roster</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<form method="post" enctype="multipart/form-data" novalidate id="teacherEnrollmentForm">
+  {% csrf_token %}
+  
+  <div class="row g-4">
+    
+    <!-- Left Column: Step Navigation & Form Sections (8 Cols) -->
+    <div class="col-lg-8">
+      
+      <!-- Section Navigation Tabs -->
+      <div class="analytics-hub-card mb-4" style="padding:0.75rem;">
+        <div class="d-flex gap-2 flex-wrap">
+          <div class="section-tab-btn active" onclick="switchStep(0)" id="stepTab0">
+            <div class="tab-icon-box"><i class="fa-solid fa-user"></i></div>
+            <span>1. Personal Details</span>
+          </div>
+          <div class="section-tab-btn" onclick="switchStep(1)" id="stepTab1">
+            <div class="tab-icon-box"><i class="fa-solid fa-graduation-cap"></i></div>
+            <span>2. Qualifications &amp; Terms</span>
+          </div>
+          <div class="section-tab-btn" onclick="switchStep(2)" id="stepTab2">
+            <div class="tab-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+            <span>3. Account &amp; Access</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Form Card Container -->
+      <div class="analytics-hub-card">
+        
+        <!-- STEP 0: PERSONAL & CONTACT INFORMATION -->
+        <div id="formStep0" class="form-step-section active">
+          <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-white border-opacity-10">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-solid fa-id-card text-success fs-5"></i>
+              <h6 class="fw-bold mb-0 text-white" style="font-size:0.96rem;">Personal &amp; Demographic Profile</h6>
+            </div>
+            <span class="badge bg-success bg-opacity-25 text-success small">Step 1 of 3</span>
+          </div>
+
+          <div class="row g-3">
+            <!-- First Name -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.first_name }}
+                <label class="float-label">First Name *</label>
+                {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.last_name }}
+                <label class="float-label">Last Name *</label>
+                {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Gender -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.gender }}
+                <label class="float-label">Gender *</label>
+                {% if form.gender.errors %}<div class="text-danger small mt-1">{{ form.gender.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Date of Birth -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.date_of_birth }}
+                <label class="float-label">Date of Birth</label>
+                {% if form.date_of_birth.errors %}<div class="text-danger small mt-1">{{ form.date_of_birth.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Blood Group -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.blood_group }}
+                <label class="float-label">Blood Group</label>
+              </div>
+            </div>
+
+            <!-- Marital Status -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.marital_status }}
+                <label class="float-label">Marital Status</label>
+              </div>
+            </div>
+
+            <!-- National ID / SSN -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.national_id_number }}
+                <label class="float-label">National ID / SSN / Aadhaar</label>
+              </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.phone_number }}
+                <label class="float-label">Primary Mobile Phone</label>
+              </div>
+            </div>
+
+            <!-- Residential Address -->
+            <div class="col-12">
+              <div class="float-field">
+                {{ form.address }}
+                <label class="float-label">Residential Address</label>
+              </div>
+            </div>
+
+            <!-- Emergency Contact Name -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.emergency_contact_name }}
+                <label class="float-label">Emergency Contact Name</label>
+              </div>
+            </div>
+
+            <!-- Emergency Contact Phone -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.emergency_contact_phone }}
+                <label class="float-label">Emergency Contact Phone</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 0 Action -->
+          <div class="d-flex justify-content-end mt-4 pt-3 border-top border-white border-opacity-10">
+            <button type="button" class="btn btn-success d-flex align-items-center gap-2 px-4" onclick="switchStep(1)" style="border-radius:12px; font-weight:600;">
+              <span>Next: Qualifications &amp; Terms</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 1: PROFESSIONAL & ACADEMIC QUALIFICATIONS -->
+        <div id="formStep1" class="form-step-section">
+          <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-white border-opacity-10">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-solid fa-briefcase text-info fs-5"></i>
+              <h6 class="fw-bold mb-0 text-white" style="font-size:0.96rem;">Professional Credentials &amp; Employment Terms</h6>
+            </div>
+            <span class="badge bg-info bg-opacity-25 text-info small">Step 2 of 3</span>
+          </div>
+
+          <div class="row g-3">
+            <!-- Employee ID -->
+            <div class="col-md-6">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-muted small" style="font-size:0.75rem;">EMPLOYEE ID *</span>
+                <button type="button" class="helper-btn-pill" onclick="generateEmployeeId()">
+                  <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Auto-Generate
+                </button>
+              </div>
+              <div class="float-field mb-0">
+                {{ form.employee_id }}
+                {% if form.employee_id.errors %}<div class="text-danger small mt-1">{{ form.employee_id.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Department -->
+            <div class="col-md-6">
+              <div class="float-field mt-3 mt-md-0">
+                {{ form.department }}
+                <label class="float-label">Academic Department</label>
+                {% if form.department.errors %}<div class="text-danger small mt-1">{{ form.department.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Designation / Role -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.designation }}
+                <label class="float-label">Designation / Role *</label>
+                {% if form.designation.errors %}<div class="text-danger small mt-1">{{ form.designation.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Highest Qualification -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.qualification }}
+                <label class="float-label">Highest Academic Qualification *</label>
+                {% if form.qualification.errors %}<div class="text-danger small mt-1">{{ form.qualification.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Experience (Years) -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.experience_years }}
+                <label class="float-label">Teaching Experience (Years)</label>
+                {% if form.experience_years.errors %}<div class="text-danger small mt-1">{{ form.experience_years.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Joining Date -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.joining_date }}
+                <label class="float-label">Date of Joining *</label>
+                {% if form.joining_date.errors %}<div class="text-danger small mt-1">{{ form.joining_date.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Contract Type -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.contract_type }}
+                <label class="float-label">Contract Type *</label>
+              </div>
+            </div>
+
+            <!-- Basic Salary -->
+            <div class="col-md-6">
+              <div class="float-field">
+                {{ form.basic_salary }}
+                <label class="float-label">Monthly Basic Salary (₹ / $)</label>
+                {% if form.basic_salary.errors %}<div class="text-danger small mt-1">{{ form.basic_salary.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <!-- Resume / CV File -->
+            <div class="col-12">
+              <div class="float-field">
+                {{ form.resume_file }}
+                <label class="float-label">Curriculum Vitae / Resume (PDF or Word)</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 1 Actions -->
+          <div class="d-flex justify-content-between mt-4 pt-3 border-top border-white border-opacity-10">
+            <button type="button" class="btn btn-outline-light d-flex align-items-center gap-2 px-3" onclick="switchStep(0)" style="border-radius:12px;">
+              <i class="fa-solid fa-arrow-left"></i>
+              <span>Previous</span>
+            </button>
+            <button type="button" class="btn btn-success d-flex align-items-center gap-2 px-4" onclick="switchStep(2)" style="border-radius:12px; font-weight:600;">
+              <span>Next: Account Setup</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 2: USER ACCOUNT & PORTAL ACCESS -->
+        <div id="formStep2" class="form-step-section">
+          <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-white border-opacity-10">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-solid fa-shield-halved text-warning fs-5"></i>
+              <h6 class="fw-bold mb-0 text-white" style="font-size:0.96rem;">System User Account &amp; Access Controls</h6>
+            </div>
+            <span class="badge bg-warning bg-opacity-25 text-warning small">Step 3 of 3</span>
+          </div>
+
+          {% if not form.instance.pk %}
+            <!-- Create Mode: Login credentials -->
+            <div class="row g-3">
+              <!-- Email Address -->
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.email }}
+                  <label class="float-label">Official Email (Login Username) *</label>
+                  {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+
+              <!-- Password -->
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="text-muted small" style="font-size:0.75rem;">PORTAL PASSWORD *</span>
+                  <button type="button" class="helper-btn-pill" onclick="generateSecurePassword()">
+                    <i class="fa-solid fa-key me-1"></i> Generate Password
+                  </button>
+                </div>
+                <div class="position-relative float-field mb-0">
+                  {{ form.password }}
+                  <button type="button" class="btn btn-sm text-muted position-absolute end-0 top-50 translate-middle-y me-2" onclick="togglePasswordVisibility()" style="border:none; background:transparent;">
+                    <i class="fa-solid fa-eye" id="pwToggleIcon"></i>
+                  </button>
+                  {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+
+              <!-- Profile Photo Upload -->
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.avatar }}
+                  <label class="float-label">Profile Photograph</label>
+                  {% if form.avatar.errors %}<div class="text-danger small mt-1">{{ form.avatar.errors.0 }}</div>{% endif %}
+                </div>
+              </div>
+
+              <!-- Force Password Change -->
+              <div class="col-md-6 d-flex align-items-center">
+                <div class="form-check form-switch p-3 rounded-3 w-100" style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.06);">
+                  {{ form.must_change_password }}
+                  <label class="form-check-label small fw-semibold text-white ms-2" for="{{ form.must_change_password.id_for_label }}">
+                    Require password reset on first login
+                  </label>
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <!-- Edit Mode -->
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="p-3 rounded-3" style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08);">
+                  <div class="text-muted small text-uppercase" style="font-size:0.72rem;">Linked User Account</div>
+                  <div class="fw-bold text-white fs-6 mt-1">{{ form.instance.user.email }}</div>
+                  <span class="badge bg-success bg-opacity-25 text-success small mt-1">Active User</span>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.avatar }}
+                  <label class="float-label">Update Profile Photograph</label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="float-field">
+                  {{ form.status }}
+                  <label class="float-label">Employment Status</label>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Step 2 Actions -->
+          <div class="d-flex justify-content-between mt-4 pt-3 border-top border-white border-opacity-10">
+            <button type="button" class="btn btn-outline-light d-flex align-items-center gap-2 px-3" onclick="switchStep(1)" style="border-radius:12px;">
+              <i class="fa-solid fa-arrow-left"></i>
+              <span>Previous</span>
+            </button>
+            <button type="submit" class="btn btn-success d-flex align-items-center gap-2 px-4 shadow" style="border-radius:12px; font-weight:700; background:linear-gradient(135deg, #10b981, #059669);">
+              <i class="fa-solid fa-check-circle"></i>
+              <span>{% if form.instance.pk %}Update Faculty Profile{% else %}Complete Faculty Enrollment{% endif %}</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right Column: Sticky Live Faculty Preview Card (4 Cols) -->
+    <div class="col-lg-4">
+      <div class="faculty-sticky-card">
+        
+        <!-- Live Avatar Circle -->
+        <div class="preview-avatar-wrapper">
+          <div class="preview-avatar-circle" id="liveAvatarCircle">
+            {% if form.instance.user.avatar %}
+              <img src="{{ form.instance.user.avatar.url }}" alt="Avatar" id="liveAvatarImg">
+            {% else %}
+              <span id="liveAvatarInitials">TF</span>
+            {% endif %}
+          </div>
+          <span class="preview-online-dot" title="Ready to Enroll"></span>
+        </div>
+
+        <!-- Live Faculty Name -->
+        <h5 class="fw-bold mb-1" id="livePreviewName" style="font-family:'Geist',sans-serif; color:var(--text-main, #fff);">
+          {% if form.instance.pk %}{{ form.instance.full_name }}{% else %}New Faculty Member{% endif %}
+        </h5>
+        
+        <!-- Live Employee ID Badge -->
+        <div class="mb-2">
+          <span class="badge bg-secondary bg-opacity-50 text-white font-monospace px-2 py-1" id="livePreviewEmpId" style="font-size:0.78rem;">
+            {{ form.instance.employee_id|default:"EMP-ID-PENDING" }}
+          </span>
+        </div>
+
+        <!-- Live Role & Department Pills -->
+        <div class="d-flex justify-content-center gap-2 flex-wrap mb-3">
+          <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-40 px-2 py-1" id="livePreviewDesignation">
+            {{ form.instance.designation.title|default:"Teaching Faculty" }}
+          </span>
+          <span class="badge bg-info bg-opacity-25 text-info border border-info border-opacity-40 px-2 py-1" id="livePreviewDept">
+            {{ form.instance.department.name|default:"Academics" }}
+          </span>
+        </div>
+
+        <!-- Live Attributes Snapshot -->
+        <div class="p-3 rounded-3 text-start mb-3" style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.06); font-size:0.82rem;">
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted"><i class="fa-solid fa-graduation-cap me-2 text-info"></i>Qualification:</span>
+            <strong class="text-white text-truncate" id="livePreviewQual">{{ form.instance.qualification|default:"Not specified" }}</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted"><i class="fa-solid fa-business-time me-2 text-warning"></i>Experience:</span>
+            <strong class="text-white" id="livePreviewExp">{{ form.instance.experience_years|default:"0" }} Years</strong>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted"><i class="fa-solid fa-calendar-check me-2 text-success"></i>Joining:</span>
+            <strong class="text-white" id="livePreviewJoin">{{ form.instance.joining_date|date:"d M Y"|default:"Today" }}</strong>
+          </div>
+        </div>
+
+        <!-- Profile Completeness Meter -->
+        <div class="text-start mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-1" style="font-size:0.75rem;">
+            <span class="text-muted fw-semibold">ENROLLMENT COMPLETENESS</span>
+            <strong class="text-success" id="completenessPercent">35%</strong>
+          </div>
+          <div class="progress" style="height: 6px; background:rgba(255,255,255,0.08); border-radius:10px;">
+            <div class="progress-bar bg-success" id="completenessProgressBar" role="progressbar" style="width: 35%; border-radius:10px; transition: width 0.3s ease;"></div>
+          </div>
+        </div>
+
+        <!-- Checklist -->
+        <div class="d-flex flex-column gap-2 text-start small text-muted" style="font-size:0.78rem;">
+          <div id="checkPersonal"><i class="fa-solid fa-circle-notch text-muted me-2"></i>Personal Profile</div>
+          <div id="checkAcademic"><i class="fa-solid fa-circle-notch text-muted me-2"></i>Academic Credentials</div>
+          <div id="checkAccount"><i class="fa-solid fa-circle-notch text-muted me-2"></i>System Portal Access</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // =========================================================================
+  // 1. MULTI-STEP TAB NAVIGATION
+  // =========================================================================
+  let currentStep = 0;
+  const totalSteps = 3;
+
+  function switchStep(stepIndex) {
+    if (stepIndex < 0 || stepIndex >= totalSteps) return;
+    currentStep = stepIndex;
+
+    // Update Tab buttons
+    for (let i = 0; i < totalSteps; i++) {
+      const tabBtn = document.getElementById(`stepTab${i}`);
+      const section = document.getElementById(`formStep${i}`);
+      if (tabBtn && section) {
+        if (i === stepIndex) {
+          tabBtn.classList.add('active');
+          section.classList.add('active');
+        } else {
+          tabBtn.classList.remove('active');
+          section.classList.remove('active');
+        }
+      }
+    }
+    updateCompleteness();
+  }
+
+  // =========================================================================
+  // 2. LIVE PROFILE PREVIEW & ATTRIBUTE SYNC
+  // =========================================================================
+  const firstNameInput = document.getElementById('id_first_name');
+  const lastNameInput = document.getElementById('id_last_name');
+  const empIdInput = document.getElementById('id_employee_id');
+  const designationInput = document.getElementById('id_designation');
+  const deptInput = document.getElementById('id_department');
+  const qualInput = document.getElementById('id_qualification');
+  const expInput = document.getElementById('id_experience_years');
+  const joinInput = document.getElementById('id_joining_date');
+  const avatarInput = document.getElementById('id_avatar');
+
+  function updateLivePreview() {
+    const fn = firstNameInput ? firstNameInput.value.trim() : '';
+    const ln = lastNameInput ? lastNameInput.value.trim() : '';
+    const fullName = (fn || ln) ? `${fn} ${ln}`.trim() : 'New Faculty Member';
+
+    // Update Full Name
+    const nameEl = document.getElementById('livePreviewName');
+    if (nameEl) nameEl.textContent = fullName;
+
+    // Update Initials
+    const initialsEl = document.getElementById('liveAvatarInitials');
+    if (initialsEl) {
+      const i1 = fn ? fn.charAt(0).toUpperCase() : 'T';
+      const i2 = ln ? ln.charAt(0).toUpperCase() : 'F';
+      initialsEl.textContent = `${i1}${i2}`;
+    }
+
+    // Update Employee ID
+    const empEl = document.getElementById('livePreviewEmpId');
+    if (empEl && empIdInput) {
+      empEl.textContent = empIdInput.value.trim() || 'EMP-ID-PENDING';
+    }
+
+    // Update Designation
+    const desigEl = document.getElementById('livePreviewDesignation');
+    if (desigEl && designationInput && designationInput.selectedIndex >= 0) {
+      const text = designationInput.options[designationInput.selectedIndex].text;
+      desigEl.textContent = text !== '---------' ? text : 'Teaching Faculty';
+    }
+
+    // Update Department
+    const deptEl = document.getElementById('livePreviewDept');
+    if (deptEl && deptInput && deptInput.selectedIndex >= 0) {
+      const text = deptInput.options[deptInput.selectedIndex].text;
+      deptEl.textContent = text !== '---------' ? text : 'Academics';
+    }
+
+    // Update Qualifications
+    const qualEl = document.getElementById('livePreviewQual');
+    if (qualEl && qualInput) {
+      qualEl.textContent = qualInput.value.trim() || 'Not specified';
+    }
+
+    // Update Experience
+    const expEl = document.getElementById('livePreviewExp');
+    if (expEl && expInput) {
+      expEl.textContent = `${expInput.value || '0'} Years`;
+    }
+
+    // Update Joining Date
+    const joinEl = document.getElementById('livePreviewJoin');
+    if (joinEl && joinInput && joinInput.value) {
+      joinEl.textContent = joinInput.value;
+    }
+  }
+
+  // Bind live listeners
+  [firstNameInput, lastNameInput, empIdInput, qualInput, expInput, joinInput].forEach(el => {
+    if (el) el.addEventListener('input', () => { updateLivePreview(); updateCompleteness(); });
+  });
+  [designationInput, deptInput].forEach(el => {
+    if (el) el.addEventListener('change', () => { updateLivePreview(); updateCompleteness(); });
+  });
+
+  // Photo Upload Live Preview
+  if (avatarInput) {
+    avatarInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const avatarCircle = document.getElementById('liveAvatarCircle');
+          if (avatarCircle) {
+            avatarCircle.innerHTML = `<img src="${evt.target.result}" alt="Preview" style="width:100%; height:100%; object-fit:cover;">`;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // =========================================================================
+  // 3. AUTO-GENERATORS (EMPLOYEE ID & SECURE PASSWORD)
+  // =========================================================================
+  function generateEmployeeId() {
+    const year = new Date().getFullYear();
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    const generatedId = `FAC-${year}-${rand}`;
+    if (empIdInput) {
+      empIdInput.value = generatedId;
+      empIdInput.dispatchEvent(new Event('input'));
+    }
+  }
+
+  function generateSecurePassword() {
+    const pwField = document.getElementById('id_password');
+    if (pwField) {
+      const year = new Date().getFullYear();
+      const rand = Math.floor(100 + Math.random() * 900);
+      const generated = `Teacher@${year}!${rand}`;
+      pwField.value = generated;
+      pwField.type = 'text';
+      const icon = document.getElementById('pwToggleIcon');
+      if (icon) icon.className = 'fa-solid fa-eye-slash';
+      pwField.dispatchEvent(new Event('input'));
+    }
+  }
+
+  function togglePasswordVisibility() {
+    const pwField = document.getElementById('id_password');
+    const icon = document.getElementById('pwToggleIcon');
+    if (pwField && icon) {
+      if (pwField.type === 'password') {
+        pwField.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        pwField.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    }
+  }
+
+  // =========================================================================
+  // 4. DYNAMIC PROFILE COMPLETENESS CALCULATOR
+  // =========================================================================
+  function updateCompleteness() {
+    let score = 0;
+    const fn = firstNameInput ? firstNameInput.value.trim() : '';
+    const ln = lastNameInput ? lastNameInput.value.trim() : '';
+    const emp = empIdInput ? empIdInput.value.trim() : '';
+    const desig = designationInput ? designationInput.value : '';
+    const qual = qualInput ? qualInput.value.trim() : '';
+    const emailField = document.getElementById('id_email');
+    const email = emailField ? emailField.value.trim() : '';
+
+    const checkP = document.getElementById('checkPersonal');
+    const checkA = document.getElementById('checkAcademic');
+    const checkAcc = document.getElementById('checkAccount');
+
+    // Personal Score
+    if (fn && ln) {
+      score += 35;
+      if (checkP) checkP.innerHTML = '<i class="fa-solid fa-circle-check text-success me-2"></i>Personal Profile';
+    } else {
+      if (checkP) checkP.innerHTML = '<i class="fa-solid fa-circle-notch text-muted me-2"></i>Personal Profile';
+    }
+
+    // Academic Score
+    if (emp && desig && qual) {
+      score += 35;
+      if (checkA) checkA.innerHTML = '<i class="fa-solid fa-circle-check text-success me-2"></i>Academic Credentials';
+    } else {
+      if (checkA) checkA.innerHTML = '<i class="fa-solid fa-circle-notch text-muted me-2"></i>Academic Credentials';
+    }
+
+    // Account Score
+    if (email) {
+      score += 30;
+      if (checkAcc) checkAcc.innerHTML = '<i class="fa-solid fa-circle-check text-success me-2"></i>System Portal Access';
+    } else {
+      if (checkAcc) checkAcc.innerHTML = '<i class="fa-solid fa-circle-notch text-muted me-2"></i>System Portal Access';
+    }
+
+    score = Math.min(100, Math.max(15, score));
+    const percentEl = document.getElementById('completenessPercent');
+    const barEl = document.getElementById('completenessProgressBar');
+    if (percentEl) percentEl.textContent = `${score}%`;
+    if (barEl) barEl.style.width = `${score}%`;
+  }
+
+  // Initial Run
+  document.addEventListener('DOMContentLoaded', () => {
+    updateLivePreview();
+    updateCompleteness();
+  });
+</script>
+{% endblock %}

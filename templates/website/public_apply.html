@@ -1,0 +1,472 @@
+{% extends 'website/public_base.html' %}
+{% load static %}
+
+{% block title %}Online Student Admission Form (2026–2027) | Horizon Premier Public School{% endblock %}
+
+{% block extra_css %}
+<style>
+  .apply-hero {
+    background: radial-gradient(circle at 50% 10%, rgba(5, 150, 105, 0.2) 0%, rgba(0, 32, 91, 0.95) 70%, #001230 100%);
+    padding: 3.5rem 0 2.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .form-section-card {
+    background: rgba(10, 25, 55, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 2rem;
+    backdrop-filter: blur(16px);
+    margin-bottom: 2rem;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+  }
+
+  .section-header-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    color: #fde68a;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+
+  .form-control, .form-select {
+    background-color: #001742 !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    padding: 0.65rem 1rem !important;
+    font-size: 0.92rem !important;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
+    background-color: #051a44 !important;
+    color: #fff !important;
+  }
+
+  .form-control::placeholder {
+    color: rgba(212, 228, 250, 0.4) !important;
+  }
+
+  .form-label {
+    color: rgba(212, 228, 250, 0.9);
+    font-size: 0.84rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-label .req {
+    color: #f87171;
+  }
+
+  .help-badge {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #93c5fd;
+    border-radius: 12px;
+    padding: 1.2rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .step-progress-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #00205b;
+    border: 2px solid #f59e0b;
+    color: #f59e0b;
+    font-weight: bold;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Header Banner -->
+<section class="apply-hero text-center">
+  <div class="container">
+    <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-3" style="background:rgba(5, 150, 105, 0.2); border:1px solid rgba(5, 150, 105, 0.4); color:#6ee7b7; font-size:0.8rem; font-weight:600;">
+      <span class="pulse-dot"></span> Admissions Open for Session 2026–2027 • CBSE Affiliation No: 2430089
+    </div>
+    <h1 class="display-6 fw-bold text-white mb-2">Online Student Admission Application</h1>
+    <p class="text-white-50 max-w-700 mx-auto" style="font-size:1.05rem;">
+      Please complete the official application form below. Once submitted, an official application reference number and printable acknowledgment receipt will be generated instantly.
+    </p>
+    <div class="d-flex justify-content-center gap-3 mt-3">
+      <a href="{% url 'website:public_apply_track' %}" class="btn btn-sm btn-outline-warning" style="border-radius:20px;">
+        <i class="fa-solid fa-magnifying-glass me-1"></i> Track Existing Application
+      </a>
+      <a href="{% url 'website:admissions' %}" class="btn btn-sm btn-outline-light" style="border-radius:20px;">
+        <i class="fa-solid fa-file-lines me-1"></i> View Fee Structure &amp; Roadmap
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+
+  {% if form.errors %}
+    <div class="alert alert-danger bg-danger bg-opacity-25 text-white border-0 shadow-lg mb-4 p-3 rounded-3">
+      <div class="d-flex align-items-center gap-2 mb-2 fw-bold">
+        <i class="fa-solid fa-triangle-exclamation text-danger fs-5"></i> Please correct the highlighted errors before submitting:
+      </div>
+      <ul class="mb-0 small">
+        {% for field in form %}
+          {% for error in field.errors %}
+            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="POST" enctype="multipart/form-data" id="publicApplyForm">
+    {% csrf_token %}
+
+    <div class="row g-4">
+      
+      <!-- Left: Application Form Steps -->
+      <div class="col-lg-8">
+
+        <!-- 1. Academic Class & Admission Category -->
+        <div class="form-section-card">
+          <div class="section-header-pill">
+            <i class="fa-solid fa-shapes"></i> Step 1: Academic Stream &amp; Grade
+          </div>
+          <h4 class="fw-bold text-white mb-3">Target Class &amp; Academic Session</h4>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Academic Session <span class="req">*</span></label>
+              {{ form.academic_year }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Applying for Class / Grade <span class="req">*</span></label>
+              {{ form.applying_for_class }}
+            </div>
+
+            <!-- Senior Stream Preference (Class XI - XII) -->
+            <div class="col-12" id="streamPreferenceContainer" style="display:none;">
+              <div class="p-3 rounded-3 bg-primary bg-opacity-10 border border-primary border-opacity-30">
+                <label class="form-label text-warning fw-bold">
+                  <i class="fa-solid fa-atom me-1"></i> Stream Preference (For Class XI &amp; XII)
+                </label>
+                {{ form.stream_preference }}
+                <span class="text-white-50 small mt-1 d-block" style="font-size:0.75rem;">
+                  Integrated CBSE curriculum with JEE / NEET / CUET / Olympiad foundation coaching.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Student Demographics -->
+        <div class="form-section-card">
+          <div class="section-header-pill">
+            <i class="fa-solid fa-user-graduate"></i> Step 2: Student Demographic Details
+          </div>
+          <h4 class="fw-bold text-white mb-3">Applicant Information</h4>
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">First Name <span class="req">*</span></label>
+              {{ form.first_name }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Middle Name</label>
+              {{ form.middle_name }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Last Name <span class="req">*</span></label>
+              {{ form.last_name }}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Gender <span class="req">*</span></label>
+              {{ form.gender }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date of Birth <span class="req">*</span></label>
+              {{ form.date_of_birth }}
+              <div id="ageCalculationBadge" class="small mt-1 text-warning" style="display:none;"></div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Blood Group</label>
+              {{ form.blood_group }}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Category</label>
+              {{ form.caste_category }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Aadhaar / National ID No.</label>
+              {{ form.aadhaar_number }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Student Photograph</label>
+              {{ form.photo }}
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Parent & Family Details -->
+        <div class="form-section-card">
+          <div class="section-header-pill">
+            <i class="fa-solid fa-users"></i> Step 3: Parent &amp; Family Information
+          </div>
+          <h4 class="fw-bold text-white mb-3">Primary Guardian &amp; Contact Details</h4>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <label class="form-label">Primary Guardian Name <span class="req">*</span></label>
+              {{ form.parent_name }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Mobile Number (SMS / WhatsApp) <span class="req">*</span></label>
+              {{ form.parent_phone }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Email Address <span class="req">*</span></label>
+              {{ form.parent_email }}
+            </div>
+          </div>
+
+          <h6 class="fw-bold text-warning mb-2 border-top border-white border-opacity-10 pt-3">
+            <i class="fa-solid fa-user-tie me-1"></i> Father's Profile (Optional)
+          </h6>
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <label class="form-label">Father's Name</label>
+              {{ form.father_name }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Father's Phone</label>
+              {{ form.father_phone }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Occupation</label>
+              {{ form.father_occupation }}
+            </div>
+          </div>
+
+          <h6 class="fw-bold text-warning mb-2 border-top border-white border-opacity-10 pt-3">
+            <i class="fa-solid fa-person-dress me-1"></i> Mother's Profile (Optional)
+          </h6>
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <label class="form-label">Mother's Name</label>
+              {{ form.mother_name }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Mother's Phone</label>
+              {{ form.mother_phone }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Occupation</label>
+              {{ form.mother_occupation }}
+            </div>
+          </div>
+
+          <h6 class="fw-bold text-white mb-2 border-top border-white border-opacity-10 pt-3">
+            <i class="fa-solid fa-location-dot me-1"></i> Residential Address
+          </h6>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Full Street Address <span class="req">*</span></label>
+              {{ form.residential_address }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">City</label>
+              {{ form.city }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">State</label>
+              {{ form.state }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">PIN Code</label>
+              {{ form.pin_code }}
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Academic Background & Transfer Certificate -->
+        <div class="form-section-card">
+          <div class="section-header-pill">
+            <i class="fa-solid fa-book-open"></i> Step 4: Academic History
+          </div>
+          <h4 class="fw-bold text-white mb-3">Previous Schooling &amp; TC Status</h4>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Last School Attended</label>
+              {{ form.previous_school }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Affiliated Board</label>
+              {{ form.previous_board }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Previous Percentage / Grade</label>
+              {{ form.previous_percentage }}
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">Transfer Certificate (TC) Availability</label>
+              {{ form.tc_status }}
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Sibling Concession & Declaration -->
+        <div class="form-section-card">
+          <div class="section-header-pill">
+            <i class="fa-solid fa-handshake"></i> Step 5: Sibling Details &amp; Declaration
+          </div>
+          <h4 class="fw-bold text-white mb-3">Sibling Concession &amp; Confirmation</h4>
+
+          <div class="p-3 rounded-3 bg-white bg-opacity-5 mb-4">
+            <div class="form-check form-switch mb-2">
+              {{ form.has_sibling_in_school }}
+              <label class="form-check-label text-white fw-semibold ms-2" for="id_has_sibling_in_school">
+                Does the applicant have a real brother/sister currently enrolled in this school?
+              </label>
+            </div>
+            <div id="siblingDetailsInputArea" style="display:none;" class="mt-3">
+              <label class="form-label small text-warning">Sibling Reference (Name, Class, Section &amp; Admission Number)</label>
+              {{ form.sibling_details }}
+              <span class="text-white-50 small mt-1 d-block" style="font-size:0.75rem;">
+                Eligible for institutional Sibling Concession as per school policy.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-check p-3 rounded-3 border border-secondary border-opacity-50" style="background:rgba(0,0,0,0.2);">
+            {{ form.parent_declaration }}
+            <label class="form-check-label text-white-50 small ms-2" for="id_parent_declaration">
+              I hereby declare that all particulars stated in this application are true, correct, and complete. I understand that admission is subject to seat availability, age verification, and institutional evaluation guidelines.
+            </label>
+          </div>
+
+          <div class="mt-4 text-end">
+            <button type="submit" class="btn-site-gold btn-lg px-5 shadow-lg">
+              <i class="fa-solid fa-paper-plane me-2"></i> Submit Official Application (2026–27)
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: Admissions Helpdesk & Document Checklist -->
+      <div class="col-lg-4">
+        
+        <div class="form-section-card mb-4">
+          <h5 class="fw-bold text-white mb-3"><i class="fa-solid fa-clipboard-check text-warning me-2"></i>Application Checklist</h5>
+          <ul class="list-unstyled d-flex flex-column gap-2 text-white-50 small mb-0">
+            <li><i class="fa-solid fa-circle-check text-success me-2"></i> <strong>Identity:</strong> Birth Certificate / Aadhaar Card</li>
+            <li><i class="fa-solid fa-circle-check text-success me-2"></i> <strong>Photographs:</strong> Recent color passport photo</li>
+            <li><i class="fa-solid fa-circle-check text-success me-2"></i> <strong>Transcripts:</strong> Last 2 years report cards</li>
+            <li><i class="fa-solid fa-circle-check text-success me-2"></i> <strong>Transfer Certificate:</strong> Signed by previous principal</li>
+            <li><i class="fa-solid fa-circle-check text-success me-2"></i> <strong>Proof of Residence:</strong> Utility bill / Passport / Lease</li>
+          </ul>
+        </div>
+
+        <div class="form-section-card mb-4">
+          <h5 class="fw-bold text-white mb-3"><i class="fa-solid fa-headset text-info me-2"></i>Admissions Helpdesk</h5>
+          <p class="text-white-50 small mb-2">
+            Need guidance regarding age criteria, syllabus, or fee structure?
+          </p>
+          <p class="text-white small mb-1"><i class="fa-solid fa-phone text-success me-2"></i> <strong>+91 (033) 2443-0451 / 0452</strong></p>
+          <p class="text-white small mb-1"><i class="fa-brands fa-whatsapp text-success me-2"></i> <strong>+91 98300 12345</strong></p>
+          <p class="text-white small mb-3"><i class="fa-solid fa-envelope text-info me-2"></i> <strong>admissions@horizon.edu.in</strong></p>
+          <div class="p-2 rounded bg-secondary bg-opacity-25 small text-white-50 text-center">
+            Office Hours: Mon – Fri: 08:30 AM – 04:00 PM
+          </div>
+        </div>
+
+        <div class="form-section-card">
+          <h5 class="fw-bold text-white mb-2"><i class="fa-solid fa-shield-halved text-success me-2"></i>Data Privacy &amp; Security</h5>
+          <p class="text-white-50 small mb-0" style="line-height:1.6;">
+            All information submitted is securely processed under institutional data protection guidelines and encrypted in transit.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 1. Sibling checkbox toggle
+    const siblingCheck = document.getElementById('id_has_sibling_in_school');
+    const siblingArea = document.getElementById('siblingDetailsInputArea');
+    if (siblingCheck && siblingArea) {
+      function toggleSibling() {
+        siblingArea.style.display = siblingCheck.checked ? 'block' : 'none';
+      }
+      siblingCheck.addEventListener('change', toggleSibling);
+      toggleSibling();
+    }
+
+    // 2. Class Level change -> Show Stream Preference if Class XI or XII
+    const classSelect = document.getElementById('id_applying_for_class');
+    const streamBox = document.getElementById('streamPreferenceContainer');
+    if (classSelect && streamBox) {
+      function checkStreamVisibility() {
+        const text = classSelect.options[classSelect.selectedIndex] ? classSelect.options[classSelect.selectedIndex].text : '';
+        if (text.includes('11') || text.includes('XI') || text.includes('12') || text.includes('XII')) {
+          streamBox.style.display = 'block';
+        } else {
+          streamBox.style.display = 'none';
+        }
+      }
+      classSelect.addEventListener('change', checkStreamVisibility);
+      checkStreamVisibility();
+    }
+
+    // 3. Date of Birth age calculation helper
+    const dobInput = document.getElementById('id_date_of_birth');
+    const ageBadge = document.getElementById('ageCalculationBadge');
+    if (dobInput && ageBadge) {
+      dobInput.addEventListener('change', function() {
+        if (!dobInput.value) return;
+        const birthDate = new Date(dobInput.value);
+        const refDate = new Date('2026-04-01'); // CBSE session start date
+        let years = refDate.getFullYear() - birthDate.getFullYear();
+        let m = refDate.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && refDate.getDate() < birthDate.getDate())) {
+          years--;
+        }
+        if (years >= 2 && years <= 20) {
+          ageBadge.style.display = 'block';
+          ageBadge.innerHTML = `<i class="fa-solid fa-circle-info me-1"></i> Age as on 01 April 2026: <strong>${years} years</strong>`;
+        } else {
+          ageBadge.style.display = 'none';
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

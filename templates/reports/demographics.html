@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Student Demographics Report{% endblock %}
+{% block page_heading %}Student Demographics & Diversity Report{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Student Enrollment Demographics</h5>
+    <p class="text-muted small mb-0">{{ academic_year.name|default:"Active Academic Session" }} | Cohort & Gender Distribution</p>
+  </div>
+  <div>
+    <a href="{% url 'reports:hub' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Reports Hub</a>
+  </div>
+</div>
+
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Grade Level</th>
+            <th>Total Enrolled</th>
+            <th>Male Students</th>
+            <th>Female Students</th>
+            <th>Other / Unspecified</th>
+            <th>Gender Ratio (M/F)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in class_rows %}
+            <tr>
+              <td class="fw-bold text-dark">{{ row.class_level.name }}</td>
+              <td class="fw-bold text-primary">{{ row.total }}</td>
+              <td>{{ row.male }}</td>
+              <td>{{ row.female }}</td>
+              <td>{{ row.other }}</td>
+              <td class="small text-muted">
+                {% if row.female > 0 %}
+                  {{ row.male }}:{{ row.female }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4 small">No grade level enrollment data available.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory & Assets Overview{% endblock %}
+{% block page_heading %}Fixed Assets & Inventory Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Asset Portfolio & Stock Valuation</h5>
+    <p class="text-muted small mb-0">Total {{ total_items_count }} item SKUs in campus inventory.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'inventory:item_list' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-boxes-stacked me-1"></i> Stock Registry</a>
+    <a href="{% url 'inventory:allocation_list' %}" class="btn btn-saas-secondary btn-sm"><i class="fa-solid fa-hand-holding me-1"></i> Asset Custody</a>
+    <a href="{% url 'inventory:item_create' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-plus me-1"></i> Add Inventory Item</a>
+  </div>
+</div>
+
+<!-- Metrics Cards -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-primary"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div>
+          <div class="text-muted small">Total Units in Stock</div>
+          <h4 class="fw-bold mb-0 text-dark">{{ total_units }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-success"><i class="fa-solid fa-coins"></i></div>
+        <div>
+          <div class="text-muted small">Asset Book Value</div>
+          <h4 class="fw-bold mb-0 text-success">₹{{ total_asset_val|floatformat:2 }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-info"><i class="fa-solid fa-hand-holding-hand"></i></div>
+        <div>
+          <div class="text-muted small">Units in Active Custody</div>
+          <h4 class="fw-bold mb-0 text-info">{{ total_in_use }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card-saas p-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="stat-icon-wrapper stat-icon-warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div>
+          <div class="text-muted small">Low Stock Warnings</div>
+          <h4 class="fw-bold mb-0 text-warning">{{ low_stock_items|length }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Low Stock Warnings -->
+  <div class="col-lg-6">
+    <div class="card-saas h-100">
+      <div class="card-saas-header">
+        <span class="text-warning fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i> Low Stock Threshold Alerts</span>
+      </div>
+      <div class="card-saas-body p-0">
+        <div class="table-responsive">
+          <table class="table-saas mb-0">
+            <thead>
+              <tr>
+                <th>Item Code</th>
+                <th>Item Name</th>
+                <th>Available</th>
+                <th>Threshold</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in low_stock_items %}
+                <tr>
+                  <td class="fw-bold text-danger small">{{ item.item_code }}</td>
+                  <td class="fw-semibold text-dark">{{ item.name }}</td>
+                  <td><span class="badge bg-danger-subtle text-danger">{{ item.available_quantity }} {{ item.unit }}</span></td>
+                  <td class="small text-muted">{{ item.reorder_threshold }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-success py-4 small">
+                    <i class="fa-solid fa-circle-check me-1"></i> All inventory stock levels are healthy.
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Custody Allocations -->
+  <div class="col-lg-6">
+    <div class="card-saas h-100">
+      <div class="card-saas-header">
+        <span class="fw-bold text-dark"><i class="fa-solid fa-clipboard-user text-primary me-2"></i> Recent Asset Allocations</span>
+        <a href="{% url 'inventory:allocation_list' %}" class="small">View All</a>
+      </div>
+      <div class="card-saas-body p-0">
+        <div class="table-responsive">
+          <table class="table-saas mb-0">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Custodian</th>
+                <th>Qty</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for alloc in active_allocations %}
+                <tr>
+                  <td class="fw-semibold text-dark">{{ alloc.item.name }}</td>
+                  <td class="small">
+                    {% if alloc.allocated_to_user %}
+                      {{ alloc.allocated_to_user.email }}
+                    {% elif alloc.department %}
+                      {{ alloc.department.name }}
+                    {% else %}
+                      Campus Staff
+                    {% endif %}
+                  </td>
+                  <td class="fw-bold text-primary">{{ alloc.quantity }}</td>
+                  <td class="small text-muted">{{ alloc.allocated_date|date:"d M Y" }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted py-4 small">No active allocations.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,267 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>License Activation Required | {{ school.name|default:"Horizon School Management" }}</title>
+
+  <!-- Google Fonts & Bootstrap 5 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e1b4b 100%);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #4f46e5;
+      --primary-glow: rgba(79, 70, 229, 0.35);
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-main);
+      padding: 2rem 1rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background glow orbs */
+    .glow-orb-1 {
+      position: absolute; width: 450px; height: 450px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.15), transparent 70%);
+      top: -100px; left: -100px; pointer-events: none;
+    }
+    .glow-orb-2 {
+      position: absolute; width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(79, 70, 229, 0.2), transparent 70%);
+      bottom: -150px; right: -100px; pointer-events: none;
+    }
+
+    .lockout-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(239, 68, 68, 0.1);
+      max-width: 720px;
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    .lockout-header {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(79, 70, 229, 0.1));
+      border-bottom: 1px solid var(--card-border);
+      padding: 2.25rem 2rem 1.75rem;
+      text-align: center;
+    }
+
+    .lock-icon-box {
+      width: 72px; height: 72px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #fff;
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.35);
+      margin-bottom: 1.25rem;
+      animation: pulseAlert 2.5s infinite alternate ease-in-out;
+    }
+    @keyframes pulseAlert {
+      0% { transform: scale(1); box-shadow: 0 10px 25px rgba(239, 68, 68, 0.35); }
+      100% { transform: scale(1.05); box-shadow: 0 14px 35px rgba(239, 68, 68, 0.55); }
+    }
+
+    .info-pill {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 0.75rem 1rem;
+      font-family: monospace;
+      font-size: 0.88rem;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .key-textarea {
+      background: rgba(15, 23, 42, 0.75) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+      border-radius: 16px !important;
+      color: #f8fafc !important;
+      font-family: monospace !important;
+      font-size: 0.88rem !important;
+      padding: 0.9rem !important;
+      resize: vertical;
+      min-height: 100px;
+      transition: all 0.25s ease !important;
+    }
+    .key-textarea:focus {
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 4px var(--primary-glow) !important;
+      outline: none !important;
+    }
+
+    .btn-activate {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      padding: 0.85rem 1.5rem;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      box-shadow: 0 8px 24px var(--primary-glow);
+      transition: all 0.25s ease;
+      width: 100%;
+    }
+    .btn-activate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(79, 70, 229, 0.5);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-orb-1"></div>
+  <div class="glow-orb-2"></div>
+
+  <div class="lockout-card">
+    
+    <!-- Lockout Header -->
+    <div class="lockout-header">
+      <div class="lock-icon-box">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <h3 class="fw-bold mb-1" style="font-family:'Geist',sans-serif; color:#fff;">
+        Software License Activation Required
+      </h3>
+      <p class="mb-0" style="color:var(--text-muted); font-size:0.92rem;">
+        The evaluation trial for <strong>{{ school.name|default:"Horizon Public School" }}</strong> has concluded.
+      </p>
+    </div>
+
+    <!-- Body & Activation Form -->
+    <div class="p-4 p-md-5">
+
+      <!-- Messages -->
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="alert alert-danger mb-4 d-flex align-items-center gap-2" style="border-radius:14px; background:rgba(239,68,68,0.2); border-color:rgba(239,68,68,0.4); color:#fca5a5; font-size:0.88rem;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div>{{ msg }}</div>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- 3-Step Guided Workflow: How to Get License Key -->
+      <div class="p-3 mb-4 rounded-4" style="background:rgba(56, 189, 248, 0.06);border:1.5px solid rgba(56, 189, 248, 0.25);">
+        <div class="fw-bold mb-2 small text-info d-flex align-items-center gap-1">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>How to Get Your License Key (3 Steps):</span>
+        </div>
+        
+        <ol class="small mb-3 ps-3 text-muted" style="font-size:0.82rem;line-height:1.6;">
+          <li><strong class="text-white">Step 1:</strong> Copy your <strong>School Code</strong> and <strong>Installation ID</strong> below.</li>
+          <li><strong class="text-white">Step 2:</strong> Send details to the software developer via <strong>WhatsApp</strong> or <strong>Email</strong>.</li>
+          <li><strong class="text-white">Step 3:</strong> Paste the signed activation code you receive and click <strong>Validate &amp; Unlock</strong>.</li>
+        </ol>
+
+        <!-- Hardware Node & School Code -->
+        <div class="info-pill mb-2">
+          <div>
+            <span class="text-white-50 small d-block">School Code:</span>
+            <strong class="text-white">{{ school.code|default:"HPS-DELHI" }}</strong>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="navigator.clipboard.writeText('{{ school.code|default:'HPS-DELHI' }}'); alert('School Code copied!');">
+            <i class="fa-regular fa-copy me-1"></i> Copy
+          </button>
+        </div>
+
+        <div class="info-pill mb-3">
+          <div>
+            <span class="text-white-50 small d-block">Server Installation ID:</span>
+            <strong class="text-info" id="installIdText">{{ license.installation_id }}</strong>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3" onclick="navigator.clipboard.writeText('{{ license.installation_id }}'); alert('Installation ID copied!');">
+            <i class="fa-regular fa-copy me-1"></i> Copy
+          </button>
+        </div>
+
+        <!-- 1-Click Request Actions -->
+        <div class="d-flex gap-2 flex-wrap">
+          <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3" onclick="copyLockoutRequestText('{{ school.name|default:'Horizon Public School' }}', '{{ school.code|default:'HPS-DELHI' }}', '{{ license.installation_id }}')" style="font-size:0.78rem;">
+            <i class="fa-solid fa-copy me-1"></i> Copy Full Request Message
+          </button>
+          <a href="https://wa.me/?text=Hello%20Developer,%20please%20generate%20an%20activation%20key%20for:%0A%E2%80%A2%20School:%20{{ school.name|default:'Horizon%20Public%20School'|urlencode }}%0A%E2%80%A2%20Code:%20{{ school.code|default:'HPS-DELHI'|urlencode }}%0A%E2%80%A2%20Install%20ID:%20{{ license.installation_id|urlencode }}" target="_blank" class="btn btn-sm btn-success rounded-pill px-3" style="font-size:0.78rem;">
+            <i class="fa-brands fa-whatsapp me-1"></i> WhatsApp Developer
+          </a>
+          <a href="mailto:support@horizonacademy.edu?subject=License%20Activation%20Request%20for%20{{ school.code|default:'HPS-DELHI' }}&body=Hello%20Developer,%0A%0APlease%20generate%20an%20activation%20license%20key%20for:%0A%E2%80%A2%20School%20Name:%20{{ school.name|default:'Horizon%20Public%20School' }}%0A%E2%80%A2%20School%20Code:%20{{ school.code|default:'HPS-DELHI' }}%0A%E2%80%A2%20Server%20Installation%20ID:%20{{ license.installation_id }}" class="btn btn-sm btn-outline-info rounded-pill px-3" style="font-size:0.78rem;">
+            <i class="fa-solid fa-envelope me-1"></i> Email Developer
+          </a>
+        </div>
+      </div>
+
+      <!-- Activation Form -->
+      <form method="post" action="{% url 'core:license_activate' %}">
+        {% csrf_token %}
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-uppercase d-flex justify-content-between" style="color:var(--text-muted); font-size:0.75rem; letter-spacing:0.05em;">
+            <span>ENTER DEVELOPER-ISSUED LICENSE KEY</span>
+            <span class="text-info"><i class="fa-solid fa-shield-halved me-1"></i> 1-Time Anti-Replay Guard</span>
+          </label>
+          <textarea name="license_key" 
+                    class="form-control key-textarea" 
+                    placeholder="Paste your signed license key token here (e.g. HRZN.eyJ...)" 
+                    required></textarea>
+          <div class="form-text small mt-2" style="color:var(--text-muted); font-size:0.76rem;">
+            <i class="fa-solid fa-shield-check text-success me-1"></i> Each license code is a 1-time cryptographic key. Once expired, request a fresh renewal code from the developer.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-activate mb-3">
+          <i class="fa-solid fa-key me-2"></i> Validate &amp; Unlock Software
+        </button>
+      </form>
+
+      <!-- Back to website -->
+      <div class="text-center pt-2">
+        <a href="/" class="text-decoration-none text-muted small">
+          <i class="fa-solid fa-arrow-left me-1"></i> Return to Public Marketing Website
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    function copyLockoutRequestText(schoolName, schoolCode, installId) {
+      const today = new Date().toISOString().split('T')[0];
+      const text = `Hello Developer, please generate an activation license key for our school:\n• School Name: ${schoolName}\n• School Code: ${schoolCode}\n• Server Installation ID: ${installId}\n• Request Date: ${today}`;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("License request details copied to clipboard! You can now send to the developer via WhatsApp or Email.");
+      });
+    }
+  </script>
+
+</body>
+</html>

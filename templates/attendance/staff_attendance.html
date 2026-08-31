@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty & Staff Attendance{% endblock %}
+{% block page_heading %}Staff Daily Attendance Register{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Staff Daily Attendance Logs</h5>
+    <p class="text-muted small mb-0">Daily check-in, check-out, and status records for faculty members.</p>
+  </div>
+</div>
+
+<!-- Date Selector -->
+<div class="card-saas p-3 mb-4">
+  <form method="get" class="row g-2 align-items-center">
+    <div class="col-md-6">
+      <input type="date" name="date" class="form-control form-control-sm" value="{{ selected_date }}" onchange="this.form.submit()">
+    </div>
+    <div class="col-md-6 text-end">
+      <button type="submit" class="btn btn-saas-primary btn-sm">Load Logs</button>
+    </div>
+  </form>
+</div>
+
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>Faculty / Staff</th>
+            <th>Designation</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in attendance_logs %}
+            <tr>
+              <td class="fw-bold text-primary small">{{ log.staff_member.employee_id }}</td>
+              <td class="fw-semibold">{{ log.staff_member.full_name }}</td>
+              <td><span class="badge bg-light text-dark border">{{ log.staff_member.designation.title }}</span></td>
+              <td class="small">{{ log.check_in_time|time:"H:i"|default:"-" }}</td>
+              <td class="small">{{ log.check_out_time|time:"H:i"|default:"-" }}</td>
+              <td>
+                {% if log.status == 'PRESENT' %}
+                  <span class="badge bg-success-subtle text-success">Present</span>
+                {% elif log.status == 'LATE' %}
+                  <span class="badge bg-warning-subtle text-warning">Late</span>
+                {% elif log.status == 'ON_LEAVE' %}
+                  <span class="badge bg-info-subtle text-info">On Leave</span>
+                {% else %}
+                  <span class="badge bg-danger-subtle text-danger">Absent</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4 small">No staff attendance records logged for this date.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

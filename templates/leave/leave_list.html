@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Leave Management{% endblock %}
+{% block page_heading %}Leave Applications & Approvals{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <h5 class="fw-bold mb-1">Leave Requests & Absences</h5>
+    <p class="text-muted small mb-0">Track employee and student leave requests.</p>
+  </div>
+  <div>
+    <a href="{% url 'leave:apply' %}" class="btn btn-saas-primary btn-sm"><i class="fa-solid fa-paper-plane me-1"></i> Apply for Leave</a>
+  </div>
+</div>
+
+<!-- Status Filters -->
+<div class="card-saas p-3 mb-4">
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{% url 'leave:list' %}" class="btn btn-sm {% if not selected_status %}btn-saas-primary{% else %}btn-saas-secondary{% endif %}">All Leaves</a>
+    <a href="{% url 'leave:list' %}?status=PENDING" class="btn btn-sm {% if selected_status == 'PENDING' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+      Pending Review ({{ pending_count }})
+    </a>
+    <a href="{% url 'leave:list' %}?status=APPROVED" class="btn btn-sm {% if selected_status == 'APPROVED' %}btn-success{% else %}btn-outline-success{% endif %}">
+      Approved ({{ approved_count }})
+    </a>
+    <a href="{% url 'leave:list' %}?status=REJECTED" class="btn btn-sm {% if selected_status == 'REJECTED' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+      Rejected
+    </a>
+  </div>
+</div>
+
+<div class="card-saas">
+  <div class="card-saas-body p-0">
+    <div class="table-responsive">
+      <table class="table-saas mb-0">
+        <thead>
+          <tr>
+            <th>Applicant</th>
+            <th>Leave Type</th>
+            <th>Dates</th>
+            <th>Duration</th>
+            <th>Reason</th>
+            <th>Status</th>
+            {% if user.is_superadmin or user.is_school_admin or user.is_principal %}
+              <th>Actions</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in leave_requests %}
+            <tr>
+              <td>
+                <div class="fw-semibold text-dark">{{ req.user.get_full_name|default:req.user.email }}</div>
+                <small class="text-muted">{{ req.user.get_user_type_display }}</small>
+              </td>
+              <td><span class="badge bg-light text-primary border">{{ req.leave_type.name }}</span></td>
+              <td class="small">{{ req.start_date|date:"d M" }} - {{ req.end_date|date:"d M Y" }}</td>
+              <td class="small fw-semibold">{{ req.total_days }} Day(s)</td>
+              <td class="small text-muted" style="max-width: 250px;">{{ req.reason|truncatechars:50 }}</td>
+              <td>
+                {% if req.status == 'APPROVED' %}
+                  <span class="badge bg-success-subtle text-success">Approved</span>
+                {% elif req.status == 'PENDING' %}
+                  <span class="badge bg-warning-subtle text-warning">Pending</span>
+                {% else %}
+                  <span class="badge bg-danger-subtle text-danger">Rejected</span>
+                {% endif %}
+              </td>
+              {% if user.is_superadmin or user.is_school_admin or user.is_principal %}
+                <td>
+                  {% if req.status == 'PENDING' %}
+                    <div class="btn-group btn-group-sm">
+                      <form method="post" action="{% url 'leave:review' req.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="APPROVE">
+                        <button type="submit" class="btn btn-outline-success py-0 px-2" title="Approve Leave"><i class="fa-solid fa-check"></i></button>
+                      </form>
+                      <form method="post" action="{% url 'leave:review' req.pk %}" class="d-inline ms-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="REJECT">
+                        <button type="submit" class="btn btn-outline-danger py-0 px-2" title="Reject Leave"><i class="fa-solid fa-xmark"></i></button>
+                      </form>
+                    </div>
+                  {% else %}
+                    <small class="text-muted">Reviewed</small>
+                  {% endif %}
+                </td>
+              {% endif %}
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4 small">No leave requests found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
