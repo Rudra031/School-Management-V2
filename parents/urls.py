@@ -10,4 +10,7 @@ urlpatterns = [
     path('<uuid:pk>/link-student/', views.ParentLinkStudentView.as_view(), name='link_student'),
     path('<uuid:pk>/unlink-student/<uuid:student_id>/', views.ParentUnlinkStudentView.as_view(), name='unlink_student'),
     path('switch-child/<uuid:child_id>/', views.ParentSwitchChildView.as_view(), name='switch_child'),
+    path('apply-leave/', views.ParentWardLeaveCreateView.as_view(), name='ward_leave'),
+    path('ward-timetable/', views.ParentChildTimetableView.as_view(), name='ward_timetable'),
 ]
+

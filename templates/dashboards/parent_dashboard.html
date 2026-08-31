@@ -1,35 +1,46 @@
 {% extends "base.html" %}
 
-{% block title %}Parent Guardian Portal{% endblock %}
+{% block title %}Parent & Guardian Portal | Horizon SMS{% endblock %}
 
 {% block content %}
 
-<div class="page-hero reveal-up" style="background:linear-gradient(135deg,rgba(124,58,237,0.08),rgba(6,182,212,0.08));">
+<!-- Parent & Ward Hero Banner -->
+<div class="page-hero reveal-up" style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(6,182,212,0.1));padding:1.5rem 1.75rem;border-radius:16px;margin-bottom:1.5rem;border:1px solid rgba(124,58,237,0.2);">
   <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
     <div>
-      <h4 class="fw-bold mb-1" style="font-family:'Geist',sans-serif;background:linear-gradient(135deg,var(--violet),var(--info));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
-        <i class="fa-solid fa-users-rectangle"></i> Parent &amp; Guardian Portal
-      </h4>
-      <p class="mb-0" style="color:var(--text-muted);font-size:0.875rem;">
-        Welcome, <strong style="color:var(--text-main);">{{ user.get_full_name|default:user.email }}</strong> &nbsp;&bull;&nbsp; Guardian Monitoring Dashboard
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h4 class="fw-bold mb-0" style="font-family:'Geist',sans-serif;background:linear-gradient(135deg,#7c3aed,#06b6d4);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">
+          <i class="fa-solid fa-users-rectangle"></i> Parent &amp; Guardian Command Portal
+        </h4>
+      </div>
+      <p class="mb-0 text-muted" style="font-size:0.85rem;">
+        Welcome, <strong class="text-main">{{ parent.full_name|default:user.get_full_name|default:user.email }}</strong> &bull; Monitoring &amp; Academic Supervision Hub
       </p>
     </div>
+
+    <!-- Multi-Child Switcher Dropdown & Chips -->
     {% if children %}
-      <div class="d-flex align-items-center gap-2">
-        <span class="small fw-semibold" style="color:var(--text-muted);">Active Ward:</span>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="small fw-bold text-muted text-uppercase" style="font-size:0.75rem;">Active Ward:</span>
         <div class="dropdown">
-          <button class="btn btn-saas-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-            <i class="fa-solid fa-child me-1"></i>
-            {{ active_child.full_name }} ({{ child_enrollment.section.full_name|default:"Student" }})
+          <button class="btn btn-saas-primary btn-sm dropdown-toggle d-flex align-items-center gap-2 px-3 py-2" type="button" data-bs-toggle="dropdown" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;box-shadow:0 4px 14px rgba(124,58,237,0.35);">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span class="fw-bold">{{ active_child.full_name }}</span>
+            <span class="badge bg-white text-dark font-monospace" style="font-size:0.7rem;">{{ child_enrollment.section.full_name|default:"Grade" }}</span>
           </button>
-          <ul class="dropdown-menu dropdown-menu-end" style="border-radius:14px;background:var(--card-bg);border-color:var(--card-border);overflow:hidden;">
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg" style="border-radius:12px;background:var(--card-bg);border:1px solid var(--card-border);min-width:260px;">
+            <li class="px-3 py-2 border-bottom border-secondary border-opacity-10 text-muted small fw-bold text-uppercase" style="font-size:0.7rem;">Select Ward to Monitor</li>
             {% for child in children %}
               <li>
-                <a class="dropdown-item {% if child.id == active_child.id %}fw-bold{% endif %}"
-                   href="{% url 'parents:switch_child' child.id %}"
-                   style="color:var(--text-main);background:transparent;padding:0.6rem 1.25rem;">
-                  <i class="fa-solid fa-user-graduate me-2" style="color:var(--primary);"></i>
-                  {{ child.full_name }}
+                <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 {% if child.id == active_child.id %}active fw-bold{% endif %}"
+                   href="{% url 'parents:switch_child' child.id %}">
+                  <div class="d-flex align-items-center gap-2">
+                    <div style="width:28px;height:28px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:0.8rem;font-weight:700;">
+                      {{ child.full_name|first }}
+                    </div>
+                    <span>{{ child.full_name }}</span>
+                  </div>
+                  <span class="badge bg-secondary-subtle text-secondary small">{{ child.current_class_section|default:"Student" }}</span>
                 </a>
               </li>
             {% endfor %}
@@ -41,78 +52,232 @@
 </div>
 
 {% if active_child %}
-  <div class="row g-4 mb-4">
-
-    <!-- Child Profile Card -->
-    <div class="col-lg-6 reveal-up delay-1">
-      <div class="card-saas h-100">
-        <div class="card-saas-header">
-          <div class="d-flex align-items-center gap-2">
-            <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;">
-              <i class="fa-solid fa-id-card" style="color:var(--primary);font-size:0.8rem;"></i>
-            </div>
-            <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Student Profile</span>
+  <!-- Active Child Profile Summary Card -->
+  <div class="card-saas p-3 mb-4 rounded-3 reveal-up" style="background:linear-gradient(135deg,rgba(79,70,229,0.04) 0%,rgba(6,182,212,0.04) 100%);border:1px solid rgba(79,70,229,0.2);">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <!-- Photo / Initials -->
+        <div style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#fff;font-weight:700;box-shadow:0 4px 14px rgba(124,58,237,0.3);overflow:hidden;border:2px solid #fff;">
+          {% if active_child.photo %}
+            <img src="{{ active_child.photo.url }}" alt="{{ active_child.full_name }}" style="width:100%;height:100%;object-fit:cover;">
+          {% else %}
+            {{ active_child.full_name|first }}
+          {% endif %}
+        </div>
+        <div>
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <h5 class="fw-bold mb-0 text-main">{{ active_child.full_name }}</h5>
+            <span class="badge bg-primary-subtle text-primary font-monospace">{{ child_enrollment.section.full_name|default:"Class Student" }}</span>
+            <span class="badge bg-success-subtle text-success">Active Enrolled</span>
           </div>
-          <div class="d-flex gap-2">
-            <a href="{% url 'examinations:admit_card' %}?student_id={{ active_child.pk }}" class="btn btn-sm btn-outline-dark" target="_blank" style="font-size:0.75rem;">
-              <i class="fa-solid fa-id-badge me-1"></i> Admit Card
-            </a>
-            <a href="{% url 'examinations:report_card' active_child.pk %}" class="btn btn-sm btn-outline-primary" style="font-size:0.75rem;">
-              <i class="fa-solid fa-file-invoice me-1"></i> Marksheet
-            </a>
+          <p class="text-muted small mb-0 mt-1">
+            Admission No: <strong class="text-main font-monospace">{{ active_child.admission_number|default:"—" }}</strong>
+            &bull; Roll No: <strong class="text-primary">{{ child_enrollment.roll_number|default:"—" }}</strong>
+            &bull; Blood Group: <strong>{{ active_child.blood_group|default:"O+" }}</strong>
+            &bull; Emergency Telephony: <strong>{{ active_child.emergency_contact_phone|default:parent.primary_phone }}</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Shortcut Buttons for Ward -->
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'parents:ward_leave' %}" class="btn btn-outline-warning btn-sm">
+          <i class="fa-solid fa-plane-departure me-1"></i> Apply for Leave
+        </a>
+        <a href="{% url 'parents:ward_timetable' %}" class="btn btn-saas-secondary btn-sm">
+          <i class="fa-solid fa-calendar-week text-primary me-1"></i> Class Timetable
+        </a>
+        <a href="{% url 'examinations:admit_card' %}?student_id={{ active_child.pk }}" class="btn btn-saas-secondary btn-sm" target="_blank">
+          <i class="fa-solid fa-id-badge text-warning me-1"></i> Admit Card
+        </a>
+        <a href="{% url 'examinations:report_card' active_child.pk %}" class="btn btn-saas-primary btn-sm">
+          <i class="fa-solid fa-file-invoice text-white me-1"></i> Full Marksheet
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ward Vital Analytics Cards -->
+  <div class="row g-3 mb-4">
+    <!-- 1. Ward Attendance -->
+    <div class="col-6 col-lg-3 reveal-up delay-1">
+      <div class="stat-card p-3 rounded-3" style="background:var(--card-bg);border:1px solid var(--card-border);">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="small fw-semibold text-muted text-uppercase" style="font-size:0.72rem;">Ward Attendance</span>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;color:#10b981;">
+            <i class="fa-solid fa-calendar-check"></i>
           </div>
         </div>
-        <div class="card-saas-body">
-          <div class="d-flex align-items-center gap-3 mb-4">
-            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--violet));display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;font-weight:700;box-shadow:0 4px 20px var(--primary-glow);flex-shrink:0;font-family:'Geist',sans-serif;">
-              {{ active_child.full_name|first }}
-            </div>
-            <div>
-              <h5 class="fw-bold mb-1" style="color:var(--text-main);font-family:'Geist',sans-serif;">{{ active_child.full_name }}</h5>
-              <p class="small mb-0" style="color:var(--text-muted);">{{ child_enrollment.section.full_name|default:"—" }} &bull; Roll #: {{ child_enrollment.roll_number|default:"—" }}</p>
-            </div>
-          </div>
-          <div style="background:var(--bg-main);border-radius:var(--radius-md);padding:1rem;">
-            <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--card-border);">
-              <span class="small" style="color:var(--text-muted);">Admission No.</span>
-              <strong class="small" style="color:var(--text-main);">{{ active_child.admission_number|default:"—" }}</strong>
-            </div>
-            <div class="d-flex justify-content-between py-2">
-              <span class="small" style="color:var(--text-muted);">Emergency Contact</span>
-              <span class="small" style="color:var(--text-main);">{{ active_child.emergency_contact_phone|default:"—" }}</span>
-            </div>
-          </div>
+        <div class="d-flex align-items-baseline gap-2">
+          <h3 class="fw-bold mb-0 text-success" style="font-family:'Geist Mono',monospace;">{{ child_attendance_pct }}%</h3>
+          <span class="small text-muted">({{ child_present_days }}/{{ child_total_days }} Days)</span>
+        </div>
+        <div class="progress mt-2" style="height:4px;">
+          <div class="progress-bar bg-success" style="width: {{ child_attendance_pct }}%;"></div>
         </div>
       </div>
     </div>
 
-    <!-- Outstanding Fees -->
-    <div class="col-lg-6 reveal-up delay-2">
-      <div class="card-saas h-100">
-        <div class="card-saas-header">
+    <!-- 2. Pending Homework -->
+    <div class="col-6 col-lg-3 reveal-up delay-2">
+      <div class="stat-card p-3 rounded-3" style="background:var(--card-bg);border:1px solid var(--card-border);">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="small fw-semibold text-muted text-uppercase" style="font-size:0.72rem;">Pending Homework</span>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;color:#f59e0b;">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+        </div>
+        <div class="d-flex align-items-baseline gap-2">
+          <h3 class="fw-bold mb-0 {% if child_pending_hw %}text-warning{% else %}text-muted{% endif %}" style="font-family:'Geist Mono',monospace;">
+            {{ child_pending_hw|length }}
+          </h3>
+          <span class="small text-muted">Assignments</span>
+        </div>
+        <div class="small mt-2" style="font-size:0.75rem;">
+          <span class="text-muted">Due this week</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Exam Evaluated Subjects -->
+    <div class="col-6 col-lg-3 reveal-up delay-3">
+      <div class="stat-card p-3 rounded-3" style="background:var(--card-bg);border:1px solid var(--card-border);">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="small fw-semibold text-muted text-uppercase" style="font-size:0.72rem;">Published Grades</span>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(124,58,237,0.12);display:flex;align-items:center;justify-content:center;color:#7c3aed;">
+            <i class="fa-solid fa-award"></i>
+          </div>
+        </div>
+        <div class="d-flex align-items-baseline gap-2">
+          <h3 class="fw-bold mb-0 text-primary" style="font-family:'Geist Mono',monospace;">{{ child_grades|length }}</h3>
+          <span class="small text-muted">Subjects on Record</span>
+        </div>
+        <div class="small mt-2" style="font-size:0.75rem;">
+          <a href="{% url 'examinations:report_card' active_child.pk %}" class="text-decoration-none">View Marksheet &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Ward Fee Balance -->
+    <div class="col-6 col-lg-3 reveal-up delay-4">
+      <div class="stat-card p-3 rounded-3" style="background:var(--card-bg);border:1px solid var(--card-border);">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="small fw-semibold text-muted text-uppercase" style="font-size:0.72rem;">Fee Balance Due</span>
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,0.12);display:flex;align-items:center;justify-content:center;color:#ef4444;">
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+          </div>
+        </div>
+        <div class="d-flex align-items-baseline gap-2">
+          <h3 class="fw-bold mb-0 {% if child_fee_balance > 0 %}text-danger{% else %}text-success{% endif %}" style="font-family:'Geist Mono',monospace;">
+            ₹{{ child_fee_balance }}
+          </h3>
+        </div>
+        <div class="small mt-2" style="font-size:0.75rem;">
+          {% if child_fee_balance > 0 %}
+            <span class="text-danger fw-semibold"><i class="fa-solid fa-circle-exclamation me-1"></i> Action Required</span>
+          {% else %}
+            <span class="text-success fw-semibold"><i class="fa-solid fa-circle-check me-1"></i> All Fees Paid</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid: Today's Classes & Fee Invoices -->
+  <div class="row g-4 mb-4">
+    <!-- Today's Classes for Ward -->
+    <div class="col-lg-6 reveal-up delay-1">
+      <div class="card-saas h-100 p-0">
+        <div class="card-saas-header p-3 border-bottom d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-2">
-            <div style="width:28px;height:28px;border-radius:8px;background:var(--danger-light);display:flex;align-items:center;justify-content:center;">
-              <i class="fa-solid fa-file-invoice-dollar" style="color:var(--danger);font-size:0.8rem;"></i>
+            <div style="width:30px;height:30px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;color:var(--primary);">
+              <i class="fa-solid fa-clock"></i>
             </div>
-            <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Outstanding Fees</span>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.92rem;">Ward's Daily Class Timetable</span>
+          </div>
+          <a href="{% url 'parents:ward_timetable' %}" class="small text-decoration-none text-primary fw-semibold">Weekly Schedule &rarr;</a>
+        </div>
+        <div class="card-saas-body p-0">
+          <table class="table-saas mb-0" style="font-size:0.85rem;">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Subject</th>
+                <th>Room</th>
+                <th>Teacher</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for slot in child_today_classes %}
+                <tr>
+                  <td>
+                    <span class="badge bg-primary-subtle text-primary font-monospace py-1 px-2">
+                      {{ slot.time_slot.start_time|time:"H:i" }}–{{ slot.time_slot.end_time|time:"H:i" }}
+                    </span>
+                  </td>
+                  <td class="fw-bold text-main">{{ slot.subject.name }}</td>
+                  <td class="text-muted small">{{ slot.room_number|default:"Room 101" }}</td>
+                  <td class="text-muted small">{{ slot.teacher.user.get_full_name|default:"Faculty" }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center py-5 text-muted">
+                    <i class="fa-regular fa-calendar-xmark mb-2 d-block" style="font-size:2rem;opacity:0.3;"></i>
+                    <span class="small">No classes scheduled for today.</span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Outstanding & Term Fees -->
+    <div class="col-lg-6 reveal-up delay-2">
+      <div class="card-saas h-100 p-0">
+        <div class="card-saas-header p-3 border-bottom d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:30px;height:30px;border-radius:8px;background:rgba(239,68,68,0.12);display:flex;align-items:center;justify-content:center;color:#ef4444;">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.92rem;">Ward Fee Invoices &amp; Receipts</span>
           </div>
         </div>
         <div class="card-saas-body p-0">
           <table class="table-saas mb-0" style="font-size:0.83rem;">
-            <thead><tr><th>Title</th><th>Due</th><th>Balance</th><th></th></tr></thead>
+            <thead>
+              <tr>
+                <th>Invoice Title</th>
+                <th>Due Date</th>
+                <th>Balance</th>
+                <th>Action</th>
+              </tr>
+            </thead>
             <tbody>
-              {% for inv in child_invoices %}
+              {% for inv in child_all_invoices|slice:":5" %}
                 <tr>
-                  <td class="fw-semibold" style="color:var(--text-main);">{{ inv.title }}</td>
-                  <td style="color:var(--text-muted);">{{ inv.due_date|date:"d M Y" }}</td>
-                  <td class="fw-bold" style="color:var(--danger);">₹{{ inv.balance_amount }}</td>
-                  <td><a href="{% url 'fees:invoice_detail' inv.pk %}" class="btn-saas-primary" style="padding:0.3rem 0.75rem;font-size:0.75rem;">Pay</a></td>
+                  <td>
+                    <div class="fw-bold text-main">{{ inv.title }}</div>
+                    <div class="text-muted small font-monospace">{{ inv.invoice_number }}</div>
+                  </td>
+                  <td class="text-muted small">{{ inv.due_date|date:"d M Y" }}</td>
+                  <td class="fw-bold font-monospace {% if inv.balance_amount > 0 %}text-danger{% else %}text-success{% endif %}">
+                    ₹{{ inv.balance_amount }}
+                  </td>
+                  <td>
+                    <a href="{% url 'fees:invoice_detail' inv.pk %}" class="btn btn-saas-primary btn-sm" style="padding:3px 10px;font-size:0.75rem;">
+                      <i class="fa-solid fa-receipt me-1"></i> Receipt
+                    </a>
+                  </td>
                 </tr>
               {% empty %}
-                <tr><td colspan="4" class="text-center py-5" style="color:var(--success);">
-                  <i class="fa-solid fa-circle-check mb-2 d-block" style="font-size:2rem;opacity:0.7;"></i>
-                  <span class="small fw-semibold">All fees paid!</span>
-                </td></tr>
+                <tr>
+                  <td colspan="4" class="text-center py-5 text-success">
+                    <i class="fa-solid fa-circle-check mb-2 d-block" style="font-size:2rem;opacity:0.7;"></i>
+                    <span class="small fw-semibold">All term fee invoices are settled in full!</span>
+                  </td>
+                </tr>
               {% endfor %}
             </tbody>
           </table>
@@ -121,31 +286,46 @@
     </div>
   </div>
 
-  <!-- Grades + Notices -->
-  <div class="row g-4">
+  <!-- Secondary Grid: Exam Scores & Ward Leave History -->
+  <div class="row g-4 mb-4">
+    <!-- Exam Scores -->
     <div class="col-lg-6 reveal-up delay-1">
-      <div class="card-saas h-100">
-        <div class="card-saas-header">
+      <div class="card-saas h-100 p-0">
+        <div class="card-saas-header p-3 border-bottom d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-2">
-            <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;">
-              <i class="fa-solid fa-award" style="color:var(--primary);font-size:0.8rem;"></i>
+            <div style="width:30px;height:30px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;color:var(--primary);">
+              <i class="fa-solid fa-award"></i>
             </div>
-            <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">Examination Marks</span>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.92rem;">Examination Performance</span>
           </div>
+          <a href="{% url 'examinations:report_card' active_child.pk %}" class="small text-decoration-none text-primary fw-semibold" target="_blank">
+            <i class="fa-solid fa-print me-1"></i> Official Report Card
+          </a>
         </div>
         <div class="card-saas-body p-0">
           <table class="table-saas mb-0" style="font-size:0.83rem;">
-            <thead><tr><th>Subject</th><th>Term</th><th>Score</th><th>Grade</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Term</th>
+                <th>Marks</th>
+                <th>Grade</th>
+              </tr>
+            </thead>
             <tbody>
               {% for grade in child_grades %}
                 <tr>
-                  <td class="fw-semibold" style="color:var(--text-main);">{{ grade.exam_schedule.subject.name }}</td>
-                  <td style="color:var(--text-muted);">{{ grade.exam_schedule.exam_term.name }}</td>
-                  <td class="fw-bold">{{ grade.total_marks_obtained }}/{{ grade.exam_schedule.total_max_marks }}</td>
-                  <td><span style="background:var(--primary-light);color:var(--primary);padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;">{{ grade.grade.grade_letter|default:"A" }}</span></td>
+                  <td class="fw-bold text-main">{{ grade.exam_schedule.subject.name }}</td>
+                  <td class="text-muted">{{ grade.exam_schedule.exam_term.name }}</td>
+                  <td class="fw-semibold font-monospace">{{ grade.marks_obtained }}/{{ grade.exam_schedule.total_max_marks }}</td>
+                  <td>
+                    <span class="badge bg-primary-subtle text-primary fw-bold">{{ grade.grade.grade_letter|default:"A" }}</span>
+                  </td>
                 </tr>
               {% empty %}
-                <tr><td colspan="4" class="text-center py-4" style="color:var(--text-muted);">No marks published.</td></tr>
+                <tr>
+                  <td colspan="4" class="text-center py-4 text-muted">No examination scores published yet.</td>
+                </tr>
               {% endfor %}
             </tbody>
           </table>
@@ -153,27 +333,43 @@
       </div>
     </div>
 
+    <!-- Ward Leave History & Apply Button -->
     <div class="col-lg-6 reveal-up delay-2">
-      <div class="card-saas h-100">
-        <div class="card-saas-header">
+      <div class="card-saas h-100 p-0">
+        <div class="card-saas-header p-3 border-bottom d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-2">
-            <div style="width:28px;height:28px;border-radius:8px;background:var(--info-light);display:flex;align-items:center;justify-content:center;">
-              <i class="fa-solid fa-bullhorn" style="color:var(--info);font-size:0.8rem;"></i>
+            <div style="width:30px;height:30px;border-radius:8px;background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;color:#f59e0b;">
+              <i class="fa-solid fa-plane-departure"></i>
             </div>
-            <span class="fw-bold" style="color:var(--text-main);font-size:0.9rem;">School Circulars</span>
+            <span class="fw-bold" style="color:var(--text-main);font-size:0.92rem;">Ward Leave Requests</span>
           </div>
+          <a href="{% url 'parents:ward_leave' %}" class="btn btn-warning btn-sm fw-bold px-3 py-1" style="font-size:0.78rem;">
+            <i class="fa-solid fa-plus me-1"></i> Apply for Leave
+          </a>
         </div>
         <div class="card-saas-body p-0">
-          {% for notice in parent_notices %}
-            <div style="padding:1rem 1.35rem;border-bottom:1px solid var(--card-border);transition:background 0.15s;"
-                 onmouseover="this.style.background='var(--table-hover)'" onmouseout="this.style.background=''">
-              <strong class="small d-block mb-1" style="color:var(--text-main);">{{ notice.title }}</strong>
-              <p class="mb-0 small" style="color:var(--text-muted);">{{ notice.content|truncatechars:100 }}</p>
+          {% for lv in child_recent_leaves %}
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color:var(--card-border) !important;">
+              <div>
+                <div class="fw-bold text-main small mb-1">{{ lv.leave_type.name }}</div>
+                <div class="text-muted small" style="font-size:0.78rem;">
+                  <i class="fa-regular fa-calendar me-1"></i> {{ lv.start_date|date:"d M Y" }} to {{ lv.end_date|date:"d M Y" }}
+                </div>
+              </div>
+              <div>
+                {% if lv.status == 'APPROVED' %}
+                  <span class="badge bg-success text-white">Approved</span>
+                {% elif lv.status == 'REJECTED' %}
+                  <span class="badge bg-danger text-white">Rejected</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">Pending Approval</span>
+                {% endif %}
+              </div>
             </div>
           {% empty %}
-            <div class="text-center py-5" style="color:var(--text-muted);">
-              <i class="fa-regular fa-bell-slash mb-2 d-block" style="font-size:2rem;opacity:0.3;"></i>
-              <span class="small">No announcements</span>
+            <div class="text-center py-5 text-muted small">
+              <i class="fa-solid fa-umbrella-beach mb-2 d-block" style="font-size:1.8rem;opacity:0.4;"></i>
+              No leave applications submitted for this academic term.
             </div>
           {% endfor %}
         </div>
@@ -182,10 +378,10 @@
   </div>
 
 {% else %}
-  <div class="card-saas p-5 text-center reveal-up" style="color:var(--text-muted);">
-    <i class="fa-solid fa-users-slash mb-3 d-block" style="font-size:3rem;opacity:0.3;"></i>
-    <h6 class="fw-bold mb-2" style="color:var(--text-main);">No Students Linked</h6>
-    <p class="small mb-0">No active students are currently linked to this guardian profile.</p>
+  <div class="card-saas p-5 text-center reveal-up">
+    <i class="fa-solid fa-child-reaching mb-3 text-muted" style="font-size:3rem;opacity:0.4;"></i>
+    <h5 class="fw-bold text-main">No Ward Profile Linked</h5>
+    <p class="text-muted small">Your parent guardian account does not currently have any student profiles linked. Please contact the school administration desk to link your child's student admission number.</p>
   </div>
 {% endif %}
 

@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from django.views import View
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, TemplateView
 from django.db.models import Q
 from django.contrib import messages
 from django.utils import timezone
@@ -366,3 +366,99 @@ class StudentExportView(AdminOrPrincipalRequiredMixin, View):
         if export_type == 'csv':
             return export_to_csv('student_directory', headers, rows)
         return export_to_excel('student_directory', 'Students', headers, rows)
+
+
+from core.permissions import StudentRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from timetable.models import ClassTimetable
+from attendance.models import StudentAttendanceRecord
+from fees.models import StudentFeeInvoice
+
+class StudentMyTimetableView(StudentRequiredMixin, TemplateView):
+    """
+    Dedicated view for a student to inspect their weekly class timetable matrix.
+    """
+    template_name = 'students/my_timetable.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student = getattr(self.request.user, 'student_profile', None)
+        enrollment = student.current_enrollment if student else None
+        timetable_by_day = {}
+        days = ClassTimetable.DayOfWeek.choices
+
+        if enrollment:
+            slots = ClassTimetable.objects.filter(
+                section=enrollment.section, is_deleted=False
+            ).select_related('time_slot', 'subject', 'teacher__user').order_by('day_of_week', 'time_slot__start_time')
+
+            for day_code, day_name in days:
+                day_slots = [s for s in slots if s.day_of_week == day_code]
+                if day_slots:
+                    timetable_by_day[day_name] = day_slots
+
+        context.update({
+            'student': student,
+            'enrollment': enrollment,
+            'timetable_by_day': timetable_by_day,
+            'page_title': 'My Weekly Class Schedule',
+        })
+        return context
+
+
+class StudentMyAttendanceView(StudentRequiredMixin, TemplateView):
+    """
+    Dedicated full-page attendance ledger and rate calculator for the student.
+    """
+    template_name = 'students/my_attendance.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student = getattr(self.request.user, 'student_profile', None)
+        enrollment = student.current_enrollment if student else None
+
+        records = StudentAttendanceRecord.objects.filter(
+            student_enrollment__student=student, is_deleted=False
+        ).select_related('sheet__section', 'sheet__academic_year').order_by('-sheet__date') if student else []
+
+
+        total_sessions = len(records)
+        present_count = sum(1 for r in records if r.status == StudentAttendanceRecord.Status.PRESENT)
+        absent_count = sum(1 for r in records if r.status == StudentAttendanceRecord.Status.ABSENT)
+        late_count = sum(1 for r in records if r.status == StudentAttendanceRecord.Status.LATE)
+        half_day_count = sum(1 for r in records if r.status == StudentAttendanceRecord.Status.HALF_DAY)
+
+        rate = round(((present_count + late_count + 0.5 * half_day_count) / total_sessions * 100), 1) if total_sessions > 0 else 100.0
+
+        context.update({
+            'student': student,
+            'enrollment': enrollment,
+            'records': records[:60],
+            'total_sessions': total_sessions,
+            'present_count': present_count,
+            'absent_count': absent_count,
+            'late_count': late_count,
+            'half_day_count': half_day_count,
+            'attendance_rate': rate,
+            'page_title': 'My Attendance History & Analytics',
+        })
+        return context
+
+
+class StudentIDCardView(LoginRequiredMixin, DetailView):
+    """
+    Printable PVC / A4 Identity Card view for a student.
+    Accessible by the student, their parents, and school administrators.
+    """
+    model = Student
+    template_name = 'students/student_id_card.html'
+    context_object_name = 'student'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        student = self.object
+        context['enrollment'] = student.current_enrollment
+        from core.models import SchoolSetting
+        context['school_setting'] = SchoolSetting.get_settings()
+        return context
+

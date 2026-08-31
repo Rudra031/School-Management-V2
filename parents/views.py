@@ -171,7 +171,13 @@ class ParentPortalView(ParentRequiredMixin, TemplateView):
 
 
 class ParentSwitchChildView(ParentRequiredMixin, View):
+    def get(self, request, child_id):
+        return self._switch(request, child_id)
+
     def post(self, request, child_id):
+        return self._switch(request, child_id)
+
+    def _switch(self, request, child_id):
         parent_profile = getattr(request.user, 'parent_profile', None)
         if parent_profile:
             # Verify child is actually linked to this parent (Object-Level Authorization Check)
@@ -182,4 +188,116 @@ class ParentSwitchChildView(ParentRequiredMixin, View):
                 messages.success(request, f"Switched view to {child.full_name if child else 'child'}.")
             else:
                 messages.error(request, "Unauthorized child selection.")
+        
+        # Redirect back to referring page or parent dashboard
+        next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or 'accounts:parent_dashboard'
+        if next_url.startswith('/'):
+            return redirect(next_url)
         return redirect('accounts:parent_dashboard')
+
+
+from parents.forms import ParentWardLeaveForm
+from leave.models import LeaveRequest
+from timetable.models import ClassTimetable
+from fees.models import StudentFeeInvoice, StudentFeePayment
+from students.models import StudentEnrollment
+
+class ParentWardLeaveCreateView(ParentRequiredMixin, CreateView):
+    """
+    Allow parents to submit leave applications on behalf of their active ward.
+    """
+    model = LeaveRequest
+    form_class = ParentWardLeaveForm
+    template_name = 'parents/ward_leave_form.html'
+    success_url = reverse_lazy('accounts:parent_dashboard')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        parent_profile = getattr(self.request.user, 'parent_profile', None)
+        children = parent_profile.children if parent_profile else []
+        active_child = None
+        if children:
+            child_id = self.request.session.get('active_child_id')
+            if child_id:
+                active_child = next((c for c in children if str(c.id) == str(child_id)), children[0])
+            else:
+                active_child = children[0]
+        context['active_child'] = active_child
+        context['children'] = children
+        context['recent_leaves'] = LeaveRequest.objects.filter(
+            user=active_child.user if (active_child and active_child.user) else self.request.user,
+            is_deleted=False
+        ).order_by('-applied_at')[:5] if active_child else []
+        return context
+
+    def form_valid(self, form):
+        parent_profile = getattr(self.request.user, 'parent_profile', None)
+        children = parent_profile.children if parent_profile else []
+        active_child = None
+        if children:
+            child_id = self.request.session.get('active_child_id')
+            if child_id:
+                active_child = next((c for c in children if str(c.id) == str(child_id)), children[0])
+            else:
+                active_child = children[0]
+
+        leave = form.save(commit=False)
+        # Assign to student's user account if exists, else parent user
+        leave.user = active_child.user if (active_child and active_child.user) else self.request.user
+        leave.reason = f"[Submitted by Parent {self.request.user.get_full_name()} for {active_child.full_name if active_child else 'Ward'}]: {leave.reason}"
+        leave.save()
+
+        messages.success(self.request, f"Leave application for {active_child.full_name if active_child else 'your ward'} submitted successfully.")
+        log_audit(
+            self.request,
+            action=AuditLog.Action.CREATE,
+            module='Leaves',
+            model_name='LeaveRequest',
+            object_id=str(leave.id),
+            object_repr=f"Parent Leave for {active_child.full_name if active_child else 'Ward'}"
+        )
+        return redirect(self.success_url)
+
+
+class ParentChildTimetableView(ParentRequiredMixin, TemplateView):
+    """
+    Weekly timetable view of the parent's currently active ward.
+    """
+    template_name = 'parents/ward_timetable.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        parent_profile = getattr(self.request.user, 'parent_profile', None)
+        children = parent_profile.children if parent_profile else []
+        active_child = None
+        if children:
+            child_id = self.request.session.get('active_child_id')
+            if child_id:
+                active_child = next((c for c in children if str(c.id) == str(child_id)), children[0])
+            else:
+                active_child = children[0]
+
+        enrollment = None
+        timetable_by_day = {}
+        days = ClassTimetable.DayOfWeek.choices
+
+        if active_child:
+            enrollment = StudentEnrollment.objects.filter(student=active_child, is_current=True).select_related('section__class_level').first()
+            if enrollment:
+                slots = ClassTimetable.objects.filter(
+                    section=enrollment.section, is_deleted=False
+                ).select_related('time_slot', 'subject', 'teacher__user').order_by('day_of_week', 'time_slot__start_time')
+                
+                for day_code, day_name in days:
+                    day_slots = [s for s in slots if s.day_of_week == day_code]
+                    if day_slots:
+                        timetable_by_day[day_name] = day_slots
+
+        context.update({
+            'active_child': active_child,
+            'children': children,
+            'enrollment': enrollment,
+            'timetable_by_day': timetable_by_day,
+        })
+        return context
+

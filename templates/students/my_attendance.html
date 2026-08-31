@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}My Attendance Record | Horizon SMS{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-1" style="font-size:0.78rem;">
+        <li class="breadcrumb-item"><a href="{% url 'accounts:student_dashboard' %}">Student Portal</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Attendance Analytics</li>
+      </ol>
+    </nav>
+    <div class="d-flex align-items-center gap-2">
+      <h4 class="fw-bold mb-0 text-main">My Academic Attendance Ledger</h4>
+      <span class="badge bg-success-subtle text-success font-monospace">{{ attendance_rate }}% Overall Rate</span>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button onclick="window.print()" class="btn btn-saas-primary btn-sm">
+      <i class="fa-solid fa-print me-1"></i> Print Attendance Report
+    </button>
+    <a href="{% url 'accounts:student_dashboard' %}" class="btn btn-saas-secondary btn-sm">
+      <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+    </a>
+  </div>
+</div>
+
+<!-- Attendance KPI Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card-saas p-3 text-center">
+      <span class="text-muted small fw-semibold text-uppercase" style="font-size:0.72rem;">Total Days Recorded</span>
+      <h3 class="fw-bold mb-0 text-primary font-monospace mt-1">{{ total_sessions }}</h3>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card-saas p-3 text-center">
+      <span class="text-muted small fw-semibold text-uppercase" style="font-size:0.72rem;">Present Days</span>
+      <h3 class="fw-bold mb-0 text-success font-monospace mt-1">{{ present_count }}</h3>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card-saas p-3 text-center">
+      <span class="text-muted small fw-semibold text-uppercase" style="font-size:0.72rem;">Late / Half-Day</span>
+      <h3 class="fw-bold mb-0 text-warning font-monospace mt-1">{{ late_count|add:half_day_count }}</h3>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card-saas p-3 text-center">
+      <span class="text-muted small fw-semibold text-uppercase" style="font-size:0.72rem;">Absent Days</span>
+      <h3 class="fw-bold mb-0 text-danger font-monospace mt-1">{{ absent_count }}</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Attendance Detailed Table -->
+<div class="card-saas p-0 reveal-up">
+  <div class="card-saas-header p-3 border-bottom d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <i class="fa-solid fa-calendar-check text-primary"></i>
+      <span class="fw-bold text-main small">Daily Attendance History Matrix</span>
+    </div>
+    <span class="text-muted small">Showing recent {{ records|length }} entries</span>
+  </div>
+  <div class="card-saas-body p-0">
+    <table class="table-saas mb-0" style="font-size:0.85rem;">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Day</th>
+          <th>Class &amp; Section</th>
+          <th>Status</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+          <tr>
+            <td class="fw-bold text-main font-monospace">{{ r.sheet.date|date:"d M Y" }}</td>
+            <td class="text-muted">{{ r.sheet.date|date:"l" }}</td>
+            <td class="text-muted">{{ r.sheet.section.full_name }}</td>
+            <td>
+              {% if r.status == 'PRESENT' %}
+                <span class="badge bg-success text-white px-2 py-1"><i class="fa-solid fa-check me-1"></i> Present</span>
+              {% elif r.status == 'LATE' %}
+                <span class="badge bg-warning text-dark px-2 py-1"><i class="fa-solid fa-clock me-1"></i> Late</span>
+              {% elif r.status == 'HALF_DAY' %}
+                <span class="badge bg-info text-dark px-2 py-1"><i class="fa-solid fa-hourglass-half me-1"></i> Half-Day</span>
+              {% else %}
+                <span class="badge bg-danger text-white px-2 py-1"><i class="fa-solid fa-xmark me-1"></i> Absent</span>
+              {% endif %}
+            </td>
+            <td class="text-muted small">{{ r.remarks|default:"Regular Attendance" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" class="text-center py-5 text-muted">No attendance logs found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

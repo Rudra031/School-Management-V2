@@ -12,4 +12,8 @@ urlpatterns = [
     path('<uuid:pk>/edit/', views.StudentUpdateView.as_view(), name='student_edit'),
     path('<uuid:pk>/health/', views.StudentHealthView.as_view(), name='student_health'),
     path('<uuid:pk>/health/incident/', views.StudentMedicalIncidentCreateView.as_view(), name='incident_create'),
+    path('my-timetable/', views.StudentMyTimetableView.as_view(), name='my_timetable'),
+    path('my-attendance/', views.StudentMyAttendanceView.as_view(), name='my_attendance'),
+    path('id-card/<uuid:pk>/', views.StudentIDCardView.as_view(), name='id_card'),
 ]
+

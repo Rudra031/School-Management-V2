@@ -220,3 +220,56 @@ Administrators have access to **Settings** organized into 11 tabs:
    - The software unlocks instantly with your commercial license.
 
 > **Important**: Each key is a **1-time cryptographic key**. Once expired, contact your software vendor for a fresh renewal code.
+
+---
+
+## 12. Student Learning & Academic Portal
+
+The Student Portal (`/dashboard/student/`) is tailored for self-guided student learning:
+
+```text
++---------------------------------------------------------------------------+
+| 🎓 STUDENT ACADEMIC PORTAL — Peter Parker (Grade 9-A)                     |
+| Roll No: 12 • Admission No: ADM-2026-0099 • Blood Group: O+               |
+|                                                                           |
+| [ 🪪 Digital ID Card ] [ 📅 Full Timetable ] [ 📄 Admit Card ] [ 📑 Marksheet ]
+|                                                                           |
+| 🟢 Attendance Rate: 96.4%     📝 Pending Homework: 2 Due                  |
+| 🏆 Graded Subjects: 6         💰 Fee Balance: ₹0.00 (Cleared)             |
++---------------------------------------------------------------------------+
+```
+
+### Key Student Capabilities:
+1. **Live Daily Timetable**: Displays current day's periods with start/end time, subject, room number, and teacher.
+2. **Weekly Timetable Matrix** (`/students/my-timetable/`): Full weekly calendar view with one-click print function.
+3. **Homework Submission**: View pending assignments, download teacher attachments, and upload completed PDF homework files.
+4. **Attendance History Matrix** (`/students/my-attendance/`): Detailed breakdown of daily attendance records, with % calculation.
+5. **Printable Digital ID Card** (`/students/id-card/<id>/`): High-resolution standard CR80 PVC identity badge with institutional branding, photo, barcode, and principal signature block.
+6. **Academic Reports & Marksheets**: Download term report cards and exam admit cards directly.
+
+---
+
+## 13. Parent & Guardian Monitoring Hub
+
+The Parent Portal (`/dashboard/parent/`) provides multi-ward academic oversight:
+
+```text
++---------------------------------------------------------------------------+
+| 👨‍👩‍👧 PARENT & GUARDIAN MONITORING HUB — David Vance                      |
+| Active Ward: [ 🎓 Lucas Vance (Grade 9-A) ▾ ]  <-- Multi-Child Switcher   |
+|                                                                           |
+| [ ✈️ Apply for Leave ] [ 📅 Ward Timetable ] [ 📄 Admit Card ] [ 📑 Marksheet ]
+|                                                                           |
+| 🟢 Ward Attendance: 98.2%     📝 Pending Homework: 1 Due                  |
+| 🏆 Evaluated Subjects: 5      💰 Fee Balance Due: ₹4,500.00               |
++---------------------------------------------------------------------------+
+```
+
+### Key Parent Capabilities:
+1. **Multi-Child Switcher**: Parents with multiple enrolled children can switch active wards instantly using the dropdown chip. The selection synchronizes across all tabs.
+2. **Ward Attendance & Progress**: Real-time attendance rate calculated from official class registers.
+3. **Fee Ledger & Payment Receipts**: Full breakdown of invoiced tuition, paid sums, balance due, and printable fee receipts.
+4. **Ward Timetable** (`/parents/ward-timetable/`): Weekly period schedule of the child's class.
+5. **Ward Leave Applications** (`/parents/apply-leave/`): Parents can apply for medical or emergency leaves for their ward, attaching doctor certificates and doctor notes.
+6. **Exam Results**: Direct access to ward's term examination results and official school marksheets.
+

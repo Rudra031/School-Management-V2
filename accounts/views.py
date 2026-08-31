@@ -855,9 +855,25 @@ class StudentDashboardView(StudentRequiredMixin, TemplateView):
         enrollment = None
         today_classes = []
         pending_assignments = []
+        submitted_assignments = []
         recent_grades = []
+        upcoming_exams = []
         unpaid_invoices = []
-        attendance_pct = 95.0
+        all_invoices = []
+        active_book_loans = []
+        recent_attendance_records = []
+        recent_leaves = []
+        
+        attendance_pct = 100.0
+        total_attendance_days = 0
+        present_days = 0
+        absent_days = 0
+        late_days = 0
+        half_days = 0
+        
+        total_fee_billed = Decimal('0.00')
+        total_fee_paid = Decimal('0.00')
+        total_fee_balance = Decimal('0.00')
 
         if student:
             enrollment = StudentEnrollment.objects.filter(student=student, is_current=True).select_related('section__class_level', 'academic_year').first()
@@ -865,23 +881,73 @@ class StudentDashboardView(StudentRequiredMixin, TemplateView):
                 iso_day = timezone.now().isoweekday()
                 if iso_day in [6, 7]:
                     iso_day = 1
-                today_name = ClassTimetable.DayOfWeek(iso_day).label
 
                 today_classes = ClassTimetable.objects.filter(
                     section=enrollment.section, day_of_week=iso_day, is_deleted=False
                 ).select_related('time_slot', 'subject', 'teacher__user').order_by('time_slot__start_time')
 
+                submitted_hw_ids = AssignmentSubmission.objects.filter(
+                    student_enrollment__student=student, is_deleted=False
+                ).values_list('assignment_id', flat=True)
+
                 pending_assignments = Assignment.objects.filter(
                     section=enrollment.section, is_deleted=False
-                ).exclude(submissions__student=student)[:5]
+                ).exclude(id__in=submitted_hw_ids).select_related('subject').order_by('due_date')[:6]
 
-                unpaid_invoices = StudentFeeInvoice.objects.filter(
-                    student_enrollment=enrollment, status__in=[StudentFeeInvoice.Status.UNPAID, StudentFeeInvoice.Status.PARTIAL]
-                )
+                submitted_assignments = AssignmentSubmission.objects.filter(
+                    student_enrollment__student=student, is_deleted=False
+                ).select_related('assignment__subject', 'assignment').order_by('-submitted_at')[:5]
+
+                all_invoices = StudentFeeInvoice.objects.filter(
+                    student_enrollment=enrollment, is_deleted=False
+                ).order_by('-due_date')
+
+
+                unpaid_invoices = all_invoices.filter(status__in=[StudentFeeInvoice.Status.UNPAID, StudentFeeInvoice.Status.PARTIAL])
+                
+                total_fee_billed = all_invoices.aggregate(Sum('total_amount'))['total_amount__sum'] or Decimal('0.00')
+                total_fee_paid = all_invoices.aggregate(Sum('paid_amount'))['paid_amount__sum'] or Decimal('0.00')
+                total_fee_balance = all_invoices.aggregate(Sum('balance_amount'))['balance_amount__sum'] or Decimal('0.00')
+
+                upcoming_exams = ExamSchedule.objects.filter(
+                    class_level=enrollment.section.class_level,
+                    exam_date__gte=timezone.now().date(),
+                    is_deleted=False
+                ).select_related('subject', 'exam_term').order_by('exam_date')[:4]
+
+            # Attendance Stats from actual records
+            att_records = StudentAttendanceRecord.objects.filter(
+                student_enrollment__student=student, is_deleted=False
+            ).select_related('sheet').order_by('-sheet__date')
+
+            
+            total_attendance_days = att_records.count()
+            if total_attendance_days > 0:
+                present_days = att_records.filter(status=StudentAttendanceRecord.Status.PRESENT).count()
+                late_days = att_records.filter(status=StudentAttendanceRecord.Status.LATE).count()
+                half_days = att_records.filter(status=StudentAttendanceRecord.Status.HALF_DAY).count()
+                absent_days = att_records.filter(status=StudentAttendanceRecord.Status.ABSENT).count()
+                attendance_pct = round(((present_days + late_days + 0.5 * half_days) / total_attendance_days * 100), 1)
+            else:
+                attendance_pct = 100.0
+
+            recent_attendance_records = att_records[:7]
 
             recent_grades = ExamMarkEntry.objects.filter(
                 student_enrollment__student=student, is_deleted=False
-            ).select_related('exam_schedule__subject', 'exam_schedule__exam_term', 'grade')[:5]
+            ).select_related('exam_schedule__subject', 'exam_schedule__exam_term', 'grade').order_by('-exam_schedule__exam_date')[:6]
+
+            active_book_loans = BookCirculation.objects.filter(
+                user=student.user if student.user else None,
+                status=BookCirculation.Status.BORROWED,
+                is_deleted=False
+            ).select_related('book').order_by('due_date')[:4] if student.user else []
+
+            from leave.models import LeaveRequest
+            recent_leaves = LeaveRequest.objects.filter(
+                user=student.user if student.user else None,
+                is_deleted=False
+            ).select_related('leave_type').order_by('-applied_at')[:4] if student.user else []
 
         context.update({
             'page_title': 'Student Academic Portal',
@@ -889,12 +955,26 @@ class StudentDashboardView(StudentRequiredMixin, TemplateView):
             'enrollment': enrollment,
             'today_classes': today_classes,
             'pending_assignments': pending_assignments,
+            'submitted_assignments': submitted_assignments,
             'recent_grades': recent_grades,
+            'upcoming_exams': upcoming_exams,
             'unpaid_invoices': unpaid_invoices,
+            'all_invoices': all_invoices,
+            'total_fee_billed': total_fee_billed,
+            'total_fee_paid': total_fee_paid,
+            'total_fee_balance': total_fee_balance,
             'attendance_pct': attendance_pct,
+            'total_attendance_days': total_attendance_days,
+            'present_days': present_days,
+            'absent_days': absent_days,
+            'late_days': late_days,
+            'half_days': half_days,
+            'recent_attendance_records': recent_attendance_records,
+            'active_book_loans': active_book_loans,
+            'recent_leaves': recent_leaves,
             'student_notices': Notice.objects.filter(
                 is_published=True, target_audience__in=[Notice.Audience.ALL, Notice.Audience.STUDENTS], is_deleted=False
-            )[:5],
+            ).order_by('-published_at', '-created_at')[:5],
         })
         return context
 
@@ -918,30 +998,112 @@ class ParentDashboardView(ParentRequiredMixin, TemplateView):
 
         child_enrollment = None
         child_invoices = []
+        child_all_invoices = []
         child_grades = []
+        child_today_classes = []
+        child_pending_hw = []
+        child_recent_leaves = []
+        child_upcoming_exams = []
+        
+        child_attendance_pct = 100.0
+        child_total_days = 0
+        child_present_days = 0
+        child_absent_days = 0
+        child_late_days = 0
+        
+        child_fee_billed = Decimal('0.00')
+        child_fee_paid = Decimal('0.00')
+        child_fee_balance = Decimal('0.00')
+
         if active_child:
-            child_enrollment = StudentEnrollment.objects.filter(student=active_child, is_current=True).select_related('section__class_level').first()
+            child_enrollment = StudentEnrollment.objects.filter(student=active_child, is_current=True).select_related('section__class_level', 'academic_year').first()
             if child_enrollment:
-                child_invoices = StudentFeeInvoice.objects.filter(
-                    student_enrollment=child_enrollment, status__in=[StudentFeeInvoice.Status.UNPAID, StudentFeeInvoice.Status.PARTIAL]
-                )
+                iso_day = timezone.now().isoweekday()
+                if iso_day in [6, 7]:
+                    iso_day = 1
+                child_today_classes = ClassTimetable.objects.filter(
+                    section=child_enrollment.section, day_of_week=iso_day, is_deleted=False
+                ).select_related('time_slot', 'subject', 'teacher__user').order_by('time_slot__start_time')
+
+                child_all_invoices = StudentFeeInvoice.objects.filter(
+                    student_enrollment=child_enrollment, is_deleted=False
+                ).order_by('-due_date')
+                
+                child_invoices = child_all_invoices.filter(status__in=[StudentFeeInvoice.Status.UNPAID, StudentFeeInvoice.Status.PARTIAL])
+                
+                child_fee_billed = child_all_invoices.aggregate(Sum('total_amount'))['total_amount__sum'] or Decimal('0.00')
+                child_fee_paid = child_all_invoices.aggregate(Sum('paid_amount'))['paid_amount__sum'] or Decimal('0.00')
+                child_fee_balance = child_all_invoices.aggregate(Sum('balance_amount'))['balance_amount__sum'] or Decimal('0.00')
+
+                child_submitted_ids = AssignmentSubmission.objects.filter(
+                    student_enrollment__student=active_child, is_deleted=False
+                ).values_list('assignment_id', flat=True)
+
+                child_pending_hw = Assignment.objects.filter(
+                    section=child_enrollment.section, is_deleted=False
+                ).exclude(id__in=child_submitted_ids).select_related('subject').order_by('due_date')[:5]
+
+                child_upcoming_exams = ExamSchedule.objects.filter(
+                    class_level=child_enrollment.section.class_level,
+                    exam_date__gte=timezone.now().date(),
+                    is_deleted=False
+                ).select_related('subject', 'exam_term').order_by('exam_date')[:4]
+
+
+            # Dynamic Attendance Rate for Child
+            att_records = StudentAttendanceRecord.objects.filter(
+                student_enrollment__student=active_child, is_deleted=False
+            ).select_related('sheet').order_by('-sheet__date')
+
+            
+            child_total_days = att_records.count()
+            if child_total_days > 0:
+                child_present_days = att_records.filter(status=StudentAttendanceRecord.Status.PRESENT).count()
+                child_late_days = att_records.filter(status=StudentAttendanceRecord.Status.LATE).count()
+                child_absent_days = att_records.filter(status=StudentAttendanceRecord.Status.ABSENT).count()
+                half_d = att_records.filter(status=StudentAttendanceRecord.Status.HALF_DAY).count()
+                child_attendance_pct = round(((child_present_days + child_late_days + 0.5 * half_d) / child_total_days * 100), 1)
+            else:
+                child_attendance_pct = 100.0
+
             child_grades = ExamMarkEntry.objects.filter(
                 student_enrollment__student=active_child, is_deleted=False
-            ).select_related('exam_schedule__subject', 'exam_schedule__exam_term', 'grade')[:5]
+            ).select_related('exam_schedule__subject', 'exam_schedule__exam_term', 'grade').order_by('-exam_schedule__exam_date')[:6]
+
+            from leave.models import LeaveRequest
+            child_leave_user = active_child.user if active_child.user else user
+            child_recent_leaves = LeaveRequest.objects.filter(
+                Q(user=child_leave_user) | Q(reason__icontains=active_child.first_name),
+                is_deleted=False
+            ).select_related('leave_type').order_by('-applied_at')[:4]
 
         context.update({
-            'page_title': 'Parent & Guardian Portal',
+            'page_title': 'Parent & Guardian Monitoring Hub',
             'parent': parent,
             'children': children,
             'active_child': active_child,
             'child_enrollment': child_enrollment,
             'child_invoices': child_invoices,
+            'child_all_invoices': child_all_invoices,
+            'child_fee_billed': child_fee_billed,
+            'child_fee_paid': child_fee_paid,
+            'child_fee_balance': child_fee_balance,
             'child_grades': child_grades,
+            'child_today_classes': child_today_classes,
+            'child_pending_hw': child_pending_hw,
+            'child_upcoming_exams': child_upcoming_exams,
+            'child_attendance_pct': child_attendance_pct,
+            'child_total_days': child_total_days,
+            'child_present_days': child_present_days,
+            'child_absent_days': child_absent_days,
+            'child_late_days': child_late_days,
+            'child_recent_leaves': child_recent_leaves,
             'parent_notices': Notice.objects.filter(
                 is_published=True, target_audience__in=[Notice.Audience.ALL, Notice.Audience.PARENTS], is_deleted=False
-            )[:5],
+            ).order_by('-published_at', '-created_at')[:5],
         })
         return context
+
 
 
 class StaffDashboardView(StaffRequiredMixin, TemplateView):

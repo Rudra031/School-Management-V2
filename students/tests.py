@@ -129,3 +129,54 @@ class StudentsTestCase(TestCase):
         self.client.login(email='teacher@school.edu', password=self.password)
         resp = self.client.get(reverse('students:student_health', kwargs={'pk': student.pk}))
         self.assertEqual(resp.status_code, 403)
+
+    def test_student_portal_views_access(self):
+        """Verify student user can access their timetable, attendance history, and digital ID card"""
+        student_user = User.objects.create_user(
+            email='peter.parker@school.edu', password=self.password, first_name='Peter', last_name='Parker', user_type=UserRole.STUDENT
+        )
+        student = Student.objects.create(
+            user=student_user,
+            admission_number='ADM-2026-0099',
+            student_id='STU-1099',
+            first_name='Peter',
+            last_name='Parker',
+            gender='MALE',
+            date_of_birth='2010-08-10',
+            admission_date=timezone.now().date(),
+            residential_address='20 Ingram St, Queens',
+            emergency_contact_name='May Parker',
+            emergency_contact_phone='+1-555-999-0000',
+            emergency_contact_relation='Aunt'
+        )
+        StudentEnrollment.objects.create(
+            student=student,
+            academic_year=self.year1,
+            section=self.sec_9a,
+            roll_number=1,
+            is_current=True
+        )
+
+        self.client.login(email='peter.parker@school.edu', password=self.password)
+
+        # 1. Student Dashboard
+        resp_dash = self.client.get(reverse('accounts:student_dashboard'))
+        self.assertEqual(resp_dash.status_code, 200)
+        self.assertContains(resp_dash, "Peter Parker")
+
+        # 2. My Timetable
+        resp_tt = self.client.get(reverse('students:my_timetable'))
+        self.assertEqual(resp_tt.status_code, 200)
+        self.assertContains(resp_tt, "My Weekly Academic Timetable")
+
+        # 3. My Attendance
+        resp_att = self.client.get(reverse('students:my_attendance'))
+        self.assertEqual(resp_att.status_code, 200)
+        self.assertContains(resp_att, "My Academic Attendance Ledger")
+
+        # 4. Digital ID Card
+        resp_id = self.client.get(reverse('students:id_card', kwargs={'pk': student.pk}))
+        self.assertEqual(resp_id.status_code, 200)
+        self.assertContains(resp_id, "Peter Parker")
+        self.assertContains(resp_id, "STUDENT PASS")
+

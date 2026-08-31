@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for Ward Leave | Horizon SMS{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center py-3">
+  <div class="col-lg-8">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-1" style="font-size:0.78rem;">
+            <li class="breadcrumb-item"><a href="{% url 'accounts:parent_dashboard' %}">Parent Portal</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Apply for Ward Leave</li>
+          </ol>
+        </nav>
+        <h4 class="fw-bold mb-0 text-main">Apply for Ward Leave Application</h4>
+      </div>
+      <a href="{% url 'accounts:parent_dashboard' %}" class="btn btn-saas-secondary btn-sm">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Portal
+      </a>
+    </div>
+
+    <!-- Active Ward Banner -->
+    {% if active_child %}
+      <div class="card p-3 mb-4 rounded-3 border-0" style="background:linear-gradient(135deg,rgba(124,58,237,0.08) 0%,rgba(6,182,212,0.08) 100%);border:1px dashed rgba(124,58,237,0.3) !important;">
+        <div class="d-flex align-items-center gap-3">
+          <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem;">
+            {{ active_child.full_name|first }}
+          </div>
+          <div>
+            <div class="fw-bold text-main" style="font-size:0.95rem;">Applying Leave for: {{ active_child.full_name }}</div>
+            <div class="text-muted small">Admission No: {{ active_child.admission_number }} &bull; {{ active_child.current_class_section|default:"Student" }}</div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Leave Application Form Card -->
+    <div class="card-saas p-4 mb-4">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="row g-3">
+          <div class="col-md-12">
+            <label class="form-label small fw-bold text-muted">Category / Leave Type <span class="text-danger">*</span></label>
+            {{ form.leave_type }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">Start Date <span class="text-danger">*</span></label>
+            {{ form.start_date }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted">End Date <span class="text-danger">*</span></label>
+            {{ form.end_date }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label small fw-bold text-muted">Reason for Absence <span class="text-danger">*</span></label>
+            {{ form.reason }}
+            <span class="text-muted small d-block mt-1">Please provide sufficient detail for class teacher and principal review.</span>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label small fw-bold text-muted">Supporting Document / Doctor's Certificate (Optional)</label>
+            {{ form.attachment }}
+            <span class="text-muted small d-block mt-1">Accepted formats: PDF, JPG, PNG (Max 5 MB).</span>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-secondary border-opacity-10">
+          <a href="{% url 'accounts:parent_dashboard' %}" class="btn btn-outline-secondary btn-sm px-3">Cancel</a>
+          <button type="submit" class="btn btn-saas-primary btn-sm px-4 fw-bold">
+            <i class="fa-solid fa-paper-plane me-1"></i> Submit Leave Request
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Recent Leave Requests History -->
+    {% if recent_leaves %}
+      <div class="card-saas p-0">
+        <div class="card-saas-header p-3 border-bottom">
+          <span class="fw-bold text-main small">Recent Leave Applications for {{ active_child.full_name }}</span>
+        </div>
+        <div class="card-saas-body p-0">
+          <table class="table-saas mb-0" style="font-size:0.83rem;">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Dates</th>
+                <th>Status</th>
+                <th>Applied On</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for lv in recent_leaves %}
+                <tr>
+                  <td class="fw-bold text-main">{{ lv.leave_type.name }}</td>
+                  <td class="text-muted">{{ lv.start_date|date:"d M Y" }} to {{ lv.end_date|date:"d M Y" }}</td>
+                  <td>
+                    {% if lv.status == 'APPROVED' %}
+                      <span class="badge bg-success text-white">Approved</span>
+                    {% elif lv.status == 'REJECTED' %}
+                      <span class="badge bg-danger text-white">Rejected</span>
+                    {% else %}
+                      <span class="badge bg-warning text-dark">Pending</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-muted small font-monospace">{{ lv.applied_at|date:"d M Y, H:i" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

@@ -100,3 +100,31 @@ class ParentsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(ParentStudent.objects.filter(parent=self.parent_profile, student=self.child1).exists())
         self.assertNotIn(self.child1, self.parent_profile.children)
+
+    def test_parent_apply_ward_leave(self):
+        """Verify parent can apply for leave for their active ward"""
+        from leave.models import LeaveType, LeaveRequest
+        leave_type = LeaveType.objects.create(name='Medical Leave', allocated_days_per_year=10)
+
+        self.client.login(email='david.vance@example.com', password=self.password)
+
+        today = timezone.now().date()
+        resp = self.client.post(reverse('parents:ward_leave'), {
+            'leave_type': str(leave_type.id),
+            'start_date': str(today),
+            'end_date': str(today),
+            'reason': 'Viral fever and doctor checkup.'
+        }, follow=True)
+
+        self.assertEqual(resp.status_code, 200)
+        leave = LeaveRequest.objects.filter(leave_type=leave_type).first()
+        self.assertIsNotNone(leave)
+        self.assertIn('Lucas', leave.reason)
+
+    def test_parent_ward_timetable_view(self):
+        """Verify parent can view timetable for their child"""
+        self.client.login(email='david.vance@example.com', password=self.password)
+        resp = self.client.get(reverse('parents:ward_timetable'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Lucas Vance's Weekly Class Timetable")
+

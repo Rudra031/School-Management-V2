@@ -79,3 +79,22 @@ class ParentStudentLinkForm(forms.ModelForm):
             'is_primary_contact': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'can_pickup_child': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+
+from leave.models import LeaveType, LeaveRequest
+
+class ParentWardLeaveForm(forms.ModelForm):
+    """
+    Form for parents to submit leave applications on behalf of their ward/child.
+    """
+    class Meta:
+        model = LeaveRequest
+        fields = ['leave_type', 'start_date', 'end_date', 'reason', 'attachment']
+        widgets = {
+            'leave_type': forms.Select(attrs={'class': 'form-select'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'reason': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Provide specific reason for absence (e.g. fever, family bereavement, medical appointment)...'}),
+            'attachment': forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.jpg,.jpeg,.png'}),
+        }
+
